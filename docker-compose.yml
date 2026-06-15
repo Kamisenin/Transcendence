@@ -1,0 +1,12 @@
+networks:
+  trans:
+    name: trans
+    driver: bridge
+
+services:
+  nginx:
+    build: srcs/nginx/
+    container_name: "nginx"
+    restart: unless-stopped
+    networks:
+      - trans
