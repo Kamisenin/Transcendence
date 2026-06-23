@@ -18,11 +18,14 @@ check_var() {
     fi
 }
 
-check_var "DB_ROOT_PASSWD" "$DB_ROOT_PASSWD"
 
-check_var "DB_NAME" "$WP_DB_NAME"
-check_var "DB_USER" "$WP_DB_USER"
-check_var "DB_USER_PASSWD" "$WP_DB_USER_PASSWD"
+DB_ROOT_PASSWD=$(cat /run/secrets/db_root_pwd)
+DB_USERS_PASSWD=$(cat /run/secrets/db_users_pwd)
+DB_WEBSITE_PASSWD=$(cat /run/secrets/db_website_pwd)
+
+check_var "DB_ROOT_PASSWD" "$DB_ROOT_PASSWD"
+check_var "DB_USERS_PASSWD" "$DB_USERS_PASSWD"
+check_var "DB_WEBSITE_PASSWD" "DB_WEBSITE_PASSWD"
 
 
 if [ -f "/var/lib/mysql/mysql/init_manifesto" ]; then
@@ -35,9 +38,13 @@ else
         ALTER USER 'root'@'localhost' IDENTIFIED BY '$DB_ROOT_PASSWD';
         FLUSH PRIVILEGES;
 
-        CREATE DATABASE IF NOT EXISTS \`${WP_DB_NAME}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-        CREATE USER IF NOT EXISTS '${WP_DB_USER}'@'%' IDENTIFIED BY '${WP_DB_USER_PASSWD}';
-        GRANT ALL PRIVILEGES ON \`${WP_DB_NAME}\`.* TO '${WP_DB_USER}'@'%';
+        CREATE DATABASE IF NOT EXISTS \`USERS\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+        CREATE USER IF NOT EXISTS 'user_db_admin' @'%' IDENTIFIED BY '${DB_USERS_PASSWD}';
+        GRANT ALL PRIVILEGES ON \`USERS\`.* TO 'user_db_admin'@'%';
+
+        CREATE DATABASE IF NOT EXISTS \`WEBSITE\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+        CREATE USER IF NOT EXISTS 'website_db_admin' @'%' IDENTIFIED BY '${DB_WEBSITE_PASSWD}';
+        GRANT ALL PRIVILEGES ON \`WEBSITE\`.* TO 'website_db_admin'@'%';
 
         CREATE USER 'health'@'%' IDENTIFIED BY 'health';
 

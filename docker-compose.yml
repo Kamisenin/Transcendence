@@ -8,10 +8,12 @@ services:
   mariadb:
     build: srcs/mariadb/
     restart: unless-stopped
-    env_file:
-      - .env
     secrets:
-      -
+      - db_root_pwd
+      - db_users_pwd
+      - db_website_pwd
+    volumes:
+      - db:/var/lib/mysql
   nginx:
     build: srcs/nginx/
     ports:
@@ -39,3 +41,5 @@ secrets:
     file: secrets/db_root_pwd.txt
   db_users_pwd:
     file : secrets/db_users_pwd.txt
+  db_website_pwd:
+    file : secrets/db_website_pwd.txt
