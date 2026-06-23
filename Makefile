@@ -38,6 +38,6 @@ fclean:
 	docker system prune -af --volumes
 	docker volume prune -af
 
-re: down clean upb
+re: clean upb
 
 .PHONY: upb up build down re clean fclean
