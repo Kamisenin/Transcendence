@@ -5,16 +5,23 @@ networks:
 
 
 services:
-  mariadb:
-    build: srcs/mariadb/
+  postgres:
+    container_name: postgres
+    image: postgres:18.4-alpine3.24
     restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_root_pwd
     secrets:
       - db_root_pwd
       - db_users_pwd
       - db_website_pwd
     volumes:
-      - db:/var/lib/mysql
+      - ./init_db.sh:/docker-entrypoint-initdb.d/init-db.sh
+    networks:
+      - 42chan
+
   nginx:
+    container_name: nginx
     build: srcs/nginx/
     ports:
       - 443:443
@@ -23,18 +30,17 @@ services:
       - ADDRESS=${ADDRESS}
     extra_hosts:
       - "host.parent:host-gateway"
+
   next:
+    container_name: next
     build: srcs/next/
     restart: unless-stopped
+    secrets:
+      - db_website_pwd
+      - db_users_pwd
+    depends_on:
+      - postgres
     profiles: ["prod"]
-
-volumes:
-  db:
-    driver: local
-    driver_opts:
-      o: bind
-      type: none
-      device: data/db
 
 secrets:
   db_root_pwd:

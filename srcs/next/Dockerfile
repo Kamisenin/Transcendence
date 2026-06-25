@@ -99,11 +99,15 @@ COPY --from=builder --chown=node:node /app/.next/static ./.next/static
 # cached responses are available immediately on startup, uncomment this line:
 # COPY --from=builder --chown=node:node /app/.next/cache ./.next/cache
 
+COPY entrypoint.sh /bin/
+RUN chmod +x /bin/entrypoint.sh
 # Switch to non-root user for security best practices
+
 USER node
 
 # Expose port 3000 to allow HTTP traffic
 EXPOSE 3000
 
 # Start Next.js standalone server
+ENTRYPOINT ["/bin/entrypoint.sh"]
 CMD ["node", "server.js"]
