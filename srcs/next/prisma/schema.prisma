@@ -30,8 +30,8 @@ model User {
   firstName String?  @map("first_name")
   lastName  String?  @map("last_name")
   imgLink   String   @default("") @map("img_link")
-  mail      String   @unique
-  passwd    String
+  email     String   @unique
+  password  String
   createdAt DateTime @default(now()) @map("created_at")
 
   sessions Session[] @relation("UserSession")
