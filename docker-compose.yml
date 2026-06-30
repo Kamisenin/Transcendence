@@ -1,0 +1,45 @@
+networks:
+  42chan:
+    name: 42chan
+    driver: bridge
+
+
+services:
+  mariadb:
+    build: srcs/mariadb/
+    restart: unless-stopped
+    secrets:
+      - db_root_pwd
+      - db_users_pwd
+      - db_website_pwd
+    volumes:
+      - db:/var/lib/mysql
+  nginx:
+    build: srcs/nginx/
+    ports:
+      - 443:443
+    restart: unless-stopped
+    environment:
+      - ADDRESS=${ADDRESS}
+    extra_hosts:
+      - "host.parent:host-gateway"
+  next:
+    build: srcs/next/
+    restart: unless-stopped
+    profiles: ["prod"]
+
+volumes:
+  db:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: data/db
+
+secrets:
+  db_root_pwd:
+    file: secrets/db_root_pwd.txt
+  db_users_pwd:
+    file : secrets/db_users_pwd.txt
+  db_website_pwd:
+    file : secrets/db_website_pwd.txt

@@ -26,11 +26,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <header className="fixed top-0 h-16 w-full bg-beige flex items-center justify-center">
             <div>hello</div>
           </header>
-        <div className="min-h-full flex flex-col">{children}</div>
-        <footer className={"flex h-16 w-full bg-beige items-center justify-center"}>
+          <div className="min-h-full item-center flex flex-col">{children}</div>
+          <footer className={"flex h-16 w-full bg-beige items-center justify-center"}>
             <p>Privacy Policy and Terms of Service</p>
-        </footer>
-      </body>
+          </footer>
+        </body>
     </html>
   );
 }
