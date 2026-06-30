@@ -44,7 +44,6 @@ This category is about database passwords, create them wisely as they are at the
 if they are not strong enough someone could break trough the password and destroy all of the Website
 ```bash
 db_root_pwd.txt # is the password of the root user of the database
-db_users_pwd.txt # is the password of the USERS database admin
 db_website_pwd.txt # is the password of the WEBSITE database admin
 ```
 
@@ -70,3 +69,27 @@ The makefile has 6 rules in total that you can use to manage the application
 Lastly for developpers there is an option to the makefile to run the NextJs application in developpment mode and allows
 its hot reload option to be use. Simply add ``MODE=dev`` to any command to activate this mode and detach the containers
 from your daemon using `d` after all the services are started and healthy to start Nextjs
+
+## Database Setup
+
+if it is the first time you are running this application (in dev mode or production), or you have made a modification to the schema prisma,
+you may need to synchronize the database to the schema prisma. There are two ways of doing so.
+
+First the database container must be started for the following actions. Secondly you will have to export the right DATABASE_URL
+environnment variable set.
+
+For that you can either check the prisma documentation for URL's or just use the command
+```bash
+source dev_setup.sh
+```
+Which will create the environnment url for you and add it to your environnment. </br>
+now that this is done just go to the srcs/next folder. </br>
+For this next section you have two choices of commands to proceed, which will depend on your situation
+
+### 1. ``npx prisma db push``
+this is the easiest way of setting up the db, this will add all the tables from the schema prisma into your database.
+**🚨 Beware !!! THIS WILL DESTROY ALL THE DATA STORED IN YOUR CURRENT DB, USE WITH PRECAUTION 🚨**
+
+### 2. ``npx prisma migrate deploy``
+for this one to work you will first need to create migration files in the prisma project
+using the following command : `npx prisma migrate dev --name init`
