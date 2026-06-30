@@ -16,7 +16,7 @@ services:
       - db_website_pwd
     volumes:
       - ./init_db.sh:/docker-entrypoint-initdb.d/init-db.sh
-      - pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql
     networks:
       - 42chan
     ports:
@@ -55,4 +55,4 @@ volumes:
     driver_opts:
       o: bind
       type: none
-      device: ./data/wp-data
+      device: ./data/db
