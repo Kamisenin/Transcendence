@@ -5,13 +5,13 @@ export async function getUser(formData: FormData)
     const email = formData.get("email") as string;
     const accountId = formData.get("account_id") as string;
 
-    if (!password) {
-        throw new Error("Field required");
-    }
+    // if (!password) {                             //password ?
+    //     throw new Error("Field required");
+    // }
     if (!email) {
         if (!accountId)
             throw new Error("Field required");
-        return await prisma.users.findUnique({ where : { accountId:accountId } });
+        return await prisma.user.findUnique({ where : { accountId:accountId } });
     } else if (!accountId) {
         return (await prisma.user.findUnique({ where: { email:email } }));
     } else

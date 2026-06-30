@@ -30,13 +30,22 @@ export async function registerUser(formData: FormData) {
 }
 
 
-export async function loginUser(formData: FormData) : boolean {
+export async function loginUser(formData: FormData) {
     const password = formData.get("password") as string;
 
-    const user = await getUser(formData);
-    if (!user)
-        return false;
-    const passwordMatch = await bcrypt.compare(password, user.password) as boolean;
-    return passwordMatch;
-}
+    if (!password) {
+        throw new Error("Field required");
+    }
 
+    const user = await getUser(formData);
+    if (!user) {
+        throw new Error("Identifiants incorrects");
+    }
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+        throw new Error("Identifiants incorrects");
+    }
+
+    redirect("/");
+}
