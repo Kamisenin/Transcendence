@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../../node_modules/.prisma/website-client"
+  output   = "../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -24,29 +24,42 @@ enum RequestStatus {
 // ════════════════════════════════════════════
 
 model User {
-  token      String   @id @default(uuid())
-  accountId  String?  @map("account_id")
-  username   String   @unique
-  firstName  String?  @map("first_name")
-  lastName   String?  @map("last_name")
-  imgLink    String   @default("") @map("img_link")
-  mail       String   @unique
-  passwd     String
-  createdAt  DateTime @default(now()) @map("created_at")
+  user_id   String   @id @default(uuid())
+  accountId String?  @map("account_id") @unique
+  username  String
+  firstName String?  @map("first_name")
+  lastName  String?  @map("last_name")
+  imgLink   String   @default("") @map("img_link")
+  mail      String   @unique
+  passwd    String
+  createdAt DateTime @default(now()) @map("created_at")
 
-  ownedTags          Tag[]                @relation("TagOwner")
-  ownedPages         Page[]               @relation("PageOwner")
-  ownedOrganizations Organization[]       @relation("OrganizationOwner")
+  sessions Session[] @relation("UserSession")
 
-  tagMemberships     TagMember[]
-  tagPermissions     TagPermission[]
-  pagePermissions    PagePermission[]
-  orgMemberships     OrganizationMember[]
+  ownedTags          Tag[]          @relation("TagOwner")
+  ownedPages         Page[]         @relation("PageOwner")
+  ownedOrganizations Organization[] @relation("OrganizationOwner")
+
+  tagMemberships  TagMember[]
+  tagPermissions  TagPermission[]
+  pagePermissions PagePermission[]
+  orgMemberships  OrganizationMember[]
 
   tagPageRequestsMade     TagPageRequest[] @relation("RequestedBy")
   tagPageRequestsReviewed TagPageRequest[] @relation("ReviewedBy")
 
   @@map("users")
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  userToken String   @map("user_token")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation("UserSession", fields: [userToken], references: [user_id], onDelete: Cascade)
+
+  @@map("sessions")
 }
 
 // ════════════════════════════════════════════
@@ -60,15 +73,15 @@ model Tag {
   description String?
   createdAt   DateTime @default(now()) @map("created_at")
 
-  owner   User       @relation("TagOwner", fields: [ownerToken], references: [token])
-  roles   TagRole[]
-  members TagMember[]
+  owner       User            @relation("TagOwner", fields: [ownerToken], references: [user_id])
+  roles       TagRole[]
+  members     TagMember[]
   permissions TagPermission[]
 
-  tagPages           TagPage[]
-  tagPageRequests    TagPageRequest[]
-  tagPageAccess      TagPageAccess[]
-  tagPageCapability  TagPageCapability[]
+  tagPages          TagPage[]
+  tagPageRequests   TagPageRequest[]
+  tagPageAccess     TagPageAccess[]
+  tagPageCapability TagPageCapability[]
 
   orgTagAccess     OrgTagAccess[]
   orgTagCapability OrgTagCapability[]
@@ -82,20 +95,20 @@ model TagRole {
   roleName       String @map("role_name")
   hierarchyLevel Int    @map("hierarchy_level")
 
-  canManageMembers   Boolean @default(false) @map("can_manage_members")
-  canManageRoles     Boolean @default(false) @map("can_manage_roles")
-  canEditInfo        Boolean @default(false) @map("can_edit_info")
-  canDeleteTag       Boolean @default(false) @map("can_delete_tag")
-  canAddPage         Boolean @default(false) @map("can_add_page")
-  canRevokePage      Boolean @default(false) @map("can_revoke_page")
+  canManageMembers    Boolean @default(false) @map("can_manage_members")
+  canManageRoles      Boolean @default(false) @map("can_manage_roles")
+  canEditInfo         Boolean @default(false) @map("can_edit_info")
+  canDeleteTag        Boolean @default(false) @map("can_delete_tag")
+  canAddPage          Boolean @default(false) @map("can_add_page")
+  canRevokePage       Boolean @default(false) @map("can_revoke_page")
   canManagePageGrants Boolean @default(false) @map("can_manage_page_grants")
-  canReviewRequests  Boolean @default(false) @map("can_review_requests")
+  canReviewRequests   Boolean @default(false) @map("can_review_requests")
 
-  tag     Tag          @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  tag     Tag         @relation(fields: [tagId], references: [id], onDelete: Cascade)
   members TagMember[]
 
-  minRoleForPageAccess        TagPageAccess[]
-  exactRoleForPageCapability  TagPageCapability[]
+  minRoleForPageAccess       TagPageAccess[]
+  exactRoleForPageCapability TagPageCapability[]
 
   @@unique([tagId, hierarchyLevel])
   @@map("tag_roles")
@@ -107,7 +120,7 @@ model TagMember {
   roleId    Int    @map("role_id")
 
   tag  Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
-  user User    @relation(fields: [userToken], references: [token], onDelete: Cascade)
+  user User    @relation(fields: [userToken], references: [user_id], onDelete: Cascade)
   role TagRole @relation(fields: [roleId], references: [id])
 
   @@id([tagId, userToken])
@@ -129,7 +142,7 @@ model TagPermission {
   canReviewRequests   Boolean @default(false) @map("can_review_requests")
 
   tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
-  user User @relation(fields: [userToken], references: [token], onDelete: Cascade)
+  user User @relation(fields: [userToken], references: [user_id], onDelete: Cascade)
 
   @@id([tagId, userToken])
   @@map("tag_permissions")
@@ -147,7 +160,7 @@ model Page {
   createdAt    DateTime @default(now()) @map("created_at")
   lastModified DateTime @updatedAt @map("last_modified")
 
-  owner User @relation("PageOwner", fields: [ownerId], references: [token])
+  owner User @relation("PageOwner", fields: [ownerId], references: [user_id])
 
   permissions PagePermission[]
   tagPages    TagPage[]
@@ -174,7 +187,7 @@ model PagePermission {
   canRequestTags       Boolean @default(false) @map("can_request_tags")
 
   page Page @relation(fields: [pageId], references: [pageId], onDelete: Cascade)
-  user User @relation(fields: [userToken], references: [token], onDelete: Cascade)
+  user User @relation(fields: [userToken], references: [user_id], onDelete: Cascade)
 
   @@id([pageId, userToken])
   @@map("page_permissions")
@@ -192,26 +205,26 @@ model TagPage {
 }
 
 model TagPageRequest {
-  id            Int           @id @default(autoincrement())
-  tagId         Int           @map("tag_id")
-  pageId        Int           @map("page_id")
-  requestedBy   String        @map("requested_by")
-  status        RequestStatus @default(PENDING)
-  reviewedBy    String?       @map("reviewed_by")
-  createdAt     DateTime      @default(now()) @map("created_at")
+  id          Int           @id @default(autoincrement())
+  tagId       Int           @map("tag_id")
+  pageId      Int           @map("page_id")
+  requestedBy String        @map("requested_by")
+  status      RequestStatus @default(PENDING)
+  reviewedBy  String?       @map("reviewed_by")
+  createdAt   DateTime      @default(now()) @map("created_at")
 
-  tag      Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
-  page     Page @relation(fields: [pageId], references: [pageId], onDelete: Cascade)
-  requester User @relation("RequestedBy", fields: [requestedBy], references: [token])
-  reviewer  User? @relation("ReviewedBy", fields: [reviewedBy], references: [token])
+  tag       Tag   @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  page      Page  @relation(fields: [pageId], references: [pageId], onDelete: Cascade)
+  requester User  @relation("RequestedBy", fields: [requestedBy], references: [user_id])
+  reviewer  User? @relation("ReviewedBy", fields: [reviewedBy], references: [user_id])
 
   @@map("tag_page_requests")
 }
 
 model TagPageAccess {
-  pageId      Int    @map("page_id")
-  tagId       Int    @map("tag_id")
-  minRoleId   Int    @map("min_role_id")
+  pageId      Int             @map("page_id")
+  tagId       Int             @map("tag_id")
+  minRoleId   Int             @map("min_role_id")
   permissions PermissionLevel
 
   page    Page    @relation(fields: [pageId], references: [pageId], onDelete: Cascade)
@@ -223,9 +236,9 @@ model TagPageAccess {
 }
 
 model OrgPageAccess {
-  orgId       Int    @map("org_id")
-  pageId      Int    @map("page_id")
-  minRoleId   Int    @map("min_role_id")
+  orgId       Int             @map("org_id")
+  pageId      Int             @map("page_id")
+  minRoleId   Int             @map("min_role_id")
   permissions PermissionLevel
 
   organization Organization     @relation(fields: [orgId], references: [id], onDelete: Cascade)
@@ -280,7 +293,7 @@ model Organization {
   name       String   @unique
   createdAt  DateTime @default(now()) @map("created_at")
 
-  owner   User                 @relation("OrganizationOwner", fields: [ownerToken], references: [token])
+  owner   User                 @relation("OrganizationOwner", fields: [ownerToken], references: [user_id])
   roles   OrganizationRole[]
   members OrganizationMember[]
 
@@ -293,10 +306,10 @@ model Organization {
 }
 
 model OrganizationRole {
-  id              Int    @id @default(autoincrement())
-  organizationId  Int    @map("organization_id")
-  roleName        String @map("role_name")
-  hierarchyLevel  Int    @map("hierarchy_level")
+  id             Int    @id @default(autoincrement())
+  organizationId Int    @map("organization_id")
+  roleName       String @map("role_name")
+  hierarchyLevel Int    @map("hierarchy_level")
 
   canManageMembers       Boolean @default(false) @map("can_manage_members")
   canManageRoles         Boolean @default(false) @map("can_manage_roles")
@@ -308,10 +321,10 @@ model OrganizationRole {
   organization Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   members      OrganizationMember[]
 
-  minRoleForOrgPageAccess     OrgPageAccess[]
-  roleForOrgPageCapability    OrgPageCapability[]
-  minRoleForOrgTagAccess      OrgTagAccess[]
-  roleForOrgTagCapability     OrgTagCapability[]
+  minRoleForOrgPageAccess  OrgPageAccess[]
+  roleForOrgPageCapability OrgPageCapability[]
+  minRoleForOrgTagAccess   OrgTagAccess[]
+  roleForOrgTagCapability  OrgTagCapability[]
 
   @@unique([organizationId, hierarchyLevel])
   @@map("organization_roles")
@@ -323,7 +336,7 @@ model OrganizationMember {
   roleId         Int    @map("role_id")
 
   organization Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  user         User             @relation(fields: [userToken], references: [token], onDelete: Cascade)
+  user         User             @relation(fields: [userToken], references: [user_id], onDelete: Cascade)
   role         OrganizationRole @relation(fields: [roleId], references: [id])
 
   @@id([organizationId, userToken])
@@ -331,9 +344,9 @@ model OrganizationMember {
 }
 
 model OrgTagAccess {
-  orgId       Int    @map("org_id")
-  tagId       Int    @map("tag_id")
-  minRoleId   Int    @map("min_role_id")
+  orgId       Int             @map("org_id")
+  tagId       Int             @map("tag_id")
+  minRoleId   Int             @map("min_role_id")
   permissions PermissionLevel
 
   organization Organization     @relation(fields: [orgId], references: [id], onDelete: Cascade)
