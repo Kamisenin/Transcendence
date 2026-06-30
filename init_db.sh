@@ -34,6 +34,7 @@ psql -v ON_ERROR_STOP=1 --username postgres <<-EOSQL
     CREATE DATABASE "WEBSITE" ENCODING 'UTF8' TEMPLATE template0;
     CREATE USER website_db_admin WITH PASSWORD '${DB_WEBSITE_PASSWD}';
     GRANT ALL PRIVILEGES ON DATABASE "WEBSITE" TO website_db_admin;
+    ALTER USER website_db_admin WITH CREATEDB;
     CREATE USER health WITH PASSWORD 'health';
 EOSQL
 
