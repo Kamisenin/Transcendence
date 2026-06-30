@@ -11,7 +11,7 @@ export async function getUser(formData: FormData)
     if (!email) {
         if (!accountId)
             throw new Error("Field required");
-        return await prisma.users.findUnique({ where : { account_id:accountId } });
+        return await prisma.users.findUnique({ where : { accountId:accountId } });
     } else if (!accountId) {
         return (await prisma.user.findUnique({ where: { email:email } }));
     } else
@@ -23,7 +23,7 @@ export async function isEmailUsed(email: string) : boolean
     if (!email)
         throw new Error("Field required");
 
-    return await prisma.user.findUnique({ where: { email: email } }) == null;
+    return await prisma.user.findUnique({ where: { email: email } }) != null;
 }
 
 export async function isAccountIdUsed(accountId: string) : boolean
@@ -31,10 +31,10 @@ export async function isAccountIdUsed(accountId: string) : boolean
     if (!accountId)
         throw new Error("Field required");
 
-    return await prisma.user.findUnique({ where: { account_id:accountId } }) == null;
+    return await prisma.user.findUnique({ where: { accountId:accountId } }) != null;
 }
 
 export async function createUser(password : string, email: string, accountId: string, username: string)
 {
-    prisma.user = await prisma.user.create({ data: { password: password, email: email, account_id:accountId, username:username } });
+    return await prisma.user.create({ data: { password: password, email: email, accountId:accountId, username:username } });
 }

@@ -1,7 +1,8 @@
 "use server";
 
 import bcrypt from 'bcrypt';
-import { getUser } from "%/lib/prisma-utils";
+import { redirect } from "next/navigation";
+import { getUser, isEmailUsed, isAccountIdUsed, createUser } from "%/lib/prisma-utils";
 
 export async function registerUser(formData: FormData) {
     const password = formData.get("password") as string;
@@ -14,15 +15,18 @@ export async function registerUser(formData: FormData) {
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-
-    let username = formData.get("username") as string;
-    if (!username)
-        username = accountId;
-    await prisma.user.create({ data: { email:email, password: hashedPassword } });
-
     console.log("Password ready to be registered : ", hashedPassword);
 
-    return { success: true };
+    let username = formData.get("username") as string;
+    if (!username) {
+        username = accountId;
+    }
+    console.log("Email : " + email + " accountId : " + accountId);
+    if (await isEmailUsed(email) || await isAccountIdUsed(accountId)) {
+        throw new Error("Email or Account id already in use");
+    }
+    createUser(password, email, accountId, username);
+    redirect("/auth/login");
 }
 
 

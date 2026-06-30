@@ -15,6 +15,13 @@ export default function RegisterPage() {
                     required
                 />
                 <input
+                    type="text"
+                    name="account_id"
+                    placeholder="Nom de compte"
+                    className="border p-2 rounded text-black"
+                    required
+                />
+                <input
                     type="password"
                     name="password"
                     placeholder="Mot de passe"
