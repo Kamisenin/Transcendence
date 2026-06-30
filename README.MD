@@ -2,12 +2,14 @@
 
 The following tools must be installed on the host machine before working on the project:
 
-| Tool                         | Minimum Tested Version | Purpose |
-|------------------------------|------------------------|---------|
-| **Docker Engine**            | 20.10+                 | Container runtime. |
-| **GNU Make**                 | 3.81+                  | Build automation through the project Makefile. |
-| [**NPM**](/npm-installation) | 11.13.0+ | Run the web application               
-| **Git**                      | —                      | Source control. |
+| Tool                                       | Minimum Tested Version | Purpose                                        |
+|--------------------------------------------|------------------------|------------------------------------------------|
+| **Docker Engine**                          | 20.10+                 | Container runtime.                             |
+| **GNU Make**                               | 3.81+                  | Build automation through the project Makefile. |
+| [**NPM**](/npm-installation)               | 11.13.0+               | Allows you to install the dependencies         |
+| Next (dev mode only)                       | 16.2.9                 | allows you to run the app for the dev mode     |
+| Prisma                                     | 7.8.0                  | allows you to setup the db for the first time  |
+| **Git**                                    | —                      | Source control.                                |
 
 Ensure the Docker daemon is running before executing any command:
 
@@ -32,6 +34,16 @@ nvm use --lts
 
 You can check your installation with
 ``node -v`` or ``npm -v``
+
+## Prisma Installation
+
+Once node is installed you can just do
+```npm i prisma```
+
+## NextJs
+
+Again once node package manager is installed do
+```npm i next```
 
 ## Secrets
 
@@ -78,11 +90,12 @@ you may need to synchronize the database to the schema prisma. There are two way
 First the database container must be started for the following actions. Secondly you will have to export the right DATABASE_URL
 environnment variable set.
 
-For that you can either check the prisma documentation for URL's or just use the command
+For that you can either check the prisma documentation for URL's or just copy the first two line inside the
 ```bash
-source dev_setup.sh
+dev_start.sh
 ```
-Which will create the environnment url for you and add it to your environnment. </br>
+file
+Which will create the environnment url and add it to your environnment. </br>
 now that this is done just go to the srcs/next folder. </br>
 For this next section you have two choices of commands to proceed, which will depend on your situation
 
