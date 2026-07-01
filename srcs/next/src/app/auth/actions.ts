@@ -1,8 +1,12 @@
 "use server";
 
 import bcrypt from 'bcrypt';
+import { cookies } from "next/headers"
 import { redirect } from "next/navigation";
 import { getUser, isEmailUsed, isAccountIdUsed, createUser } from "%/lib/prisma-utils";
+import { createSession, deleteSession } from "%/lib/session";
+
+const ten_y_ms = 10 * 365 * 24 * 60 * 60 * 1000;
 
 export async function registerUser(formData: FormData) {
     const password = formData.get("password") as string;
@@ -25,7 +29,7 @@ export async function registerUser(formData: FormData) {
     if (await isEmailUsed(email) || await isAccountIdUsed(accountId)) {
         throw new Error("Email or Account id already in use");
     }
-    createUser(password, email, accountId, username);
+    await createUser(hashedPassword, email, accountId, username);
     redirect("/auth/login");
 }
 
@@ -47,5 +51,18 @@ export async function loginUser(formData: FormData) {
         throw new Error("Identifiants incorrects");
     }
 
+    const token = await createSession(user.user_id);
+    const cookieStore = await cookies();
+    cookieStore.set("session", token, {httpOnly: true, secure: true, sameSite: "lax", path: "/", maxAge: ten_y_ms,});
     redirect("/");
+}
+
+export async function logoutUser() {
+    const   cookieStore = await cookies();
+    const   token = cookieStore.get("session")?.value;
+
+    if (token)
+        await deleteSession(token);
+    cookieStore.delete("session");
+    redirect("/auth/login");
 }
