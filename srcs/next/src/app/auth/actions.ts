@@ -3,6 +3,9 @@
 import bcrypt from 'bcrypt';
 import { redirect } from "next/navigation";
 import { getUser, isEmailUsed, isAccountIdUsed, createUser } from "%/lib/prisma-utils";
+import {prisma} from "%/lib/prisma";
+import { cookies } from 'next/headers'
+import { getUserIp } from "%/lib/auth";
 
 export async function registerUser(formData: FormData) {
     const password = formData.get("password") as string;
@@ -25,7 +28,7 @@ export async function registerUser(formData: FormData) {
     if (await isEmailUsed(email) || await isAccountIdUsed(accountId)) {
         throw new Error("Email or Account id already in use");
     }
-    createUser(password, email, accountId, username);
+    createUser(hashedPassword, email, accountId, username);
     redirect("/auth/login");
 }
 
@@ -43,9 +46,48 @@ export async function loginUser(formData: FormData) {
     }
 
     const passwordMatch = await bcrypt.compare(password, user.password);
+    console.log("UserPassword: " + user.password + " password " + password);
     if (!passwordMatch) {
         throw new Error("Identifiants incorrects");
     }
-
+    await createSession(user.user_id, false); // TODO add a "remember me" checkbox on login page
     redirect("/");
+}
+
+export async function createSession(userId : string, stayConnected: boolean) : string
+{
+    const ip : string = await getUserIp();
+    console.log("IP :" + ip);
+    const expiresAt = stayConnected
+        ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)  // 30 jours
+        : new Date(Date.now() + 24 * 60 * 60 * 1000); // 24h
+
+    const session = await prisma.session.create({
+        data : {
+            userToken : userId,
+            expiresAt : expiresAt,
+            ipAddress: ip
+        }
+    })
+    setCookies(session, stayConnected);
+    return (session.id);
+}
+
+export async function setCookies(session: prisma.session, stayConnected: boolean)
+{
+    const cookieStore = await cookies();
+    if (stayConnected) {
+        cookieStore.set('session_id', session.id, {
+            httpOnly: true,
+            sameSite: 'lax',
+            secure: process.env.NODE_ENV === 'production',
+        });
+        return;
+    }
+    cookieStore.set('session_id', session.id, {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 60 * 60 * 24 * 30
+    });
 }
