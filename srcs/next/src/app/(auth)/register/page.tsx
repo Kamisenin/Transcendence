@@ -1,12 +1,39 @@
-import { registerUser } from "%/auth/actions"
+'use client';
+
+import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
+    const router = useRouter();
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+
+        const form = new FormData(event.currentTarget);
+        console.log(form);
+        const f = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: form.get('email'),
+                password: form.get('password'),
+                accountId: form.get('account_id'),
+                stayConnected: false //TODO checkbox stay connected
+            })
+        });
+        if (f.ok) {
+            const j = await f.json();
+            console.log(j);
+            window.location.href = '/';
+        } else
+            console.log('server has sent an error');
+    }
+
     return (
         <div className="flex flex-col items-center justify-center min-h-screen">
             <h1 className="text-2xl font-bold mb-4">Créer un compte</h1>
 
-            {/* Next.js gère le lien avec le serveur automatiquement grâce à l'attribut action */}
-            <form action={registerUser} className="flex flex-col gap-3 w-80">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-3 w-80">
                 <input
                     type="email"
                     name="email"

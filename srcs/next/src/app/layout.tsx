@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { getSession } from "%/lib/auth"
 import "./globals.css";
-
-
+import { getCurrentUser } from "%/lib/session";
+import LogoutButton from "@/components/LogoutButton";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -21,25 +20,30 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode; }>) {
-    const session = await getSession();
+    const user = await getCurrentUser();
+    console.log(user);
     return (
-        <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`} >
-          <body>
-              <header className="fixed top-0 h-16 w-full bg-beige flex items-center justify-center">
-                <div>hello</div>
-                <div className={"align-right"}>
-                    {session ? (
-                        <p>Connecté en tant que {session.user.username}</p>
-                    ) : (
-                        <a href="/auth/login">Se connecter</a>
-                    )}
+        <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+        <body>
+        <header className="fixed top-0 h-16 w-full bg-beige flex items-center justify-center gap-24 px-6">
+            <div>hello</div>
+
+            {user ? (
+                <div className="flex items-center gap-3">
+                    <span>{user.username}</span>
+                    <LogoutButton />
                 </div>
-              </header>
-              <div className="min-h-full item-center flex flex-col">{children}</div>
-              <footer className={"flex h-16 w-full bg-beige items-center justify-center"}>
-                <p>Privacy Policy and Terms of Service</p>
-              </footer>
-            </body>
+            ) : (
+                <a href="/login" className="text-sm underline">
+                    log in
+                </a>
+            )}
+        </header>
+        <main className="min-h-full item-center flex flex-col">{children}</main>
+        <footer className={"flex h-16 w-full bg-beige items-center justify-center"}>
+            <p>Privacy Policy and Terms of Service</p>
+        </footer>
+        </body>
         </html>
-      );
+    );
 }

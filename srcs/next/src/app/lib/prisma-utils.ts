@@ -1,21 +1,11 @@
 import { prisma } from "%/lib/prisma";
 
-export async function getUser(formData: FormData)
+export async function getUser(id : string)
 {
-    const email = formData.get("email") as string;
-    const accountId = formData.get("account_id") as string;
-
-    // if (!password) {                             //password ?
-    //     throw new Error("Field required");
-    // }
-    if (!email) {
-        if (!accountId)
-            throw new Error("Field required");
-        return await prisma.user.findUnique({ where : { accountId:accountId } });
-    } else if (!accountId) {
-        return (await prisma.user.findUnique({ where: { email:email } }));
-    } else
-        throw new Error("Field required");
+    let user = await prisma.user.findUnique({ where : { accountId:id } });
+    if (!user)
+        user = await prisma.user.findUnique({ where : { email:id } });
+    return user;
 }
 
 export async function isEmailUsed(email: string) : boolean
