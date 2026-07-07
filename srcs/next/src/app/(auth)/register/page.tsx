@@ -18,20 +18,23 @@ export default function RegisterPage() {
                 email: form.get('email'),
                 password: form.get('password'),
                 accountId: form.get('account_id'),
-                stayConnected: false //TODO checkbox stay connected
+                stayConnected: false
             })
         });
         if (f.ok) {
             const j = await f.json();
             console.log(j);
             window.location.href = '/';
-        } else
+        } else if (f.status === 409) {
+            console.log("email already in use")
+        }
+        else
             console.log('server has sent an error');
     }
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen">
-            <h1 className="text-2xl font-bold mb-4">Créer un compte</h1>
+            <h1 className="text-2xl font-bold mb-4">Create an account</h1>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-3 w-80">
                 <input
@@ -44,19 +47,19 @@ export default function RegisterPage() {
                 <input
                     type="text"
                     name="account_id"
-                    placeholder="Nom de compte"
+                    placeholder="Account name"
                     className="border p-2 rounded text-black"
                     required
                 />
                 <input
                     type="password"
                     name="password"
-                    placeholder="Mot de passe"
+                    placeholder="Password"
                     className="border p-2 rounded text-black"
                     required
                 />
                 <button type="submit" className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
-                    S'inscrire
+                    Sign up
                 </button>
             </form>
         </div>

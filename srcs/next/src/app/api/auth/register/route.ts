@@ -1,7 +1,7 @@
 import {createUser, isAccountIdUsed, isEmailUsed} from "%/lib/prisma-utils";
 import bcrypt from 'bcrypt';
 import { redirect } from "next/navigation";
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import {createSession, setCookies} from "%/lib/session";
 
 export async function POST(req: NextRequest) {

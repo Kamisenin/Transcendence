@@ -1,7 +1,7 @@
 import {createUser, getUser, isAccountIdUsed, isEmailUsed} from "%/lib/prisma-utils";
 import {createSession, setCookies} from "%/lib/session";
 import { compare } from 'bcrypt';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
     const body = await req.json();
@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
 
     const user = await getUser(body.id);
     if (!user) {
-        throw new Error("Identifiants incorrects");
+        return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
 
     const password = body.password as string;
@@ -20,9 +20,8 @@ export async function POST(req: NextRequest) {
         throw new Error("Identifiants incorrects");
     }
 
-    const stayConnected = false; //TODO create a stay connected button
-    // formData.get("stayConnected") as boolean;
-    const session = await createSession(user.user_id);
+    const stayConnected = body.stayConnected as boolean;
+    const session = await createSession(user.user_id, stayConnected);
     await setCookies(session, stayConnected);
     return NextResponse.json({ success: true, message: "User logged in" }, { status: 201 });
 }
