@@ -25,12 +25,11 @@ export async function getSessionUser(token: string) {
     return session.user;
 }
 
-export async function isSessionExpired(session : prisma.session) : Promise<boolean> {
+export async function isSessionExpired(session : Session) : Promise<boolean> {
     if (session.expiresAt < Date.now()) {
-        deleteSession(session.id);
+        await deleteSession(session.id);
         return true;
     }
-    console.log("session not expired: " + Date.now());
     return false;
 }
 
@@ -44,11 +43,10 @@ export async function getCurrentUser() {
     if (!token)
         return null;
     const user = await getSessionUser(token);
-    console.log(user);
     return user;
 }
 
-export async function setCookies(session: prisma.session, stayConnected: boolean)
+export async function setCookies(session: Session, stayConnected: boolean)
 {
     const cookieStore = await cookies();
     if (!stayConnected) {
