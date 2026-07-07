@@ -1,13 +1,11 @@
-import crypto from "crypto";
 import { cookies } from "next/headers";
+import type { Session } from "@prisma/client";
 import { prisma } from "%/lib/prisma";
 import { getUserIp } from "%/lib/auth";
 
-const ten_y_ms = 10 * 365 * 24 * 60 * 60 * 1000;
+export async function createSession(userId: string, stayConnected = false): Promise<Session> {
 
-export async function createSession(userId: string, stayConnected: boolean): Promise<prisma.session> {
-
-    const ip : string = await getUserIp();
+    const ip: string = await getUserIp();
     const expiresAt = stayConnected
         ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)  // 30 jours
         : new Date(Date.now() + 24 * 60 * 60 * 1000); // 24h
