@@ -8,7 +8,7 @@ log() {
 
 log "Initializing Database URL"
 
-DB_WEBSITE_PASSWD=$(cat /run/secrets/db_website_passwd)
+DB_WEBSITE_PASSWD=$(cat /run/secrets/db_website_pwd)
 
 
 export DATABASE_URL="postgresql://website_db_admin:${DB_WEBSITE_PASSWD}@postgres:5432/WEBSITE?schema=public"
