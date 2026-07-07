@@ -25,7 +25,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
     return (
         <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
         <body>
-        <header className="fixed top-0 h-16 w-full bg-beige flex items-center justify-center gap-24 px-6">
+        <header className="fixed top-0 h-16 w-full bg-beige flex items-center justify-center gap-24 px-6 z-10">
             <div>hello</div>
 
             {user ? (
@@ -39,7 +39,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
                 </a>
             )}
         </header>
-        <main className="min-h-full item-center flex flex-col">{children}</main>
+        <main className="flex-col justify-center">{children}</main>
         <footer className={"flex h-16 w-full bg-beige items-center justify-center"}>
             <p>Privacy Policy and Terms of Service</p>
         </footer>
