@@ -2,7 +2,7 @@ MODE ?= prod
 
 ifeq ($(MODE),dev)
 	ADDRESS := host.parent
-	NEXT_RUN := npm run dev --prefix srcs/next/
+	NEXT_RUN := ./dev_start.sh
 	PROFILE_FLAG :=
 else
 	ADDRESS := next
