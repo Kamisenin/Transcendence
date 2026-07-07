@@ -1,4 +1,5 @@
 import {createSession, setCookies} from "%/lib/session";
+import { getUser } from "%/lib/prisma-utils";
 import { compare } from 'bcrypt';
 import { NextResponse, NextRequest } from 'next/server';
 
