@@ -8,7 +8,7 @@ export async function getUser(id : string)
     return user;
 }
 
-export async function isEmailUsed(email: string) : boolean
+export async function isEmailUsed(email: string): Promise<boolean>
 {
     if (!email)
         throw new Error("Field required");
@@ -16,7 +16,7 @@ export async function isEmailUsed(email: string) : boolean
     return await prisma.user.findUnique({ where: { email: email } }) != null;
 }
 
-export async function isAccountIdUsed(accountId: string) : boolean
+export async function isAccountIdUsed(accountId: string): Promise<boolean>
 {
     if (!accountId)
         throw new Error("Field required");

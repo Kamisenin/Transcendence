@@ -2,7 +2,7 @@ import { prisma } from "%/lib/prisma";
 import { redirect } from "next/navigation";
 import { cookies, headers } from 'next/headers'
 
-export async function getUserIp() : string
+export async function getUserIp(): Promise<string>
 {
     const headersList = await headers();
     const forwardedFor = headersList.get("x-forwarded-for");

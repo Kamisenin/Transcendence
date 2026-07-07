@@ -1,10 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-
 export default function LogoutButton() {
-    const router = useRouter();
-
     const handleLogout = async () => {
         const res = await fetch("/api/auth/logout", {method: "POST"});
 
@@ -14,6 +10,6 @@ export default function LogoutButton() {
             console.error("Unable to logout");
     };
     return (
-        <button className={"border:solid"} onClick={handleLogout}>Disconnect</button>
+        <button className={"border-solid"} onClick={handleLogout}>Disconnect</button>
     );
 }
