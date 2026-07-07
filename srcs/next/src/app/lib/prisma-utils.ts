@@ -8,7 +8,7 @@ export async function getUser(id : string)
     return user;
 }
 
-export async function isEmailUsed(email: string) : boolean
+export async function isEmailUsed(email: string): Promise<boolean>
 {
     if (!email)
         throw new Error("Field required");
