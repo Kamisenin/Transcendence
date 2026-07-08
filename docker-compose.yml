@@ -43,6 +43,15 @@ services:
       - postgres
     profiles: ["prod"]
 
+  search-engine:
+    container_name: search
+    build: srcs/search-engine/
+    restart: unless-stopped
+    networks: 
+      - 42chan
+    ports: 
+      - 8000:8000
+
 secrets:
   db_root_pwd:
     file: secrets/db_root_pwd.txt
