@@ -11,7 +11,7 @@ export default function UserMenu({ user }: UserMenuProps) {
     const [open, setOpen] = useState(false);
 
     async function handleLogout() {
-        await fetch("/api/auth/logout", { methode: "POST" });
+        await fetch("/api/auth/logout", { method: "POST" });
         window.location.href = "/";
     }
     return (
@@ -24,6 +24,9 @@ export default function UserMenu({ user }: UserMenuProps) {
                 <div className="absolute right-0 mt-2 w-48 bg-white text-back rounded shadow-lg border">
                     {user ? (
                         <>
+                            <div className="px-4 py-2 border-b text-sm font-semibold">
+                                Hello, {user.username}
+                            </div>
                             <Link href="/account" className="block px-4 py-2 hover:bg-gray-100">
                                 Account
                             </Link>

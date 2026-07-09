@@ -26,7 +26,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
     return (
         <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
         <body>
-        <header className="fixed top-0 h-16 w-full bg-beige flex items-center justify-center px-6">
+        <header className="fixed top-0 h-16 w-full bg-beige flex items-center justify-between px-6">
             <HomeButton />
             <UserMenu user={user} />
         </header>
