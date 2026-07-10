@@ -1,10 +1,18 @@
 		"use client";
 		import { useState, useEffect } from "react";
 
+		interface Page 
+		{
+			id: number;
+			title: string;
+			tags: string[];
+			score: number;
+		}
+
 		export default function SearchBar() 
 		{
 			const [query, setQuery] = useState("");
-			const [results, setResults] = useState([]);
+			const [results, setResults] = useState<Page[]>([]);
 
 			useEffect(() => 
 			{
