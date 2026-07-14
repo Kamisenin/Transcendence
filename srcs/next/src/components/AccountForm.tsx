@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState} from "react";
+import { useRouter } from "next/navigation";
 
 type Props = {
     user: {
@@ -10,10 +11,16 @@ type Props = {
 }
 
 export default function AccountForm({ user }: Props) {
+    const [loading, setLoading] = useState(false);
     const [username, setUsername] = useState(user.username);
     const [email, setEmail] = useState(user.email);
+    const [message, setMessage] = useState("");
+    const router = useRouter();
 
     async function save() {
+        if (!username || !email)
+            return ;
+        setLoading(true);
         const res = await fetch("/api/auth/update", {
             method: "POST",
             headers: {
@@ -25,11 +32,13 @@ export default function AccountForm({ user }: Props) {
             }),
         });
         if (res.ok) {
-            console.log("saved");
+            setMessage("Saved !");
+            router.refresh();
         } else {
-            console.log("error");
+            setMessage("Error");
         }
-    };
+        setLoading(false);
+    }
     return (
         <div className="flex flex-col gap-4">
             <label>
@@ -47,11 +56,12 @@ export default function AccountForm({ user }: Props) {
                     onChange={(e) => setEmail(e.target.value)}/>
             </label>
             <button
+                disabled={loading}
                 onClick={save}
                 className="bg-black text-white p-2 rounded">
-                save
+                {loading ? "Saving..." : "Save"}
             </button>
-
+            <p>{message}</p>
         </div>
     );
 }

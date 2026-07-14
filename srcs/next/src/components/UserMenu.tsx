@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 
 type UserMenuProps = {
@@ -9,13 +9,25 @@ type UserMenuProps = {
 
 export default function UserMenu({ user }: UserMenuProps) {
     const [open, setOpen] = useState(false);
+    const menuRef = useRef<HTMLDivElement>(null);
 
+    useEffect(() => {
+        function handleClick(event: MouseEvent) {
+            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+                setOpen(false);
+            }
+        }
+        document.addEventListener("mousedown", handleClick);
+        return () => {
+            document.removeEventListener("mousedown", handleClick);
+        };
+    }, []);
     async function handleLogout() {
         await fetch("/api/auth/logout", { method: "POST" });
         window.location.href = "/";
     }
     return (
-        <div className="relative">
+        <div ref={menuRef} className="relative">
             <button
                 onClick={() => setOpen(!open)}
                 className="w-10 h-10 rounded-full bg-gray-300 cursor-pointer">
