@@ -48,6 +48,8 @@ model User {
   tagPageRequestsMade     TagPageRequest[] @relation("RequestedBy")
   tagPageRequestsReviewed TagPageRequest[] @relation("ReviewedBy")
 
+  uploads  Upload[]  @relation("FileOwner")
+
   @@map("users")
 }
 
@@ -61,6 +63,19 @@ model Session {
   user User @relation("UserSession", fields: [userToken], references: [user_id], onDelete: Cascade)
 
   @@map("sessions")
+}
+
+// ════════════════════════════════════════════
+// UPLOADS
+// ════════════════════════════════════════════
+
+model Upload {
+  id          Int     @id @default(autoincrement())
+  ownerToken  String  @map("owner_token")
+  path        String
+  fileSize    BigInt  @map("file_size")
+
+  owner       User    @relation("FileOwner", fields: [ownerToken], references: [user_id])
 }
 
 // ════════════════════════════════════════════
