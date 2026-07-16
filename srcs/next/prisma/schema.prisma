@@ -34,6 +34,10 @@ model User {
   password  String
   createdAt DateTime @default(now()) @map("created_at")
 
+  emailVerified Boolean   @default(false) @map("email_verified")
+  verifCode     String?   @map("verif_code")
+  verifExpiry   DateTime? @map("verif_expiry")
+
   sessions Session[] @relation("UserSession")
 
   ownedTags          Tag[]          @relation("TagOwner")

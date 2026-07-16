@@ -24,7 +24,7 @@ export default function RegisterPage() {
         if (f.ok) {
             const j = await f.json();
             console.log(j);
-            window.location.href = '/';
+            window.location.href = '/verify';
         } else if (f.status === 409) {
             console.log("email already in use")
         }
