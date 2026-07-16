@@ -1,23 +1,16 @@
 "use client";
 
-import { useEditor, EditorContent } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
-import Image from '@tiptap/extension-image';
-import Toolbar from '@/components/Toolbar'
+import WikiEditor from "@/components/WikiEditor";
 
-export default function WikiEditor() {
-    const editor = useEditor({
-        extensions: [
-            StarterKit,
-            Image,
-        ],
-        placeholder: '<p>Commence à écrire...</p>',
-    });
 
+export default function Page() {
     return (
-        <div className={"pt-16 min-h-screen"}>
-            <Toolbar editor={editor} />
-            <EditorContent className={"min-h-screen"} editor={editor} />
-        </div>
-    );
+        <div className="pt-16 grid grid-cols-2 gap-4 h-[calc(100vh-4rem)]">
+            <div className="h-full border rounded bg-white">
+                <WikiEditor className="h-full w-full" />
+            </div>
+            <div className="h-full border rounded bg-white">
+                <WikiEditor className="h-full w-full" />
+            </div>
+        </div>);
 }
