@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
     if (!user) {
         return NextResponse.json({ error: "Not logged in"} , { status: 401});
     }
-    if (!user.email_verified) {
+    if (user.emailVerified) {
         return NextResponse.json( {success: true, message: "Already verified"});
     }
     const code = generateVerifCode();

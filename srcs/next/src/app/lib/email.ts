@@ -1,8 +1,13 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer"
 import crypto from "crypto";
 
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_APP_PASSWORD,
+    }
+})
 
 export function generateVerifCode(): string {
     return crypto.randomInt(0, 1_000_000).toString().padStart(6, "0");
@@ -13,10 +18,15 @@ export  function getVerifExpiry(): Date {
 }
 
 export async function sendVerifEmail(to: string, code: string) {
-    await resend.emails.send({
-        from: "onboarding@resend.dev",
-        to,
-        subject: "Your verification code",
-        html: `<p>Your verification code is: <strong>${code}</strong></p><p>This code expires in 15 minutes.</p>`,
-    });
+    try {
+        const info = await transporter.sendMail({
+            from: `"transcendence" <${process.env.GMAIL_USER}>`,
+            to,
+            subject: "Your verification code",
+            html: `<p>Your verification code is: <strong>${code}</strong></p><p>This code expires in 15 minutes.</p>`,
+        });
+        console.log("Email sent:", info.messageId);
+    } catch (error) {
+        console.error("Resend error:", error);
+    }
 }

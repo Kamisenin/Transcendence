@@ -12,7 +12,7 @@ export async function POST (req: NextRequest) {
     if (!submittedCode) {
         return NextResponse.json({ error: "Code required" }, {status: 400});
     }
-    if (user.email_verified) {
+    if (user.emailVerified) {
         return NextResponse.json({ error: "Already verified" }, {status: 400});
     }
     if (!user.verifCode || !user.verifExpiry) {

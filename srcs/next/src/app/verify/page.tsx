@@ -31,7 +31,7 @@ export default function VerifyPage() {
 
     async function handleResend() {
         setMessage("");
-        const res = await fetch("/api/auth/resend-code", { method : "POST" });
+        const res = await fetch("/api/auth/resend_code", { method : "POST" });
         const data = await res.json();
         setMessage(res.ok ? "Code resent" : (data.error || "Something went wrong"));
     }

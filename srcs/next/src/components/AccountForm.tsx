@@ -2,11 +2,13 @@
 
 import { useState} from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 type Props = {
     user: {
         username: string;
         email: string;
+        emailVerified: boolean;
     };
 }
 
@@ -21,21 +23,22 @@ export default function AccountForm({ user }: Props) {
         if (!username || !email)
             return ;
         setLoading(true);
+        setMessage("");
         const res = await fetch("/api/auth/update", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                username,
-                email,
-            }),
+            headers: {"Content-Type": "application/json" },
+            body: JSON.stringify({username, email}),
         });
+        const data = await res.json();
         if (res.ok) {
+            if (data.emailChanged) {
+                router.push("/verify");
+                return ;
+            }
             setMessage("Saved !");
             router.refresh();
         } else {
-            setMessage("Error");
+            setMessage(data.error || "Error");
         }
         setLoading(false);
     }
@@ -55,6 +58,13 @@ export default function AccountForm({ user }: Props) {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}/>
             </label>
+            <div className="text-sm">
+                {user.emailVerified ? (
+                    <span className="text-green-600 font-semibold">✓ Email verified</span>
+                ) : (
+                    <span className="text-red-500 font-semibold">✗ Email not verified</span>
+                )}
+            </div>
             <button
                 disabled={loading}
                 onClick={save}
@@ -62,6 +72,9 @@ export default function AccountForm({ user }: Props) {
                 {loading ? "Saving..." : "Save"}
             </button>
             <p>{message}</p>
+            <Link href="/account/password" className="text-sm text-blue-500 underline">
+                Change password
+            </Link>
         </div>
     );
 }
