@@ -37,6 +37,8 @@ model User {
   emailVerified Boolean   @default(false) @map("email_verified")
   verifCode     String?   @map("verif_code")
   verifExpiry   DateTime? @map("verif_expiry")
+  twoFactorEnabled Boolean @default(false) @map("two_factor_enabled")
+
 
   sessions Session[] @relation("UserSession")
 
