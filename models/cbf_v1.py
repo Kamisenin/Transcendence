@@ -56,9 +56,7 @@ def calculate_channel_score(user_profile, channel_tags):
     return score
 
 
-# -------------------------
-# Programme principal
-# -------------------------
+# -------------------------------------{ Programme principal }------------------------------------- #
 
 data = load_data("../data/test.csv")
 
