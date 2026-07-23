@@ -31,10 +31,6 @@ export default function AccountForm({ user }: Props) {
         });
         const data = await res.json();
         if (res.ok) {
-            if (data.emailChanged) {
-                router.push("/verify");
-                return ;
-            }
             setMessage("Saved !");
             router.refresh();
         } else {
@@ -62,7 +58,12 @@ export default function AccountForm({ user }: Props) {
                 {user.emailVerified ? (
                     <span className="text-green-600 font-semibold">✓ Email verified</span>
                 ) : (
-                    <span className="text-red-500 font-semibold">✗ Email not verified</span>
+                    <>
+                        <span className="text-red-500 font-semibold">✗ Email not verified </span>
+                        <Link href="/verify" className="text-blue-500 underline">
+                            Verify my email
+                        </Link>
+                    </>
                 )}
             </div>
             <button
