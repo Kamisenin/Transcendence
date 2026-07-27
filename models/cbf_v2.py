@@ -34,9 +34,9 @@ def weight_tags(data):
     count = 0
 
     for item in data:  
+        count += 1
         for tag in item["tags"]:    
             
-            count += 1
             if tag in lst_tags:
                 lst_tags[tag] += 1
             else:
@@ -46,8 +46,9 @@ def weight_tags(data):
     print(lst_tags)
 
     for tag in lst_tags:
-        lst_tags[tag] = round(math.log(lst_tags[tag] + 1 / count + 1) + 1, 4)
-    return lst_tags
+        lst_tags[tag] = round(math.log((count + 1) / (lst_tags[tag] + 1)) + 1, 4)
+    lst_tags_sort = dict(sorted(lst_tags.items()))
+    return lst_tags_sort
 
 
 def build_user_profile(data, user_id, weight_tag):
@@ -62,7 +63,7 @@ def build_user_profile(data, user_id, weight_tag):
         # Ajout du poids à chaque tag
         for tag in row["tags"]:
             profile[tag] += round(EVENT_WEIGHTS[row["event"]] * weight_tag[tag], 4)
-
+    
     return dict(profile)
 
 
@@ -85,6 +86,8 @@ weight_tags = weight_tags(data)
 
 print("\nweight tag :")
 print(weight_tags)
+
+
 
 profile = build_user_profile(data, user_id, weight_tags)
 
