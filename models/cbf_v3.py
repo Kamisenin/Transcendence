@@ -44,7 +44,6 @@ def weight_tags(data, vocabulary):
 
     df = defaultdict(int)
 
-    # nombre de channels
     nb_channels = len(set(row["channel_id"] for row in data))
 
     for row in data:
@@ -57,14 +56,17 @@ def weight_tags(data, vocabulary):
     idf = {}
 
     for index, count in df.items():
-        idf[index] = round(math.log((nb_channels + 1) / (count + 1)) + 1, 4)
+        idf[index] = math.log((nb_channels + 1) / (count + 1)) + 1
 
     return idf
 
 
 def build_user_profile(data, user_id, vocabulary, idf):
 
-    profile = defaultdict(float)
+    profile = {
+        "vector": defaultdict(float),
+        "norm": 0.0
+    }
 
     for row in data:
 
@@ -77,7 +79,14 @@ def build_user_profile(data, user_id, vocabulary, idf):
 
             index = vocabulary[tag]
 
-            profile[index] += round(weight * idf[index], 4)
+            profile["vector"][index] += weight * idf[index]
+
+    norm_user = 0.0
+
+    for value in profile["vector"].values():
+        norm_user += value * value
+
+    profile["norm"] = math.sqrt(norm_user)
 
     return dict(profile)
 
@@ -91,63 +100,65 @@ def build_channel_vectors(data, vocabulary, idf):
         cid = row["channel_id"]
 
         if cid not in channels:
-            channels[cid] = {}
+            channels[cid] = {
+                "vector": {},
+                "norm": 0
+            }
+
+        norm_channel = 0.0
 
         for tag in row["tags"]:
 
             index = vocabulary[tag]
 
-            channels[cid][index] = idf[index]
+            value = idf[index]
+
+            channels[cid]["vector"][index] = value
+
+            norm_channel += value * value
+
+
+        channels[cid]["norm"] = math.sqrt(norm_channel)
 
     return channels
 
 
-def cosine_similarity(user_vector, channel_vector):
+def cosine_similarity(user, channel):
 
     produit = 0.0
 
-    for index in user_vector:
+    for index in user["vector"]:
 
-        if index in channel_vector:
+        if index in channel["vector"]:
+
             produit += (
-                user_vector[index]
+                user["vector"][index]
                 *
-                channel_vector[index]
+                channel["vector"][index]
             )
 
-    norm_user = 0.0
-
-    for value in user_vector.values():
-        norm_user += value * value
-
-    norm_user = math.sqrt(norm_user)
-
-    norm_channel = 0.0
-
-    for value in channel_vector.values():
-        norm_channel += value * value
-
-    norm_channel = math.sqrt(norm_channel)
-
-    if norm_user == 0 or norm_channel == 0:
+    if user["norm"] == 0 or channel["norm"] == 0:
         return 0
 
-    return round(produit / (norm_user * norm_channel), 4)
+    return round(produit / (user["norm"] * channel["norm"]), 4)
 
-# -------------------------------------{ Programme principal }------------------------------------- #
+# -------------------------------------{ Main }------------------------------------- #
 
 data = load_data("../data/test.csv")
 
 user_id = 1
 
-# Construction des structures
+# ============== { def struct }
+
 vocabulary = build_vocabulary(data)
 idf = weight_tags(data, vocabulary)
 profile = build_user_profile(data, user_id, vocabulary, idf)
 channel_vectors = build_channel_vectors(data, vocabulary, idf)
 
+# ============== { test }
+
 print("\nVocabulary :")
-print(vocabulary)
+print(vocabulary, 4)
 
 print("\nIDF :")
 print(idf)
@@ -157,16 +168,48 @@ print(profile)
 
 print("\nVecteurs des channels :")
 
+
 for channel_id, vector in channel_vectors.items():
+
+    print(
+    "Channel:",
+    channel_id,
+    "| Vector:",
+    {
+        k: round(v, 4)
+        for k, v in vector["vector"].items()
+    },
+    "| Norm:",
+    round(vector["norm"], 4),
+    "| Similarity:",
+    cosine_similarity(profile, vector))
+
+# ============== { result }
+print("\nRecommendation :")
+
+
+results = []
+
+for channel_id, vector in channel_vectors.items():
+
+    score = cosine_similarity(profile, vector)
+
+    results.append(
+        (channel_id, score)
+    )
+
+
+top_3 = sorted(
+    results,
+    key=lambda x: x[1],
+    reverse=True
+)[:3]
+
+for channel_id, score in top_3:
 
     print(
         "Channel:",
         channel_id,
-        "| Vector:",
-        vector,
         "| Similarity:",
-        cosine_similarity(profile, vector)
+        score
     )
-
-
-    
