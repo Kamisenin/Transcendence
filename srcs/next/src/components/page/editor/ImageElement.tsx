@@ -2,9 +2,11 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Transforms } from "slate";
-import { ReactEditor, useSelected, useFocused, useSlate } from "slate-react";
-import { Trash2, AlignLeft, AlignCenter, AlignRight, Image as ImageIcon, Upload, Check, Pencil, Move, GripVertical,
-    ArrowUp, ArrowDown } from "lucide-react";
+import { ReactEditor, useSelected, useFocused, useSlate, useReadOnly } from "slate-react";
+import {
+    Trash2, AlignLeft, AlignCenter, AlignRight, Image as ImageIcon,
+    Upload, Check, Pencil, Move, ArrowUp, ArrowDown
+} from "lucide-react";
 
 const MIN_WIDTH = 120;
 const MAX_WIDTH = 900;
@@ -22,6 +24,9 @@ export default function ImageElement({ attributes, children, element }: any) {
     const focused = useFocused();
     const editor = useSlate();
 
+    // 💡 1. Hook pour détecter si l'éditeur est en mode lecture seule
+    const readOnly = useReadOnly();
+
     const savedUrl = element.url || "";
     const alt = element.alt || "";
     const align = element.align || "center";
@@ -31,7 +36,7 @@ export default function ImageElement({ attributes, children, element }: any) {
     const [hasError, setHasError] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
 
-    // width
+    // Redimensionnement
     const [width, setWidth] = useState<number>(savedWidth);
     const [isResizing, setIsResizing] = useState(false);
     const isDragging = useRef(false);
@@ -42,15 +47,14 @@ export default function ImageElement({ attributes, children, element }: any) {
         if (!isDragging.current) setWidth(savedWidth);
     }, [savedWidth]);
 
-    // Positioning
     const getLayoutClasses = () => {
         switch (align) {
             case "left":
-                return "float-left mr-4 mb-2"; // Image à gauche, texte à droite
+                return "float-left mr-4 mb-2";
             case "right":
-                return "float-right ml-4 mb-2"; // Image à droite, texte à gauche
+                return "float-right ml-4 mb-2";
             default:
-                return "mx-auto my-4 clear-both"; // Centré (bloque le texte à côté)
+                return "mx-auto my-4 clear-both";
         }
     };
 
@@ -61,10 +65,8 @@ export default function ImageElement({ attributes, children, element }: any) {
 
     const handleResizeMove = (e: MouseEvent) => {
         if (!isDragging.current) return;
-
         const delta = e.clientX - dragStart.current.x;
         const next = Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, dragStart.current.width + delta));
-
         widthRef.current = next;
         setWidth(next);
     };
@@ -111,13 +113,6 @@ export default function ImageElement({ attributes, children, element }: any) {
         updateElement({ url: "" });
     };
 
-    // const handleDragStart = (e: React.DragEvent) => {
-    //     e.stopPropagation()
-    //     const path = ReactEditor.findPath(editor, element);
-    //     e.dataTransfer.setData("application/slate-image-path", JSON.stringify(path));
-    //     e.dataTransfer.effectAllowed = "move";
-    // };
-
     const moveUp = () => {
         try {
             const path = ReactEditor.findPath(editor, element);
@@ -129,7 +124,7 @@ export default function ImageElement({ attributes, children, element }: any) {
                 });
             }
         } catch (e) {
-            console.warn("Impossible de monter l'image", e);
+            console.warn("Can't move image upward", e);
         }
     };
 
@@ -145,7 +140,6 @@ export default function ImageElement({ attributes, children, element }: any) {
                     to: [currentIndex + 1],
                 });
             } else {
-                // Si l'image est tout en bas, on insère un nouveau paragraphe puis on descend l'image
                 Transforms.insertNodes(
                     editor,
                     { type: "paragraph", children: [{ text: "" }] } as any,
@@ -157,25 +151,38 @@ export default function ImageElement({ attributes, children, element }: any) {
                 });
             }
         } catch (e) {
-            console.warn("Impossible de descendre l'image", e);
+            console.warn("Can't move image downward", e);
         }
     };
 
+    // READ MODE
+    if (readOnly) {
+        if (!savedUrl || hasError) {
+            return <span {...attributes}>{children}</span>;
+        }
+
+        return (
+            <div {...attributes} contentEditable={false} className={`user-select-none ${getLayoutClasses()}`}>
+                <div style={{ width: `${width}px`, maxWidth: "100%", boxSizing: "border-box" }}>
+                    <img
+                        src={savedUrl}
+                        alt={alt}
+                        className="w-full h-auto object-cover rounded-md"
+                    />
+                </div>
+                {/* Ne JAMAIS oublier children pour Slate ! */}
+                {children}
+            </div>
+        );
+    }
+
+    // EDIT MODE
     return (
         <div {...attributes} contentEditable={false} className={`user-select-none ${getLayoutClasses()}`}>
             <div style={{ width: `${width}px`, maxWidth: "100%", boxSizing: "border-box" }}>
                 {savedUrl && !hasError && !isEditing ? (
-                    /* Image */
+                    /* Vue Édition : Image chargée avec contrôles */
                     <div className={`relative group border-2 rounded-lg overflow-hidden ${selected && focused ? "border-blue-500 shadow-md" : "border-transparent"}`}>
-                        {/*
-                    //         draggable
-                    //         onDragStart={handleDragStart}
-                    //         onMouseDown={(e) => e.stopPropagation()}
-                    //         className="absolute top-2 left-2 bg-white/90 backdrop-blur border rounded-lg shadow p-1 cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity z-20 text-gray-500 hover:text-gray-800"
-                    //         title="Maintenir et glisser pour déplacer l'image"
-                    //     >
-                    //         <GripVertical size={14} />
-                    //     </div> */}
                         <img
                             src={savedUrl}
                             alt={alt}
@@ -183,51 +190,32 @@ export default function ImageElement({ attributes, children, element }: any) {
                             className="w-full h-auto object-cover max-h-96 rounded-md pointer-events-none"
                         />
 
-                        {/* Image Toolbar */}
-
+                        {/* Toolbar d'édition sur l'image */}
                         <div className="absolute top-2 right-2 bg-white/90 backdrop-blur border rounded-lg shadow p-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                            <button
-                                type="button"
-                                onClick={moveUp}
-                                className="p-1 hover:bg-gray-100 text-gray-600 rounded"
-                                title="Monter l'image"
-                            >
+                            <button type="button" onClick={moveUp} className="p-1 hover:bg-gray-100 text-gray-600 rounded" title="Monter l'image">
                                 <ArrowUp size={14} />
                             </button>
-
-                            <button
-                                type="button"
-                                onClick={moveDown}
-                                className="p-1 hover:bg-gray-100 text-gray-600 rounded"
-                                title="Descendre l'image"
-                            >
+                            <button type="button" onClick={moveDown} className="p-1 hover:bg-gray-100 text-gray-600 rounded" title="Descendre l'image">
                                 <ArrowDown size={14} />
                             </button>
-                            <button
-                                type="button"
-                                onClick={() => { setTempUrl(savedUrl); setIsEditing(true); }}
-                                className="p-1 hover:bg-gray-100 text-gray-600 rounded"
-                                title="Modifier l'URL"
-                            >
+                            <button type="button" onClick={() => { setTempUrl(savedUrl); setIsEditing(true); }} className="p-1 hover:bg-gray-100 text-gray-600 rounded" title="Modifier l'URL">
                                 <Pencil size={14} />
                             </button>
 
                             <div className="w-[1px] h-4 bg-gray-200 mx-0.5" />
 
-                            {/* Image placement */}
-                            <button type="button" onClick={() => updateElement({ align: "left" })} className={`p-1 rounded ${align === "left" ? "bg-blue-100 text-blue-600" : "hover:bg-gray-100 text-gray-600"}`} title="Aligner à gauche (Texte à droite)">
+                            <button type="button" onClick={() => updateElement({ align: "left" })} className={`p-1 rounded ${align === "left" ? "bg-blue-100 text-blue-600" : "hover:bg-gray-100 text-gray-600"}`} title="Aligner à gauche">
                                 <AlignLeft size={14} />
                             </button>
                             <button type="button" onClick={() => updateElement({ align: "center" })} className={`p-1 rounded ${align === "center" ? "bg-blue-100 text-blue-600" : "hover:bg-gray-100 text-gray-600"}`} title="Centrer">
                                 <AlignCenter size={14} />
                             </button>
-                            <button type="button" onClick={() => updateElement({ align: "right" })} className={`p-1 rounded ${align === "right" ? "bg-blue-100 text-blue-600" : "hover:bg-gray-100 text-gray-600"}`} title="Aligner à droite (Texte à gauche)">
+                            <button type="button" onClick={() => updateElement({ align: "right" })} className={`p-1 rounded ${align === "right" ? "bg-blue-100 text-blue-600" : "hover:bg-gray-100 text-gray-600"}`} title="Aligner à droite">
                                 <AlignRight size={14} />
                             </button>
 
                             <div className="w-[1px] h-4 bg-gray-200 mx-0.5" />
 
-                            {/* size preset */}
                             {SIZE_PRESETS.map((preset) => (
                                 <button
                                     key={preset.label}
@@ -247,7 +235,7 @@ export default function ImageElement({ attributes, children, element }: any) {
                             </button>
                         </div>
 
-                        {/* resize button */}
+                        {/* Poignée de redimensionnement */}
                         <div
                             onMouseDown={handleResizeStart}
                             className="absolute bottom-1 right-1 w-4 h-4 rounded-sm bg-blue-500 border-2 border-white shadow cursor-nwse-resize opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-20"
@@ -256,7 +244,7 @@ export default function ImageElement({ attributes, children, element }: any) {
                             <Move size={9} className="text-white" />
                         </div>
 
-                        {/* width indcator */}
+                        {/* Indicateur de taille */}
                         {isResizing && (
                             <div className="absolute bottom-1 left-1 bg-black/70 text-white text-[10px] px-1.5 py-0.5 rounded z-20">
                                 {Math.round(width)}px
@@ -264,7 +252,7 @@ export default function ImageElement({ attributes, children, element }: any) {
                         )}
                     </div>
                 ) : (
-                    /* Editing form */
+                    /* Vue Édition : Formulaire de saisie d'URL */
                     <div className={`p-4 border-2 border-dashed rounded-xl bg-gray-50 flex flex-col gap-3 min-w-[300px] ${selected && focused ? "border-blue-500 ring-2 ring-blue-100" : "border-gray-300"}`}>
                         <div className="flex items-center justify-between text-xs font-semibold text-gray-500">
                             <span className="flex items-center gap-1.5"><ImageIcon size={14} /> {isEditing ? "Modifier l'image" : "Ajouter une image"}</span>
@@ -300,7 +288,7 @@ export default function ImageElement({ attributes, children, element }: any) {
 
                             {hasError && (
                                 <span className="text-[11px] text-red-500 font-medium pl-1">
-                                    image not found
+                                    image non trouvée
                                 </span>
                             )}
                         </div>
@@ -312,7 +300,7 @@ export default function ImageElement({ attributes, children, element }: any) {
                             onChange={(e) => updateElement({ alt: e.target.value })}
                             className="text-xs p-2 bg-white border rounded-lg outline-none focus:border-blue-500"
                         />
-                        {/* TODO upload */}
+
                         <div className="border border-dashed border-gray-200 bg-white rounded-lg p-3 text-center opacity-60 cursor-not-allowed">
                             <p className="text-[11px] text-gray-400 flex items-center justify-center gap-1">
                                 <Upload size={12} /> Glisser un fichier ou parcourir (Bientôt disponible)

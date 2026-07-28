@@ -1,19 +1,17 @@
 "use client";
 
-import { useMemo, useEffect, useCallback, useState } from "react";
-import { createEditor, Editor, BaseEditor, Descendant, Transforms, Element as SlateElement } from "slate";
-import { Slate, Editable, withReact, ReactEditor, useSelected } from "slate-react";
+import { useMemo, useEffect } from "react";
+import { createEditor, Editor, BaseEditor, Descendant } from "slate";
+import { Slate, Editable, withReact } from "slate-react";
 import { withHistory, HistoryEditor } from "slate-history";
 import { GripVertical, Trash2 } from "lucide-react";
-import ImageElement from "./ImageElement";
-import { EditorDragProvider, useEditorDrag } from "@/components/context/EditorDragContext";
+import { renderElement, renderLeaf } from "%/lib/slate_renderer";
 
 type CustomElement = { type: "paragraph"; children: CustomText[] };
 type CustomText = { text: string };
 
 declare module "slate" {
     interface CustomTypes {
-
         Editor: BaseEditor & ReactEditor & HistoryEditor;
         Element: CustomElement;
         Text: CustomText;
@@ -25,15 +23,16 @@ type EditorInstance = BaseEditor & ReactEditor;
 type Props = {
     id: string;
     isActive: boolean;
+    value: Descendant[];
+    onValueChange: (id: string, value: Descendant[]) => void;
     onFocus: (id: string) => void;
     onMount: (id: string, editor: EditorInstance) => void;
     onUnmount: (id: string) => void;
     onDelete?: (id: string) => void;
     onChange?: () => void;
-    onAction?: () => void;
 };
 
-export default function WikiEditor({ id, isActive, onFocus, onMount, onUnmount, onDelete, onChange, onAction }: Props) {
+export default function WikiEditor({ id, value, onValueChange, isActive, onFocus, onMount, onUnmount, onDelete }: Props) {
 
     const editor = useMemo(() => {
         const e = withHistory(withReact(createEditor()));
@@ -42,60 +41,23 @@ export default function WikiEditor({ id, isActive, onFocus, onMount, onUnmount, 
         return e;
     }, []);
 
-
-    const initialValue = useMemo<Descendant[]>(
-        () => [{ type: "paragraph", children: [{ text: "" }] }],
-        []
-    );
-
     useEffect(() => {
         onMount(id, editor);
         return () => onUnmount(id);
     }, [id, editor, onMount, onUnmount]);
 
-    const renderElement = useCallback((props: any) => {
-            if (props.element.type === "image") {
-                return <ImageElement {...props} />;
-            }
-            return (
-                <p {...props.attributes} className="min-h-[1.5em] my-1 outline-none">
-                    {props.children}
-                </p>
-            );
-        }, []);
-
-    const renderLeaf = useCallback((props: any) => {
-        const style: React.CSSProperties = {
-            fontSize: props.leaf.fontSize || "16px",
-            color: props.leaf.color || "#000000",
-        };
-
-        let el = <span {...props.attributes} style={style}>{props.children}</span>;
-        if (props.leaf.bold) el = <strong>{el}</strong>;
-        if (props.leaf.italic) el = <em>{el}</em>;
-        if (props.leaf.underline) el = <u>{el}</u>;
-        if (props.leaf.strikethrough) el = <s>{el}</s>;
-
-        return el;
-    }, []);
-
     const toggleMark = (mark: string) => {
         const marks = Editor.marks(editor);
-        const isActive = marks ? marks[mark] === true : false;
+        const isMarkActive = marks ? marks[mark] === true : false;
 
-        if (isActive) {
+        if (isMarkActive) {
             Editor.removeMark(editor, mark);
         } else {
             Editor.addMark(editor, mark, true);
         }
-
-        // follow action to parent
-        if (onAction) {
-            onAction();
-        }
     };
 
-    const keyHandler =  (event : any) => {
+    const keyHandler = (event: any) => {
         if (event.ctrlKey || event.metaKey) {
             switch (event.key.toLowerCase()) {
                 case 'b':
@@ -106,7 +68,7 @@ export default function WikiEditor({ id, isActive, onFocus, onMount, onUnmount, 
                     event.preventDefault();
                     toggleMark('italic');
                     break;
-                case 'u' :
+                case 'u':
                     event.preventDefault();
                     toggleMark('underline');
                     break;
@@ -118,41 +80,50 @@ export default function WikiEditor({ id, isActive, onFocus, onMount, onUnmount, 
                     }
             }
         }
-    }
-
+    };
 
     return (
         <div
             className={[
-                "group relative h-full rounded border bg-white p-2 transition shadow-sm overflow-x-auto max-w-full",
+                "group relative h-full rounded border bg-white p-3 transition shadow-sm overflow-x-auto max-w-full flex flex-col",
                 isActive
                     ? "border-blue-500 ring-2 ring-blue-100"
                     : "border-gray-200 hover:border-gray-300"
             ].join(" ")}
-            onMouseDown={() => onFocus(id)}
         >
-            <div className="absolute left-2 top-2 z-10 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute left-2 top-2 z-10 flex flex-col items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 backdrop-blur-sm rounded border border-gray-100 shadow-xs p-0.5">
                 <button
                     type="button"
                     className="drag-handle cursor-grab active:cursor-grabbing p-1 rounded hover:bg-gray-100 text-gray-400"
+                    title="Déplacer le bloc"
                 >
                     <GripVertical size={14} />
                 </button>
                 {onDelete && (
                     <button
                         type="button"
-                        onClick={() => onDelete(id)}
-                        className="p-1 rounded hover:bg-red-50 text-red-400"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onDelete(id);
+                        }}
+                        className="p-1 rounded hover:bg-red-50 text-red-400 hover:text-red-600 transition"
+                        title="Supprimer le bloc"
                     >
                         <Trash2 size={14} />
                     </button>
                 )}
             </div>
 
-            <div className="pl-8 h-full">
-                <Slate editor={editor} initialValue={initialValue}>
+            <div className="pl-9 h-full flex flex-col justify-center " onMouseDown={(e) => e.stopPropagation()}>
+                <Slate
+                    editor={editor}
+                    initialValue={value}
+                    onChange={(newValue) => {
+                        onValueChange(id, newValue);
+                    }}
+                >
                     <Editable
-                        className="w-full h-full p-2 outline-none"
+                        className="slate-editor-content w-full h-full outline-none text-gray-800 leading-normal"
                         placeholder="Type your text here..."
                         onFocus={() => onFocus(id)}
                         renderElement={renderElement}

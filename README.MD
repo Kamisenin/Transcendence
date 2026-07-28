@@ -35,15 +35,8 @@ nvm use --lts
 You can check your installation with
 ``node -v`` or ``npm -v``
 
-## Prisma Installation
-
-Once node is installed you can just do
-```npm i prisma```
-
-## NextJs
-
-Again once node package manager is installed do
-```npm i next```
+Then once npm is installed go inside srcs/next folder and run ``npm install``
+this will install all the dependencies of the project that are listed in the package.json 
 
 ## Secrets
 

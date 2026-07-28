@@ -19,6 +19,12 @@ enum RequestStatus {
   REJECTED
 }
 
+enum SlugType {
+  USER
+  TAG
+}
+
+
 // ════════════════════════════════════════════
 // USERS
 // ════════════════════════════════════════════
@@ -33,6 +39,12 @@ model User {
   email     String   @unique
   password  String
   createdAt DateTime @default(now()) @map("created_at")
+
+  emailVerified Boolean   @default(false) @map("email_verified")
+  verifCode     String?   @map("verif_code")
+  verifExpiry   DateTime? @map("verif_expiry")
+  twoFactorEnabled Boolean @default(false) @map("two_factor_enabled")
+
 
   sessions Session[] @relation("UserSession")
 
@@ -88,6 +100,8 @@ model Tag {
   name        String   @unique
   description String?
   createdAt   DateTime @default(now()) @map("created_at")
+  namespace   String?
+  color       Int?
 
   owner       User            @relation("TagOwner", fields: [ownerToken], references: [user_id])
   roles       TagRole[]
@@ -188,7 +202,25 @@ model Page {
   orgPageAccess     OrgPageAccess[]
   orgPageCapability OrgPageCapability[]
 
+  slugs             PageSlug[]
+
   @@map("pages")
+}
+
+// Page Slug allows for multiple redirections to be working at the same time will only one is the official one
+model PageSlug {
+  id          Int      @id @default(autoincrement())
+  pageId      Int      @map("page_id")
+  namespace   String   @map("namespace")
+  slug        String   @map("slug")
+  type        SlugType @map("type")
+  isCanonical Boolean  @default(false) @map("is_canonical") // main path
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  page Page @relation(fields: [pageId], references: [pageId], onDelete: Cascade)
+
+  @@unique([namespace, slug])
+  @@map("page_slugs")
 }
 
 // Direct Permission access of a user to a Page
