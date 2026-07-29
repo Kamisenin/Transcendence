@@ -41,6 +41,7 @@ EOSQL
 psql -v ON_ERROR_STOP=1 --username "postgres" --dbname "WEBSITE" <<-EOSQL
     ALTER SCHEMA public OWNER TO website_db_admin;
     GRANT ALL PRIVILEGES ON SCHEMA public TO website_db_admin;
+    CREATE EXTENSION IF NOT EXISTS pg_trgm;
 EOSQL
 
 log "Initialization done..."
