@@ -1,11 +1,10 @@
-import {createUser, getUser, isAccountIdUsed, isEmailUsed} from "%/lib/prisma-utils";
+import {getUser} from "%/lib/prisma-utils";
 import { sendVerifEmail, generateVerifCode, getVerifExpiry } from "@/app/lib/email";
 import {createSession, setCookies} from "%/lib/session";
 import { NextRequest, NextResponse } from 'next/server';
 import { compare } from 'bcrypt';
 import { cookies } from "next/headers";
 import { prisma } from "%/lib/prisma"
-import TwoFactorToggle from "@/components/TwoFactor";
 
 export async function POST(req: NextRequest) {
     const body = await req.json();
@@ -35,11 +34,11 @@ export async function POST(req: NextRequest) {
             secure: process.env.NODE_ENV === "production",
             maxAge: 60 * 10,
         });
-        return NextResponse.json({success: true, TwoFactorRequired: true});
+        return NextResponse.json({success: true, twoFactorRequired: true});
     }
 
     const stayConnected = body.stayConnected as boolean;
     const session = await createSession(user.user_id, stayConnected);
     await setCookies(session, stayConnected);
-    return NextResponse.json({ success: true, TwoFactorRequired: false});
+    return NextResponse.json({ success: true, twoFactorRequired: false});
 }

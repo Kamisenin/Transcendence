@@ -18,6 +18,8 @@ export async function POST(req: NextRequest) {
 
     if (!user || !user.verifCode || !user.verifExpiry)
         return NextResponse.json({error: "No pending verification"}, {status: 400});
+    if (user.verifExpiry < new Date())
+        return NextResponse.json({error: "Code expired"}, {status: 400});
     if (user.verifCode !== submittedCode) 
         return NextResponse.json({error: "invalid code"}, {status: 400});
     

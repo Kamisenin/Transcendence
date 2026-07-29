@@ -17,7 +17,7 @@ export default function TwoFactorToggle({ twoFactorEnabled, emailVerified }: Pro
     async function handleToggle() {
         const newValue = !enabled;
 
-        if (!newValue && !emailVerified) {
+        if (newValue && !emailVerified) {
             setMessage("Please verify your email first, in your account settings.");
             return ;
         }
@@ -25,7 +25,7 @@ export default function TwoFactorToggle({ twoFactorEnabled, emailVerified }: Pro
         setMessage("");
         const res = await fetch("/api/auth/2fa", {
             method: "POST",
-            headers: {"Content-Type": "application.json"},
+            headers: {"Content-Type": "application/json"},
             body: JSON.stringify({enable: newValue}),
         });
         const data = await res.json();
