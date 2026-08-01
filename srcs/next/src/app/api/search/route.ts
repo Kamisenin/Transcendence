@@ -14,6 +14,9 @@ export async function GET(req: NextRequest) {
   const userId = user.user_id
   const queryWords = query.split(" ").filter((w: string) => w.length > 2).join(" ")
 
+  if (!queryWords)
+	return NextResponse.json({ error: "Query too short" }, { status: 400 })
+
   const pages = await prisma.$queryRaw`
 	SELECT DISTINCT p.page_id, p.title,
 	  array_agg(t.name) as tags
@@ -34,11 +37,19 @@ export async function GET(req: NextRequest) {
 	tags: page.tags
   }))
 
-  const response = await fetch("http://search-engine:8000/search", {
-	method: "POST",
-	headers: { "Content-Type": "application/json" },
-	body: JSON.stringify({ query, items })
-  })
+  let response
+  try {
+	response = await fetch("http://search-engine:8000/search", {
+	  method: "POST",
+	  headers: { "Content-Type": "application/json" },
+	  body: JSON.stringify({ query, items })
+	})
+  } catch (err) {
+	return NextResponse.json({ error: "Search service unavailable" }, { status: 503 })
+  }
+
+  if (!response.ok)
+	return NextResponse.json({ error: "Search service error" }, { status: 502 })
 
   return NextResponse.json(await response.json())
 }
