@@ -20,10 +20,9 @@ export default async function WikiEditPage({ params }: Params) {
 
     const { page } = await resolvePage(namespace, slug);
     if (!page) notFound();
-    if (!await canEditPage(page.pageId, user)) {
+    if (!await canEditPage(page.pageId, user.user_id)) {
         redirect(`/wiki/${namespace}/${slug}`);
     }
-
 
     const content = page.content as { blocks: any[] } | null;
 
@@ -32,6 +31,7 @@ export default async function WikiEditPage({ params }: Params) {
             pageId={page.pageId}
             initialTitle={page.title}
             initialBlocks={content?.blocks ?? []}
+            visibility={page.public}
         />
     );
 }
