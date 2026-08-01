@@ -186,9 +186,12 @@ model Page {
   pageId       Int      @id @default(autoincrement()) @map("page_id")
   title        String
   content      Json?
+  description  String?
+  img          String?
   ownerId      String   @map("owner_id")
   createdAt    DateTime @default(now()) @map("created_at")
   lastModified DateTime @updatedAt @map("last_modified")
+  public       Boolean  @default(false)
 
   owner User @relation("PageOwner", fields: [ownerId], references: [user_id])
 

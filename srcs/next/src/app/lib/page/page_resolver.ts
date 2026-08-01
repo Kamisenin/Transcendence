@@ -17,9 +17,6 @@ export async function resolvePage(
     slug: string
 ): Promise<ResolvedPage | null> {
 
-
-    console.log(namespace, slug);
-
     const pageSlug = await prisma.pageSlug.findUnique({
         where: {
             namespace_slug : {
@@ -31,16 +28,11 @@ export async function resolvePage(
 
     if (!pageSlug) return null;
 
-    console.log("YEEEES");
-
     const page = await prisma.page.findUnique({
         where: { pageId: pageSlug.pageId },
     });
 
     if (!page) return null;
-
-
-    console.log("PAGE FOUND");
 
     let redirectTo: string | null = null;
 

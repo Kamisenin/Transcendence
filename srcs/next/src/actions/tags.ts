@@ -84,7 +84,7 @@ export async function getTagsAction(query?: string) {
         take: 30, //limit for the autocomplete
     });
 
-    return tags.map((t: any) => ({
+    return tags.map((t) => ({
         id: t.id.toString(),
         name: t.name,
         namespace: t.namespace,
