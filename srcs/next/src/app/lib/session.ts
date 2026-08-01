@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import type { Session } from "@prisma/client";
-import { prisma } from "%/lib/prisma";
+import { prisma } from "%/lib/prisma/prisma";
 import { getUserIp } from "%/lib/auth";
 
 export async function createSession(userId: string, stayConnected = false): Promise<Session> {
@@ -18,7 +18,15 @@ export async function createSession(userId: string, stayConnected = false): Prom
     });
 }
 
+export async function getSessionCookie() : Promise<string> {
+    const cookieStore = await cookies();
+    return cookieStore.get("session_id")?.value;
+}
+
 export async function getSessionUser(token: string) {
+
+    if (!token || token.length === 0) return null;
+
     const session = await prisma.session.findUnique({where: {id: token}, include: {user: true},});
     if (!session || await isSessionExpired(session))
         return null;
