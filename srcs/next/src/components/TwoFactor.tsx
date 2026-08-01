@@ -4,35 +4,36 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 type Props = {
-    twoFactor: boolean;
-    emailVerif: boolean;
+    twoFactorEnabled: boolean;
+    emailVerified: boolean;
 };
 
-export default function TwoFactorToggle({ twoFactor, emailVerif }: Props) {
-    const [enabled, setEnabled] = useState(twoFactor);
+export default function TwoFactorToggle({ twoFactorEnabled, emailVerified }: Props) {
+    const [enabled, setEnabled] = useState(twoFactorEnabled);
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
     const router = useRouter();
 
     async function handleToggle() {
-        setMessage("");
+        const newValue = !enabled;
 
-        if (!enabled && !emailVerif) {
-            setLoading(true);
-            await fetch("/api/auth/resend_code", {method: "POST"});
-            router.push("/verify");
+        if (newValue && !emailVerified) {
+            setMessage("Please verify your email first, in your account settings.");
             return ;
         }
         setLoading(true);
-        const res = await fetch("/api/auth/2fa/toggle", {
+        setMessage("");
+        const res = await fetch("/api/auth/2fa", {
             method: "POST",
-            headers: {"Content-Type": "application.json"},
-            body: JSON.stringify({enable: !enabled}),
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({enable: newValue}),
         });
         const data = await res.json();
         
         if (res.ok) {
-            setEnabled(!enabled);
+            setEnabled(data.twoFactorEnabled);
+            setMessage(newValue ? "Two-factor authentication enabled." : "Two-factor authentification disabled")
+            router.refresh();
         } else {
             setMessage(data.error || "Something went wrong");
         }
@@ -44,12 +45,12 @@ export default function TwoFactorToggle({ twoFactor, emailVerif }: Props) {
                 <input
                     type="checkbox"
                     checked={enabled}
-                    disabled={loading}
                     onChange={handleToggle}
+                    disabled={loading}
                 />
-                Two-factor authentication (email code)
+                <span>Two-factor authentication (email code)</span>
             </label>
-            {message && <p className="text-sm text-red-500">{message}</p>}
+            {message && <p className="text-sm text-red-600">{message}</p>}
         </div>
     );
 }
