@@ -10,16 +10,16 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
 
     if (!body.id || !body.password)
-        return NextResponse.json({ error: "Field Required" }, { status: 400 });
+        return NextResponse.json({error: "Field Required"}, {status: 400});
 
     const user = await getUser(body.id);
     if (!user)
-        return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+        return NextResponse.json({error: "Invalid credentials"}, {status: 401});
 
     const password = body.password as string;
     const passwordMatch = await compare(password, user.password);
     if (!passwordMatch)
-        return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+        return NextResponse.json({error: "Invalid credentials"}, {status: 401});
     if (user.twoFactorEnabled) {
         const code = generateVerifCode();
         const expiry = getVerifExpiry();
@@ -40,5 +40,5 @@ export async function POST(req: NextRequest) {
     const stayConnected = body.stayConnected as boolean;
     const session = await createSession(user.user_id, stayConnected);
     await setCookies(session, stayConnected);
-    return NextResponse.json({ success: true, twoFactorRequired: false});
+    return NextResponse.json({success: true, twoFactorRequired: false});
 }
