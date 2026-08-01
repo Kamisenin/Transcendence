@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/app/lib/session";
-import { prisma } from  "%/lib/prisma";
+import { prisma } from  "%/lib/prisma/prisma";
 import { sendVerifEmail, getVerifExpiry, generateVerifCode } from "@/app/lib/email";
 
 export async function POST(req: NextRequest) {

@@ -33,6 +33,10 @@ services:
     extra_hosts:
       - "host.parent:host-gateway"
 
+  yjs:
+    container_name: yjs
+    build: srcs/yjs
+    restart: unless-stopped
   next:
     container_name: next
     build: srcs/next/
@@ -42,6 +46,15 @@ services:
     depends_on:
       - postgres
     profiles: ["prod"]
+
+  search-engine:
+    container_name: search
+    build: srcs/search-engine/
+    restart: unless-stopped
+    networks: 
+      - 42chan
+    ports: 
+      - 8000:8000
 
 secrets:
   db_root_pwd:

@@ -1,5 +1,5 @@
-import {getUser} from "%/lib/prisma-utils";
 import { sendVerifEmail, generateVerifCode, getVerifExpiry } from "@/app/lib/email";
+import {createUser, getUser, isAccountIdUsed, isEmailUsed} from "%/lib/prisma/prisma-utils";
 import {createSession, setCookies} from "%/lib/session";
 import { NextRequest, NextResponse } from 'next/server';
 import { compare } from 'bcrypt';
@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
     const password = body.password as string;
     const passwordMatch = await compare(password, user.password);
     if (!passwordMatch)
-        throw new Error("Identifiants incorrects");
+        return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     if (user.twoFactorEnabled) {
         const code = generateVerifCode();
         const expiry = getVerifExpiry();

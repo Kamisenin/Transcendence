@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import type { Session } from "@prisma/client";
-import { prisma } from "%/lib/prisma";
+import { prisma } from "%/lib/prisma/prisma";
 import { getUserIp } from "%/lib/auth";
 
 export async function createSession(userId: string, stayConnected = false): Promise<Session> {
@@ -18,19 +18,26 @@ export async function createSession(userId: string, stayConnected = false): Prom
     });
 }
 
+export async function getSessionCookie() : Promise<string> {
+    const cookieStore = await cookies();
+    return cookieStore.get("session_id")?.value;
+}
+
 export async function getSessionUser(token: string) {
+
+    if (!token || token.length === 0) return null;
+
     const session = await prisma.session.findUnique({where: {id: token}, include: {user: true},});
     if (!session || await isSessionExpired(session))
         return null;
     return session.user;
 }
 
-export async function isSessionExpired(session : prisma.session) : Promise<boolean> {
+export async function isSessionExpired(session : Session) : Promise<boolean> {
     if (session.expiresAt < Date.now()) {
-        deleteSession(session.id);
+        await deleteSession(session.id);
         return true;
     }
-    console.log("session not expired: " + Date.now());
     return false;
 }
 
@@ -44,11 +51,10 @@ export async function getCurrentUser() {
     if (!token)
         return null;
     const user = await getSessionUser(token);
-    console.log(user);
     return user;
 }
 
-export async function setCookies(session: prisma.session, stayConnected: boolean)
+export async function setCookies(session: Session, stayConnected: boolean)
 {
     const cookieStore = await cookies();
     if (!stayConnected) {
