@@ -5,15 +5,15 @@ import { getSessionUser, getSessionCookie } from '%/lib/session';
 import { redirect } from "next/navigation";
 import { PermissionLevel } from "@prisma/client"
 import { init_slug, syncUserSlugs, slugify, removeTagSlug, setTagSlug } from "%/lib/page/slug";
-import { User } from '@prisma/client';
+import { User, Page } from '@prisma/client';
 import { type InfoboxData } from "@/components/page/Infobox"
 
 export async function savePage(pageId: number, title: string, content: any, infobox: InfoboxData, visibility: boolean, canonicalNamespace?: string | null
 ) {
     const user = await getSessionUser(await getSessionCookie());
-    if (!user) throw new Error("Unidentified user");
+    if (!user) redirect("/login");
 
-    console.log("desc : ", infobox.description, " img :", infobox.imageUrl);
+    // console.log("desc : ", infobox.description, " img :", infobox.imageUrl);
     await prisma.page.update({
         where: { pageId },
         data: { title, content, public: visibility, description: infobox.description, img: infobox.imageUrl}
@@ -32,7 +32,7 @@ export async function savePage(pageId: number, title: string, content: any, info
 export async function createPage() {
     const user = await getSessionUser(await getSessionCookie());
 
-    if (!user) throw new Error("Unidentified user");
+    if (!user) redirect("/login");
 
     const page = await prisma.page.create({
         data: {
@@ -174,11 +174,7 @@ export async function canEditPage(pageId: number, userToken: string = ""): Promi
 export async function canViewPage(pageId: number, userToken: string = ""): Promise<boolean> {
     if (userToken.length === 0)
         userToken = await getUserToken();
-
-    const page = await prisma.page.findUnique({ where: { pageId }, select: { public: true } });
-    if (!page) return false;
-
-    if (!userToken) return false;
-
+    if (!userToken)
+        return false;
     return await hasPageAccess(userToken, pageId, ['READ', 'WRITE', 'ADMIN']);
 }

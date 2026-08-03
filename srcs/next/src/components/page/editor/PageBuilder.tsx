@@ -55,7 +55,6 @@ export default function PageBuilder({ pageId, initialTitle, initialBlocks, visib
     const [activeEditor, setActiveEditor] = useState<EditorInstance | null>(null);
     const toolbarRef = useRef<ToolbarRef>(null);
 
-    // Initialisation : s'assure qu'un bloc 'infobox' existe toujours en constante
     const [blocks, setBlocks] = useState<SavedBlock[]>(() => {
         if (initialBlocks.length > 0) {
             const hasInfobox = initialBlocks.some(b => b.type === 'infobox');
@@ -186,7 +185,6 @@ export default function PageBuilder({ pageId, initialTitle, initialBlocks, visib
                     };
                 }),
             };
-
             await savePage(pageId, pageTitle, content as any, mainInfobox?.infoboxData, visibility);
         } finally {
             setSaving(false);
