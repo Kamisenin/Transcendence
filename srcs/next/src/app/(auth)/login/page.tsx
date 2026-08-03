@@ -21,8 +21,12 @@ export default function LoginPage() {
         });
         const j = await f.json();
 
+        if (j.twoFactorRequired) {
+            window.location.href = '/verify_2fa';
+        } else {
+            window.location.href = '/';
+        }
         console.log(j);
-        window.location.href = '/';
     }
 
 

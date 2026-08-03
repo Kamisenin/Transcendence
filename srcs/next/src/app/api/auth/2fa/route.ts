@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/app/lib/session";
 import { prisma } from "%/lib/prisma";
-import TwoFactorToggle from "@/components/TwoFactor";
 
 export async function POST(req: NextRequest) {
     const user = await getCurrentUser();
@@ -18,5 +17,5 @@ export async function POST(req: NextRequest) {
         where: {user_id: user.user_id},
         data: {twoFactorEnabled: enable},
     });
-    return NextResponse.json({success: true, TwoFactorEnbale: enbale});
+    return NextResponse.json({success: true, twoFactorEnabled: enable});
 }
