@@ -4,7 +4,7 @@ import {createSession, setCookies} from "%/lib/session";
 import { NextRequest, NextResponse } from 'next/server';
 import { compare } from 'bcrypt';
 import { cookies } from "next/headers";
-import { prisma } from "%/lib/prisma"
+import { prisma } from "%/lib/prisma/prisma"
 
 export async function POST(req: NextRequest) {
     const body = await req.json();
