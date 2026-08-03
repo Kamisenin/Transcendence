@@ -11,7 +11,6 @@ type Params = {
 };
 
 export default async function WikiViewPage({ params }: Params) {
-    // 1. Récupération des données côté serveur (Prisma)
     const { namespace, slug } = await params;
     const result = await resolvePage(namespace, slug);
 
@@ -22,8 +21,6 @@ export default async function WikiViewPage({ params }: Params) {
 
     const content = page.content as { blocks: any[] } | null;
     const blocks = content?.blocks ?? [];
-
-    // 2. On passe les données pures au composant client
     return (
         <PageViewer
             title={page.title}
