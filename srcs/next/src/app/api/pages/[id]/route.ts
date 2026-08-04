@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "%/lib/prisma";
+import { prisma } from "%/lib/prisma/prisma";
 
 export async function GET(
   request: Request,
@@ -15,13 +15,14 @@ export async function GET(
     return NextResponse.json({ error: "ID invalide" }, { status: 400 });
   }
 
-  try {
-    // 3. Requête Prisma avec le champ 'slugs' issu de ton schema.prisma
+try {
     const page = await prisma.page.findUnique({
       where: { pageId: numericId },
       select: {
         pageId: true,
         title: true,
+        description: true, // <-- À vérifier/ajouter dans Prisma
+        img: true, // 1. Récupération du lien de l'image (String?)
         slugs: {
           select: {
             slug: true,
@@ -29,9 +30,21 @@ export async function GET(
             isCanonical: true,
           },
           orderBy: {
-            isCanonical: "desc", // On prend le slug principal (canonical) en premier
+            isCanonical: "desc",
           },
           take: 1,
+        },
+        // 2. Récupération des tags via la relation intermédiaire TagPage, ne fonctionne pas donc on vas attendre que les tag soit terminer avent de le retravailler
+        tagPages: {
+          select: {
+            tag: {
+              select: {
+                id: true,
+                name: true,
+                color: true,
+              },
+            },
+          },
         },
       },
     });
@@ -42,11 +55,17 @@ export async function GET(
 
     const currentSlug = page.slugs[0];
 
+    // Formatage propre du tableau de tags pour le frontend
+    const tags = page.tagPages.map((tp) => tp.tag);
+
     return NextResponse.json({
       pageId: page.pageId,
       title: page.title,
+      description: page.description || "", 
+      img: page.img || null, // Image renvoyée au frontend (null si vide)
       slug: currentSlug?.slug || "",
       namespace: currentSlug?.namespace || "",
+      tags: tags, // Tableau de tags ex: [{ id: 1, name: "forum", color: 0xff0000 }, a revoir car j ai pas compris ton organisation
     });
   } catch (error) {
     console.error("Erreur API Page:", error);
