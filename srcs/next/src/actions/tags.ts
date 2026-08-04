@@ -5,11 +5,12 @@ import { getSessionUser, getSessionCookie } from '%/lib/session';
 import { intToHex, hexToInt } from "%/lib/hex_utils"
 import { getTagCapabilities, canManageRoleRank, canAssignRoleRank } from '%/lib/tag_permissions';
 import { revalidatePath } from 'next/cache';
+import { redirect } from "next/navigation";
 
-async function requireUser() {
-    const session = await getSession();
-    if (!session) throw new Error("Non authentifié");
-    return session.user;
+export async function requireUser() {
+    const user = await getSessionUser(await getSessionCookie());
+    if (!user) redirect("/login");
+    return user;
 }
 
 // ───────────── ROLES ─────────────
@@ -27,12 +28,11 @@ export async function createTagRole(tagId: number, data: {
     canReviewRequests: boolean;
 }) {
     const user = await requireUser();
-    const caps = await getTagCapabilities(tagId, user.token);
-    if (!caps.canManageRoles) throw new Error("Permission refusée");
+    const caps = await getTagCapabilities(tagId, user.user_id);
+    if (!caps.canManageRoles) throw new Error("Permission denied");
 
-    // Le rôle créé ne peut pas dépasser (ou égaler) le rang de son créateur, sauf pour l'owner
     if (!caps.isOwner && data.hierarchyLevel >= caps.rank) {
-        throw new Error("Tu ne peux pas créer un rôle égal ou supérieur à ton rang");
+        throw new Error("Cannot create a role higher or equal to your's");
     }
 
     await prisma.tagRole.create({ data: { tagId, ...data } });
@@ -52,18 +52,18 @@ export async function updateTagRole(tagId: number, roleId: number, data: Partial
     canReviewRequests: boolean;
 }>) {
     const user = await requireUser();
-    const caps = await getTagCapabilities(tagId, user.token);
-    if (!caps.canManageRoles) throw new Error("Permission refusée");
+    const caps = await getTagCapabilities(tagId, user.user_id);
+    if (!caps.canManageRoles) throw new Error("Permission denied");
 
     const target = await prisma.tagRole.findUnique({ where: { id: roleId } });
-    if (!target || target.tagId !== tagId) throw new Error("Rôle introuvable");
+    if (!target || target.tagId !== tagId) throw new Error("Couldn't find target role");
 
     if (!canManageRoleRank(caps.rank, target.hierarchyLevel)) {
-        throw new Error("Tu ne peux pas gérer un rôle de rang égal ou supérieur au tien");
+        throw new Error("Cannot manage a role higher or equal to your's");
     }
 
     if (data.hierarchyLevel !== undefined && !caps.isOwner && data.hierarchyLevel >= caps.rank) {
-        throw new Error("Tu ne peux pas fixer ce rôle à ton rang ou au-dessus");
+        throw new Error("Cannot set a role's hierarchy higher or equal to your's");
     }
 
     await prisma.tagRole.update({ where: { id: roleId }, data });
@@ -72,14 +72,14 @@ export async function updateTagRole(tagId: number, roleId: number, data: Partial
 
 export async function deleteTagRole(tagId: number, roleId: number) {
     const user = await requireUser();
-    const caps = await getTagCapabilities(tagId, user.token);
-    if (!caps.canManageRoles) throw new Error("Permission refusée");
+    const caps = await getTagCapabilities(tagId, user.user_id);
+    if (!caps.canManageRoles) throw new Error("Permission denied");
 
     const target = await prisma.tagRole.findUnique({ where: { id: roleId } });
-    if (!target || target.tagId !== tagId) throw new Error("Rôle introuvable");
+    if (!target || target.tagId !== tagId) throw new Error("Couldn't find target role");
 
     if (!canManageRoleRank(caps.rank, target.hierarchyLevel)) {
-        throw new Error("Tu ne peux pas supprimer un rôle de rang égal ou supérieur au tien");
+        throw new Error("Cannot delete a role higher or equal to your's");
     }
 
     await prisma.tagRole.delete({ where: { id: roleId } });
@@ -90,14 +90,14 @@ export async function deleteTagRole(tagId: number, roleId: number) {
 
 export async function assignTagRole(tagId: number, targetUserToken: string, roleId: number) {
     const user = await requireUser();
-    const caps = await getTagCapabilities(tagId, user.token);
-    if (!caps.canManageMembers) throw new Error("Permission refusée");
+    const caps = await getTagCapabilities(tagId, user.user_id);
+    if (!caps.canManageMembers) throw new Error("Permission denied");
 
     const role = await prisma.tagRole.findUnique({ where: { id: roleId } });
-    if (!role || role.tagId !== tagId) throw new Error("Rôle introuvable");
+    if (!role || role.tagId !== tagId) throw new Error("Couldn't find target role");
 
     if (!canAssignRoleRank(caps.rank, role.hierarchyLevel)) {
-        throw new Error("Tu ne peux pas assigner un rôle égal ou supérieur à ton rang");
+        throw new Error("Cannot assign a role higher or equal to your's");
     }
 
     await prisma.tagMember.upsert({
@@ -110,8 +110,8 @@ export async function assignTagRole(tagId: number, targetUserToken: string, role
 
 export async function removeTagMember(tagId: number, targetUserToken: string) {
     const user = await requireUser();
-    const caps = await getTagCapabilities(tagId, user.token);
-    if (!caps.canManageMembers) throw new Error("Permission refusée");
+    const caps = await getTagCapabilities(tagId, user.user_id);
+    if (!caps.canManageMembers) throw new Error("Permission denied");
 
     const membership = await prisma.tagMember.findUnique({
         where: { tagId_userToken: { tagId, userToken: targetUserToken } },
@@ -120,7 +120,7 @@ export async function removeTagMember(tagId: number, targetUserToken: string) {
     if (!membership) return;
 
     if (!canManageRoleRank(caps.rank, membership.role.hierarchyLevel)) {
-        throw new Error("Tu ne peux pas retirer un membre de rang égal ou supérieur au tien");
+        throw new Error("Cannot kick a user higher in rank than your's");
     }
 
     await prisma.tagMember.delete({ where: { tagId_userToken: { tagId, userToken: targetUserToken } } });
@@ -133,16 +133,16 @@ export async function reviewTagPageRequest(requestId: number, accept: boolean) {
     const user = await requireUser();
 
     const request = await prisma.tagPageRequest.findUnique({ where: { id: requestId } });
-    if (!request) throw new Error("Demande introuvable");
+    if (!request) throw new Error("Couldn't find Request");
 
-    const caps = await getTagCapabilities(request.tagId, user.token);
-    if (!caps.canReviewRequests) throw new Error("Permission refusée");
+    const caps = await getTagCapabilities(request.tagId, user.user_id);
+    if (!caps.canReviewRequests) throw new Error("Permission denied");
 
     await prisma.tagPageRequest.update({
         where: { id: requestId },
         data: {
-            status: accept ? 'ACCEPTEE' : 'REFUSEE',
-            reviewedBy: user.token,
+            status: accept ? 'APPROVED' : 'REJECTED',
+            reviewedBy: user.user_id,
         },
     });
 
@@ -163,10 +163,22 @@ export async function updateTagInfo(tagId: number, data: {
     name?: string;
     description?: string;
     color?: number;
+    namespace?: string | "";
 }) {
     const user = await requireUser();
-    const caps = await getTagCapabilities(tagId, user.token);
-    if (!caps.canEditInfo) throw new Error("Permission refusée");
+    const caps = await getTagCapabilities(tagId, user.user_id);
+    if (!caps.canEditInfo) throw new Error("Permission Denied");
+
+    if (data.namespace && data.namespace?.length > 0 && data.namespace.trim()) {
+        const trimmed = data.namespace.trim();
+        const existing = await prisma.tag.findFirst({
+            where: { namespace: trimmed, id: { not: tagId } },
+        });
+        if (existing) throw new Error("This namespace is already in use by another tag or user");
+        data.namespace = trimmed;
+    } else {
+        data.namespace = "";
+    }
 
     await prisma.tag.update({ where: { id: tagId }, data });
     revalidatePath(`/tags/${tagId}`);
@@ -197,24 +209,22 @@ export async function checkTagNamespaceAvailability(namespace: string): Promise<
 }
 
 export async function createTagAction(data: { name: string; namespace?: string; colorHex?: string }) {
-    const user = await getSessionUser(await getSessionCookie());
-    if (!user) throw new Error("Utilisateur non identifié");
-
+    const user = await requireUser();
     const name = data.name.trim();
-    if (!name) throw new Error("Le nom du tag est obligatoire.");
+    if (!name) throw new Error("Tag name is required.");
 
     const existingName = await prisma.tag.findUnique({
         where: { name }
     });
     if (existingName) {
-        throw new Error("Un tag avec ce nom existe déjà.");
+        throw new Error("This tag name is taken.");
     }
 
     const cleanNamespace = data.namespace?.trim() || null;
     if (cleanNamespace) {
         const check = await checkTagNamespaceAvailability(cleanNamespace);
         if (!check.available) {
-            throw new Error(check.message || "Namespace indisponible.");
+            throw new Error(check.message || "Namespace already in use.");
         }
     }
 
@@ -261,3 +271,25 @@ export async function getTagsAction(query?: string) {
     }));
 }
 
+export async function addTagMember(tagId: number, targetUserToken: string, roleId: number) {
+    const user = await requireUser();
+    const caps = await getTagCapabilities(tagId, user.user_id);
+    if (!caps.canManageMembers) throw new Error("Permission denied");
+
+    const existing = await prisma.tagMember.findUnique({
+        where: { tagId_userToken: { tagId, userToken: targetUserToken } },
+    });
+    if (existing) throw new Error("This user is already member of the tag");
+
+    const role = await prisma.tagRole.findUnique({ where: { id: roleId } });
+    if (!role || role.tagId !== tagId) throw new Error("Couldn't find target role");
+
+    if (!canAssignRoleRank(caps.rank, role.hierarchyLevel)) {
+        throw new Error("You cannot assign a role equal or superior of your own role");
+    }
+
+    await prisma.tagMember.create({
+        data: { tagId, userToken: targetUserToken, roleId },
+    });
+    revalidatePath(`/tags/${tagId}`);
+}

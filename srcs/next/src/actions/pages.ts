@@ -13,20 +13,37 @@ export async function savePage(pageId: number, title: string, content: any, info
     const user = await getSessionUser(await getSessionCookie());
     if (!user) redirect("/login");
 
-    // console.log("desc : ", infobox.description, " img :", infobox.imageUrl);
-    await prisma.page.update({
-        where: { pageId },
-        data: { title, content, public: visibility, description: infobox.description, img: infobox.imageUrl}
+    const titleSlug = title.trim() ? slugify(title) : null;
+    if (!titleSlug) return { success: false, error: "Le titre ne peut pas être vide." };
+
+    console.log("titleSlug", titleSlug);
+    console.log("canonicalNamespace", canonicalNamespace);
+    const tagNamespace = canonicalNamespace?.trim() || null;
+
+    const targetNamespaces = [user.accountId, ...(tagNamespace ? [tagNamespace] : [])];
+    console.log("TagNamespace", tagNamespace);
+    const conflict = await prisma.pageSlug.findFirst({
+        where: { slug: titleSlug, namespace: { in: targetNamespaces }, pageId: { not: pageId } }
     });
 
-    await syncUserSlugs(pageId, title, user.accountId);
-
-    // cleanup and update of page slug
-    if (canonicalNamespace && canonicalNamespace.trim()) {
-        await setTagSlug(pageId, title, canonicalNamespace.trim());
-    } else {
-        await removeTagSlug(pageId);
+    if (conflict) {
+        return { success: false, error: `Le titre "${title}" est déjà utilisé dans l'espace "${conflict.namespace}".` };
     }
+    
+    await prisma.page.update({
+        where: { pageId },
+        data: { title, content, public: visibility, description: infobox.description, img: infobox.imageUrl }
+    });
+    
+    await syncUserSlugs(pageId, titleSlug, user.accountId);
+
+    if (tagNamespace) {
+        await setTagSlug(pageId, titleSlug, tagNamespace);
+    } else {
+        await removeTagSlug(pageId, titleSlug);
+    }
+
+    return { success: true };
 }
 
 export async function createPage() {
@@ -177,4 +194,11 @@ export async function canViewPage(pageId: number, userToken: string = ""): Promi
     if (!userToken)
         return false;
     return await hasPageAccess(userToken, pageId, ['READ', 'WRITE', 'ADMIN']);
+}
+
+export async function getCanonicalNamespace(pageId: number)
+{
+    return await prisma.pageSlug.findFirst({
+        where : { pageId, isCanonical : true}
+    });
 }
