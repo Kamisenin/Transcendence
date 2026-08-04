@@ -23,6 +23,7 @@ export type InfoboxData = {
 };
 
 type Props = {
+    accountId: string
     id: string;
     pageId: number;
     data: InfoboxData;
@@ -30,9 +31,10 @@ type Props = {
     onDelete?: (id: string) => void;
     isReadOnly?: boolean;
     availableTagsPool?: Tag[];
+    canonicalNamespace?: string | null;
 };
 
-export default function Infobox({ id, pageId, data, onChange, onDelete, isReadOnly = false }: Props) {
+export default function Infobox({ accountId, id, pageId, data, onChange, onDelete, isReadOnly = false, canonicalNamespace }: Props) {
     const [isPreview, setIsPreview] = useState(isReadOnly);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
@@ -82,6 +84,7 @@ export default function Infobox({ id, pageId, data, onChange, onDelete, isReadOn
                 <DescriptionInput value={data.description} onChange={(val) => updateField("description", val)} />
 
                 <TagManager
+                    pageId={pageId}
                     data={data}
                     onChange={onChange}
                     onOpenModal={() => setIsCreateModalOpen(true)}

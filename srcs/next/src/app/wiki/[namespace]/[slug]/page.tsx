@@ -14,14 +14,13 @@ export default async function WikiViewPage({ params }: Params) {
     const { namespace, slug } = await params;
     const result = await resolvePage(namespace, slug);
 
-    if (!result ) notFound();
+    if (!result) notFound();
 
     const { page, redirectTo } = result;
-
     if (redirectTo) redirect(redirectTo);
 
     try {
-        if (!page.public && !await canViewPage(page)) notFound();
+        if (!page.public && !await canViewPage(page.pageId)) notFound();
     } catch (e) {
         notFound();
     }

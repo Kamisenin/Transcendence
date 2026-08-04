@@ -18,5 +18,5 @@ export async function POST(req: NextRequest) {
         where: {user_id: user.user_id},
         data: {twoFactorEnabled: enable},
     });
-    return NextResponse.json({ success: true, TwoFactorEnable: enable });
+    return NextResponse.json({success: true, twoFactorEnabled: enable});
 }

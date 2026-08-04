@@ -1,9 +1,9 @@
-import {createUser, isAccountIdUsed, isEmailUsed} from "%/lib/prisma-utils";
+import {createUser, isAccountIdUsed, isEmailUsed} from "%/lib/prisma/prisma-utils";
 import bcrypt from 'bcrypt';
 import { NextResponse, NextRequest } from 'next/server';
 import {createSession, setCookies} from "%/lib/session";
 import { sendVerifEmail, generateVerifCode, getVerifExpiry } from "@/app/lib/email";
-import { prisma } from "%/lib/prisma";
+import { prisma } from "%/lib/prisma/prisma";
 
 export async function POST(req: NextRequest) {
     const body = await req.json();

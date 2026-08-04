@@ -5,7 +5,6 @@ type ResolvedPage = {
     redirectTo: string | null;
 };
 
-
 /*
 * This functions takes a namespace and a slug to
 * find a page to redirect to. If the address exists

@@ -5,34 +5,51 @@ import { getSessionUser, getSessionCookie } from '%/lib/session';
 import { redirect } from "next/navigation";
 import { PermissionLevel } from "@prisma/client"
 import { init_slug, syncUserSlugs, slugify, removeTagSlug, setTagSlug } from "%/lib/page/slug";
-import { User } from '@prisma/client';
+import { User, Page } from '@prisma/client';
 import { type InfoboxData } from "@/components/page/Infobox"
 
 export async function savePage(pageId: number, title: string, content: any, infobox: InfoboxData, visibility: boolean, canonicalNamespace?: string | null
 ) {
     const user = await getSessionUser(await getSessionCookie());
-    if (!user) throw new Error("Unidentified user");
+    if (!user) redirect("/login");
 
-    console.log("desc : ", infobox.description, " img :", infobox.imageUrl);
-    await prisma.page.update({
-        where: { pageId },
-        data: { title, content, public: visibility, description: infobox.description, img: infobox.imageUrl}
+    const titleSlug = title.trim() ? slugify(title) : null;
+    if (!titleSlug) return { success: false, error: "Le titre ne peut pas être vide." };
+
+    console.log("titleSlug", titleSlug);
+    console.log("canonicalNamespace", canonicalNamespace);
+    const tagNamespace = canonicalNamespace?.trim() || null;
+
+    const targetNamespaces = [user.accountId, ...(tagNamespace ? [tagNamespace] : [])];
+    console.log("TagNamespace", tagNamespace);
+    const conflict = await prisma.pageSlug.findFirst({
+        where: { slug: titleSlug, namespace: { in: targetNamespaces }, pageId: { not: pageId } }
     });
 
-    await syncUserSlugs(pageId, title, user.accountId);
-
-    // cleanup and update of page slug
-    if (canonicalNamespace && canonicalNamespace.trim()) {
-        await setTagSlug(pageId, title, canonicalNamespace.trim());
-    } else {
-        await removeTagSlug(pageId);
+    if (conflict) {
+        return { success: false, error: `Le titre "${title}" est déjà utilisé dans l'espace "${conflict.namespace}".` };
     }
+    
+    await prisma.page.update({
+        where: { pageId },
+        data: { title, content, public: visibility, description: infobox.description, img: infobox.imageUrl }
+    });
+    
+    await syncUserSlugs(pageId, titleSlug, user.accountId);
+
+    if (tagNamespace) {
+        await setTagSlug(pageId, titleSlug, tagNamespace);
+    } else {
+        await removeTagSlug(pageId, titleSlug);
+    }
+
+    return { success: true };
 }
 
 export async function createPage() {
     const user = await getSessionUser(await getSessionCookie());
 
-    if (!user) throw new Error("Unidentified user");
+    if (!user) redirect("/login");
 
     const page = await prisma.page.create({
         data: {
@@ -174,11 +191,14 @@ export async function canEditPage(pageId: number, userToken: string = ""): Promi
 export async function canViewPage(pageId: number, userToken: string = ""): Promise<boolean> {
     if (userToken.length === 0)
         userToken = await getUserToken();
-
-    const page = await prisma.page.findUnique({ where: { pageId }, select: { public: true } });
-    if (!page) return false;
-
-    if (!userToken) return false;
-
+    if (!userToken)
+        return false;
     return await hasPageAccess(userToken, pageId, ['READ', 'WRITE', 'ADMIN']);
+}
+
+export async function getCanonicalNamespace(pageId: number)
+{
+    return await prisma.pageSlug.findFirst({
+        where : { pageId, isCanonical : true}
+    });
 }
