@@ -68,8 +68,11 @@ export default function UserMenu({ user }: UserMenuProps) {
                     <Link href="/account" className="block px-4 py-2 hover:bg-gray-100">
                         Account
                     </Link>
-                    <Link href="/pages/my_pages" className="block px-4 py-2 hover:bg-gray-100">
+                    <Link href="/pages/" className="block px-4 py-2 hover:bg-gray-100">
                         My pages
+                    </Link>
+                    <Link href="/orgs/" className="block px-4 py-2 hover:bg-gray-100">
+                        My organizations
                     </Link>
                     <button
                         onClick={handleCreatePage}
