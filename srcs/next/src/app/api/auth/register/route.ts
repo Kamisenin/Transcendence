@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
 
     console.log(body)
     if (!body.password || !body.email || !body.accountId) {
-        return NextResponse.json({ error: "Field Required" }, { status: 400 });
+        return NextResponse.json({error: "Field Required"}, {status: 400});
     }
 
     username = body.accountId;
@@ -22,19 +22,23 @@ export async function POST(req: NextRequest) {
 
     if (body.username) username = body.username;
 
-    console.log("Email : " + body.email + " accountId : " + body.accountId);
     if (await isEmailUsed(body.email) || await isAccountIdUsed(body.accountId)) {
-        return NextResponse.json({ error: "Email or Account id already in use" }, { status: 409 });
+        return NextResponse.json({error: "Email or Account id already in use"}, {status: 409});
     }
     const user = await createUser(hashedPassword, body.email, body.accountId, username);
     const code = generateVerifCode();
     const expiry = getVerifExpiry();
     await prisma.user.update({
-        where: { user_id: user.user_id },
-        data: { verifCode: code, verifExpiry: expiry },
+        where: {user_id: user.user_id},
+        data: {verifCode: code, verifExpiry: expiry},
     });
     await sendVerifEmail(user.email, code);
-    const session = await createSession(user.user_id);
-    await setCookies(session, body.stayConnected);
-    return NextResponse.json({ success: true, message: "User created and logged in" }, { status: 201 });
+    try {
+        const session = await createSession(user.user_id);
+        await setCookies(session, body.stayConnected);
+        return NextResponse.json({success: true, message: "User created and logged in"}, {status: 201});
+    } catch (err) {
+        NextResponse.json({success: false});
+    }
+
 }
