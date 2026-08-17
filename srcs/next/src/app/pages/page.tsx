@@ -75,19 +75,14 @@ export default function MyPages() {
         }
     }, []);
 
-    // initial load & when tab changes
     useEffect(() => {
         fetchPages(tab);
-        // update url without full navigation
         const nextUrl = `/pages/?tab=${encodeURIComponent(tab)}`;
-        // use router.push to keep SPA behavior
         router.replace(nextUrl);
     }, [tab, fetchPages, router]);
 
-    // sync with URL changes (back/forward)
     useEffect(() => {
         if (urlTab && urlTab !== tab) setTab(urlTab);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [urlTab]);
 
     return (

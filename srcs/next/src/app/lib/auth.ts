@@ -15,5 +15,5 @@ export async function getUserIp(): Promise<string>
     const realIp = headersList.get("x-real-ip");
     if (realIp) return realIp;
 
-    return ("idk"); //TODO Throw une erreur
+    throw new Error("IP Not Found");
 }

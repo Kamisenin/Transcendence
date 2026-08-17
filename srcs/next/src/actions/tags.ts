@@ -6,11 +6,78 @@ import { intToHex, hexToInt } from "%/lib/hex_utils"
 import { getTagCapabilities, canManageRoleRank, canAssignRoleRank } from '%/lib/tag_permissions';
 import { revalidatePath } from 'next/cache';
 import { redirect } from "next/navigation";
+import { TagPermissionError } from '%/lib/errors';
 
 export async function requireUser() {
     const user = await getSessionUser(await getSessionCookie());
     if (!user) redirect("/login");
     return user;
+}
+
+export async function createTag(data: FormData) {
+    const user = await requireUser();
+
+    const rawName = String(data.get('name') ?? '').trim();
+    const rawDescription = String(data.get('description') ?? '').trim();
+    const rawColor = String(data.get('color') ?? '#3b82f6').trim();
+    const rawNamespace = String(data.get('namespace') ?? '').trim();
+
+    if (!rawName) throw new Error('Tag name is required.');
+
+    const name = slugify(rawName);
+    if (!name) throw new Error('Invalid tag name.');
+
+    const namespace = rawNamespace ? slugify(rawNamespace) : null;
+    if (rawNamespace && !namespace) throw new Error('Invalid namespace.');
+
+    const hex = rawColor.startsWith('#') ? rawColor.slice(1) : rawColor;
+    if (!/^[0-9a-fA-F]{6}$/.test(hex)) {
+        throw new Error('Invalid color format. Expected #RRGGBB.');
+    }
+    const color = parseInt(hex, 16);
+    const description = rawDescription || null;
+
+    // --- Availability checks ---
+    // Rule:
+    // - name must be globally unique (or scope it if you prefer)
+    // - namespace must be unique when provided (ignore null/empty)
+    //
+    // Drizzle-style example:
+    //
+    // const conflicts = await db.query.tags.findMany({
+    //   where: namespace
+    //     ? or(eq(tags.name, name), eq(tags.namespace, namespace))
+    //     : eq(tags.name, name),
+    //   columns: { id: true, name: true, namespace: true },
+    // });
+    //
+    // const nameTaken = conflicts.some((t) => t.name === name);
+    // const namespaceTaken = namespace
+    //   ? conflicts.some((t) => t.namespace === namespace)
+    //   : false;
+    //
+    // if (nameTaken && namespaceTaken) {
+    //   throw new Error('Tag name and namespace are already taken.');
+    // }
+    // if (nameTaken) {
+    //   throw new Error('Tag name is not available.');
+    // }
+    // if (namespaceTaken) {
+    //   throw new Error('Namespace is not available.');
+    // }
+
+    // Insert (adapt to your DB layer)
+    // await db.insert(tags).values({
+    //   name,
+    //   description,
+    //   color,
+    //   namespace,
+    //   ownerToken: user.user_id,
+    //   createdAt: new Date(),
+    //   updatedAt: new Date(),
+    // });
+
+    revalidatePath('/tags');
 }
 
 // ───────────── ROLES ─────────────
@@ -292,4 +359,34 @@ export async function addTagMember(tagId: number, targetUserToken: string, roleI
         data: { tagId, userToken: targetUserToken, roleId },
     });
     revalidatePath(`/tags/${tagId}`);
+}
+
+export async function deleteTag(
+    prisma: PrismaClient,
+    tagId: number,
+    userId: string
+): Promise<void> {
+    const tag = await prisma.tag.findUnique({
+        where: { id: tagId },
+        include: {
+            permissions: { where: { userToken: userId } },
+            members: {
+                where: { userToken: userId },
+                include: { role: true },
+            },
+        },
+    });
+
+    if (!tag)
+        redirect("/");
+
+    const isOwner = tag.ownerToken === userId;
+    const hasDirectPermission = tag.permissions.some((p) => p.canDeleteTag);
+    const hasRolePermission = tag.members.some((m) => m.role.canDeleteTag);
+
+    if (!isOwner && !hasDirectPermission && !hasRolePermission)
+        throw new PermissionError("Forbidden");
+
+    await prisma.tag.delete({ where: { id: tagId } });
+    redirect("/");
 }

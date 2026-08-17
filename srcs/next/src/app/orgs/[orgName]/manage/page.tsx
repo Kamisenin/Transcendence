@@ -1,17 +1,19 @@
-import React from 'react';
-import { getOrganization, userHasOrgPermission } from '@/actions/orgs';
-import dynamic from 'next/dynamic';
+import React from "react";
+import { getOrganization, userHasOrgPermission } from "@/actions/orgs";
+import OrgManageClient from "@/components/orgs/OrgManage";
+import { getSessionUser, getSessionCookie } from "%/lib/session";
 
 type Props = { params: Promise<{ orgName: string }> };
 
-const OrgManageClient = dynamic(() => import('@/components/orgs/OrgManage').then(m => m.default), { ssr: false });
-
 export default async function OrgManagePage({ params }: Props) {
-    const { orgName }  = await params;
+    const { orgName } = await params;
     const org = await getOrganization(orgName);
     if (!org) return <div>Organization not found</div>;
 
-    const canManage = await userHasOrgPermission(org.id, "canManageMembers") || org.ownerToken === (await (await import('%/lib/session')).getSessionUser((await import('%/lib/session')).getSessionCookie()));
+    const sessionUser = await getSessionUser(await getSessionCookie());
+    const canManage =
+        (await userHasOrgPermission(org.id, "canManageMembers", sessionUser)) ||
+        org.ownerToken === sessionUser?.user_id;
 
     return (
         <main className="p-6 pt-20 min-h-screen">

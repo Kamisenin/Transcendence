@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from 'react';
-import { updateTagInfo } from '@/actions/tags';
+import { updateTagInfo, deleteTag } from '@/actions/tags';
 import type { TagCapabilities } from '@/lib/tag-permissions';
 
 type Tag = {
@@ -28,12 +28,17 @@ function slugify(text: string): string {
 export default function TagSettingsPanel({ tag, capabilities }: Props) {
     const [isPending, startTransition] = useTransition();
     const [error, setError] = useState<string | null>(null);
+
     const [name, setName] = useState(tag.name);
     const [description, setDescription] = useState(tag.description ?? '');
     const [color, setColor] = useState(
         tag.color ? `#${tag.color.toString(16).padStart(6, '0')}` : '#3b82f6'
     );
     const [namespace, setNamespace] = useState(tag.namespace ?? '');
+
+    // Delete confirmation state
+    const [deleteStep, setDeleteStep] = useState(0);
+    const [deleteStatus, setDeleteStatus] = useState<string | null>(null);
 
     function handleSave() {
         setError(null);
@@ -47,6 +52,35 @@ export default function TagSettingsPanel({ tag, capabilities }: Props) {
                 });
             } catch (e: any) {
                 setError(e.message);
+            }
+        });
+    }
+
+    function getDeleteButtonText() {
+        if (isPending && deleteStatus) return deleteStatus;
+        if (deleteStep === 0) return 'Delete Tag';
+        if (deleteStep === 1) return 'Confirmer la suppression';
+        if (deleteStep === 2) return 'Dernière confirmation';
+        return 'Delete Tag';
+    }
+
+    function handleDelete() {
+        setError(null);
+
+        if (deleteStep < 2) {
+            setDeleteStep((s) => s + 1);
+            return;
+        }
+
+        startTransition(async () => {
+            try {
+                setDeleteStatus('Suppression en cours...');
+                await deleteTag(tag.id); // ta fonction gère déjà la redirection
+                setDeleteStatus('Tag supprimé, redirection...');
+            } catch (e: any) {
+                setError(e.message ?? 'Erreur lors de la suppression');
+                setDeleteStep(0);
+                setDeleteStatus(null);
             }
         });
     }
@@ -123,10 +157,19 @@ export default function TagSettingsPanel({ tag, capabilities }: Props) {
             {capabilities.canDeleteTag && (
                 <div className="border-t pt-4">
                     <p className="text-sm text-gray-500 mb-2">Dangerous Zone</p>
-                    <button className="text-sm bg-red-50 text-red-600 hover:bg-red-100 px-4 py-1.5 rounded-lg">
-                        Delete Tag
+                    <button
+                        onClick={handleDelete}
+                        disabled={isPending}
+                        className="text-sm bg-red-50 text-red-600 hover:bg-red-100 disabled:opacity-50 px-4 py-1.5 rounded-lg"
+                    >
+                        {getDeleteButtonText()}
                     </button>
-                    {/* TODO : brancher une Server Action deleteTag + confirmation */}
+
+                    {deleteStep > 0 && !isPending && (
+                        <p className="text-xs text-red-500 mt-2">
+                            This action is irreversible.
+                        </p>
+                    )}
                 </div>
             )}
         </div>
