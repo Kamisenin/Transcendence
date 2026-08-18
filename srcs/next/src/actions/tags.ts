@@ -37,46 +37,6 @@ export async function createTag(data: FormData) {
     const color = parseInt(hex, 16);
     const description = rawDescription || null;
 
-    // --- Availability checks ---
-    // Rule:
-    // - name must be globally unique (or scope it if you prefer)
-    // - namespace must be unique when provided (ignore null/empty)
-    //
-    // Drizzle-style example:
-    //
-    // const conflicts = await db.query.tags.findMany({
-    //   where: namespace
-    //     ? or(eq(tags.name, name), eq(tags.namespace, namespace))
-    //     : eq(tags.name, name),
-    //   columns: { id: true, name: true, namespace: true },
-    // });
-    //
-    // const nameTaken = conflicts.some((t) => t.name === name);
-    // const namespaceTaken = namespace
-    //   ? conflicts.some((t) => t.namespace === namespace)
-    //   : false;
-    //
-    // if (nameTaken && namespaceTaken) {
-    //   throw new Error('Tag name and namespace are already taken.');
-    // }
-    // if (nameTaken) {
-    //   throw new Error('Tag name is not available.');
-    // }
-    // if (namespaceTaken) {
-    //   throw new Error('Namespace is not available.');
-    // }
-
-    // Insert (adapt to your DB layer)
-    // await db.insert(tags).values({
-    //   name,
-    //   description,
-    //   color,
-    //   namespace,
-    //   ownerToken: user.user_id,
-    //   createdAt: new Date(),
-    //   updatedAt: new Date(),
-    // });
-
     revalidatePath('/tags');
 }
 
@@ -273,6 +233,20 @@ export async function checkTagNamespaceAvailability(namespace: string): Promise<
     }
 
     return { available: true };
+}
+
+export async function checkTagNameAvailability(name: string, namespace?: string) {
+    const trimmed = name.trim();
+    if (!trimmed) return { available: null as boolean | null };
+
+    const taken = await tagNameExists(trimmed, namespace ?? null);
+    return { available: !taken, message: taken ? "This name is already taken" : undefined };
+}
+
+async function tagNameExists(name: string): Promise<boolean> {
+    return (await prisma.tag.findUnique({
+        where: { name }
+    }))
 }
 
 export async function createTagAction(data: { name: string; namespace?: string; colorHex?: string }) {
