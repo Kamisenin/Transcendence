@@ -27,7 +27,7 @@ type Props = {
     id: string;
     pageId: number;
     data: InfoboxData;
-    onChange: (data: InfoboxData) => void;
+    onChange?: (data: InfoboxData) => void;
     onDelete?: (id: string) => void;
     isReadOnly?: boolean;
     availableTagsPool?: Tag[];
