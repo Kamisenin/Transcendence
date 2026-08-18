@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { prisma } from "@/app/lib/prisma"
+import { prisma } from "@/app/lib/prisma/prisma"
 import { getCurrentUser } from "@/app/lib/session"
 
 export async function GET(req: NextRequest) {
@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
 
   let response
   try {
-	response = await fetch("http://search-engine:8000/search", {
+	response = await fetch(`${process.env.SEARCH_ENGINE_URL || "http://search-engine:8000"}/search`, {
 	  method: "POST",
 	  headers: { "Content-Type": "application/json" },
 	  body: JSON.stringify({ query, items })
