@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 
 type UserMenuProps = {
@@ -9,6 +10,7 @@ type UserMenuProps = {
 };
 
 export default function UserMenu({ user }: UserMenuProps) {
+    const t = useTranslations("UserMenu");
     const [open, setOpen] = useState(false);
     const [creating, setCreating] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
@@ -25,6 +27,7 @@ export default function UserMenu({ user }: UserMenuProps) {
             document.removeEventListener("mousedown", handleClick);
         };
     }, []);
+
     async function handleLogout() {
         await fetch("/api/auth/logout", { method: "POST" });
         window.location.href = "/";
@@ -42,18 +45,20 @@ export default function UserMenu({ user }: UserMenuProps) {
         }
         setCreating(false);
     }
+
     if (!user) {
         return (
             <div className="flex items-center gap-3">
                 <Link href="/login" className="border border-black px-4 py-2 rounded">
-                    Sign in
+                    {t("signIn")}
                 </Link>
                 <Link href="/register" className="border border-black px-4 py-2 rounded">
-                    Sign up
+                    {t("signUp")}
                 </Link>
             </div>
         );
     }
+
     return (
         <div ref={menuRef} className="relative">
             <button
@@ -63,25 +68,25 @@ export default function UserMenu({ user }: UserMenuProps) {
             {open && (
                 <div className="absolute right-0 mt-2 w-48 bg-white text-back rounded shadow-lg border">
                     <div className="px-4 py-2 border-b text-sm font-semibold">
-                        Hello, {user.username}
+                        {t("hello", {username: user.username})}
                     </div>
                     <Link href="/account" className="block px-4 py-2 hover:bg-gray-100">
-                        Account
+                        {t("account")}
                     </Link>
                     <Link href="/pages/my_pages" className="block px-4 py-2 hover:bg-gray-100">
-                        My pages
+                        {t("myPages")}
                     </Link>
                     <button
                         onClick={handleCreatePage}
                         disabled={creating}
                         className="w-full text-left px-4 py-2 hover:bg-gray-100">
-                        {creating ? "Creating..." : "Create a new page"}
+                        {creating ? t("creatingPage") : t("createPage")}
                     </button>
                     <Link href="/settings" className="block px-4 py-2 hover:bg-gray-100">
-                        Settings
+                        {t("settings")}
                     </Link>
                     <button onClick={handleLogout} className="w-full text-left px-4 py-2 hover:bg-gray-100">
-                        Log out
+                        {t("logOut")}
                     </button>
                 </div>
             )}

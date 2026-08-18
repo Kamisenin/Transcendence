@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { X, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { checkTagNamespaceAvailability, createTagAction } from "@/actions/tags";
+import { useTranslations } from "next-intl";
 
 type Props = {
     isOpen: boolean;
@@ -16,6 +17,9 @@ const PRESET_COLORS = [
 ];
 
 export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props) {
+    const t = useTranslations("Tags.createModal");
+    const tTags = useTranslations("Tags");
+    const tCommon = useTranslations("Common");
     const [name, setName] = useState("");
     const [namespace, setNamespace] = useState("");
     const [colorHex, setColorHex] = useState("#3b82f6");
@@ -53,12 +57,12 @@ export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props)
         setError(null);
 
         if (!name.trim()) {
-            setError("Le nom du tag est obligatoire.");
+            setError(tTags("tagNameRequired"));
             return;
         }
 
         if (namespace.trim() && nsStatus.available === false) {
-            setError("Le namespace indiqué est indisponible.");
+            setError(t("namespaceUnavailable"));
             return;
         }
 
@@ -78,7 +82,7 @@ export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props)
             setColorHex("#3b82f6");
             onClose();
         } catch (err: any) {
-            setError(err.message || "Une erreur est survenue.");
+            setError(err.message || tCommon("somethingWentWrong"));
         } finally {
             setIsSubmitting(false);
         }
@@ -89,7 +93,7 @@ export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props)
             <div className="bg-white w-full max-w-sm rounded-2xl shadow-xl border border-gray-100 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
                 {/* Header */}
                 <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
-                    <h3 className="text-sm font-bold text-gray-900">Créer un nouveau Tag</h3>
+                    <h3 className="text-sm font-bold text-gray-900">{t("title")}</h3>
                     <button
                         type="button"
                         onClick={onClose}
@@ -110,13 +114,13 @@ export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props)
 
                     {/* Nom */}
                     <div>
-                        <label className="block font-semibold text-gray-700 mb-1">Nom du Tag *</label>
+                        <label className="block font-semibold text-gray-700 mb-1">{t("nameLabel")}</label>
                         <input
                             type="text"
                             required
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            placeholder="Ex: Personnage, Lore, Important..."
+                            placeholder={t("namePlaceholder")}
                             className="w-full text-xs px-3 py-2 border border-gray-200 rounded-lg outline-none focus:border-blue-500 transition"
                         />
                     </div>
@@ -124,24 +128,24 @@ export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props)
                     {/* Namespace */}
                     <div>
                         <label className="block font-semibold text-gray-700 mb-1">
-                            Namespace <span className="font-normal text-gray-400">(Optionnel)</span>
+                            {t("namespaceLabel")} <span className="font-normal text-gray-400">{t("namespaceOptional")}</span>
                         </label>
                         <input
                             type="text"
                             value={namespace}
                             onChange={(e) => setNamespace(e.target.value)}
-                            placeholder="Ex: my-namespace"
+                            placeholder={t("namespacePlaceholder")}
                             className="w-full text-xs px-3 py-2 border border-gray-200 rounded-lg outline-none focus:border-blue-500 transition"
                         />
                         {namespace.trim() !== "" && (
                             <div className="mt-1 flex items-center gap-1.5">
                                 {nsStatus.checking ? (
                                     <span className="text-gray-400 flex items-center gap-1">
-                                        <Loader2 size={12} className="animate-spin" /> Vérification...
+                                        <Loader2 size={12} className="animate-spin" /> {tCommon("searching")}
                                     </span>
                                 ) : nsStatus.available === true ? (
                                     <span className="text-emerald-600 flex items-center gap-1 font-medium">
-                                        <CheckCircle2 size={12} /> Namespace disponible
+                                        <CheckCircle2 size={12} /> {t("namespaceAvailable")}
                                     </span>
                                 ) : nsStatus.available === false ? (
                                     <span className="text-rose-500 flex items-center gap-1 font-medium">
@@ -154,7 +158,7 @@ export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props)
 
                     {/* Couleur */}
                     <div>
-                        <label className="block font-semibold text-gray-700 mb-1.5">Couleur</label>
+                        <label className="block font-semibold text-gray-700 mb-1.5">{t("colorLabel")}</label>
                         <div className="flex items-center gap-2 mb-2">
                             <input
                                 type="color"
@@ -190,7 +194,7 @@ export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props)
                             onClick={onClose}
                             className="px-3 py-1.5 font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition"
                         >
-                            Annuler
+                            {tCommon("cancel")}
                         </button>
                         <button
                             type="submit"
@@ -198,7 +202,7 @@ export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props)
                             className="px-4 py-1.5 font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded-lg shadow-xs transition flex items-center gap-1.5"
                         >
                             {isSubmitting && <Loader2 size={12} className="animate-spin" />}
-                            Créer
+                            {tCommon("create")}
                         </button>
                     </div>
                 </form>

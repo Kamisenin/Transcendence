@@ -7,6 +7,7 @@ import {
     Trash2, AlignLeft, AlignCenter, AlignRight, Image as ImageIcon,
     Upload, Check, Pencil, Move, ArrowUp, ArrowDown
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 const MIN_WIDTH = 120;
 const MAX_WIDTH = 900;
@@ -20,6 +21,7 @@ const SIZE_PRESETS = [
 ];
 
 export default function ImageElement({ attributes, children, element }: any) {
+    const t = useTranslations("Page.editor");
     const selected = useSelected();
     const focused = useFocused();
     const editor = useSlate();
@@ -124,7 +126,7 @@ export default function ImageElement({ attributes, children, element }: any) {
                 });
             }
         } catch (e) {
-            console.warn("Can't move image upward", e);
+            console.warn(t("cantMoveUp"), e);
         }
     };
 
@@ -151,7 +153,7 @@ export default function ImageElement({ attributes, children, element }: any) {
                 });
             }
         } catch (e) {
-            console.warn("Can't move image downward", e);
+            console.warn(t("cantMoveDown"), e);
         }
     };
 
@@ -192,25 +194,25 @@ export default function ImageElement({ attributes, children, element }: any) {
 
                         {/* Toolbar d'édition sur l'image */}
                         <div className="absolute top-2 right-2 bg-white/90 backdrop-blur border rounded-lg shadow p-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                            <button type="button" onClick={moveUp} className="p-1 hover:bg-gray-100 text-gray-600 rounded" title="Monter l'image">
+                            <button type="button" onClick={moveUp} className="p-1 hover:bg-gray-100 text-gray-600 rounded" title={t("moveImageUp")}>
                                 <ArrowUp size={14} />
                             </button>
-                            <button type="button" onClick={moveDown} className="p-1 hover:bg-gray-100 text-gray-600 rounded" title="Descendre l'image">
+                            <button type="button" onClick={moveDown} className="p-1 hover:bg-gray-100 text-gray-600 rounded" title={t("moveImageDown")}>
                                 <ArrowDown size={14} />
                             </button>
-                            <button type="button" onClick={() => { setTempUrl(savedUrl); setIsEditing(true); }} className="p-1 hover:bg-gray-100 text-gray-600 rounded" title="Modifier l'URL">
+                            <button type="button" onClick={() => { setTempUrl(savedUrl); setIsEditing(true); }} className="p-1 hover:bg-gray-100 text-gray-600 rounded" title={t("editUrl")}>
                                 <Pencil size={14} />
                             </button>
 
                             <div className="w-[1px] h-4 bg-gray-200 mx-0.5" />
 
-                            <button type="button" onClick={() => updateElement({ align: "left" })} className={`p-1 rounded ${align === "left" ? "bg-blue-100 text-blue-600" : "hover:bg-gray-100 text-gray-600"}`} title="Aligner à gauche">
+                            <button type="button" onClick={() => updateElement({ align: "left" })} className={`p-1 rounded ${align === "left" ? "bg-blue-100 text-blue-600" : "hover:bg-gray-100 text-gray-600"}`} title={t("alignLeft")}>
                                 <AlignLeft size={14} />
                             </button>
-                            <button type="button" onClick={() => updateElement({ align: "center" })} className={`p-1 rounded ${align === "center" ? "bg-blue-100 text-blue-600" : "hover:bg-gray-100 text-gray-600"}`} title="Centrer">
+                            <button type="button" onClick={() => updateElement({ align: "center" })} className={`p-1 rounded ${align === "center" ? "bg-blue-100 text-blue-600" : "hover:bg-gray-100 text-gray-600"}`} title={t("center")}>
                                 <AlignCenter size={14} />
                             </button>
-                            <button type="button" onClick={() => updateElement({ align: "right" })} className={`p-1 rounded ${align === "right" ? "bg-blue-100 text-blue-600" : "hover:bg-gray-100 text-gray-600"}`} title="Aligner à droite">
+                            <button type="button" onClick={() => updateElement({ align: "right" })} className={`p-1 rounded ${align === "right" ? "bg-blue-100 text-blue-600" : "hover:bg-gray-100 text-gray-600"}`} title={t("alignRight")}>
                                 <AlignRight size={14} />
                             </button>
 
@@ -222,7 +224,7 @@ export default function ImageElement({ attributes, children, element }: any) {
                                     type="button"
                                     onClick={() => applyPresetWidth(preset.value)}
                                     className={`px-1.5 py-0.5 rounded text-[10px] font-semibold ${Math.abs(width - preset.value) < 10 ? "bg-blue-100 text-blue-600" : "hover:bg-gray-100 text-gray-600"}`}
-                                    title={`Taille ${preset.label} (${preset.value}px)`}
+                                    title={`${t("sizeLabel")} ${preset.label} (${preset.value}px)`}
                                 >
                                     {preset.label}
                                 </button>
@@ -230,7 +232,7 @@ export default function ImageElement({ attributes, children, element }: any) {
 
                             <div className="w-[1px] h-4 bg-gray-200 mx-0.5" />
 
-                            <button type="button" onClick={deleteImage} className="p-1 hover:bg-red-50 text-red-500 rounded" title="Supprimer">
+                            <button type="button" onClick={deleteImage} className="p-1 hover:bg-red-50 text-red-500 rounded" title={t("deleteBlock")}>
                                 <Trash2 size={14} />
                             </button>
                         </div>
@@ -239,7 +241,7 @@ export default function ImageElement({ attributes, children, element }: any) {
                         <div
                             onMouseDown={handleResizeStart}
                             className="absolute bottom-1 right-1 w-4 h-4 rounded-sm bg-blue-500 border-2 border-white shadow cursor-nwse-resize opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-20"
-                            title="Glisser pour redimensionner"
+                            title={t("dragToResize")}
                         >
                             <Move size={9} className="text-white" />
                         </div>
@@ -255,15 +257,15 @@ export default function ImageElement({ attributes, children, element }: any) {
                     /* Vue Édition : Formulaire de saisie d'URL */
                     <div className={`p-4 border-2 border-dashed rounded-xl bg-gray-50 flex flex-col gap-3 min-w-[300px] ${selected && focused ? "border-blue-500 ring-2 ring-blue-100" : "border-gray-300"}`}>
                         <div className="flex items-center justify-between text-xs font-semibold text-gray-500">
-                            <span className="flex items-center gap-1.5"><ImageIcon size={14} /> {isEditing ? "Modifier l'image" : "Ajouter une image"}</span>
-                            <button type="button" onClick={deleteImage} className="text-red-500 hover:text-red-700">Supprimer</button>
+                            <span className="flex items-center gap-1.5"><ImageIcon size={14} /> {isEditing ? t("editImage") : t("addImage")}</span>
+                            <button type="button" onClick={deleteImage} className="text-red-500 hover:text-red-700">{t("delete")}</button>
                         </div>
 
                         <div className="flex flex-col gap-1">
                             <div className="flex gap-2">
                                 <input
                                     type="text"
-                                    placeholder="Coller l'URL de l'image..."
+                                    placeholder={t("pasteImageUrl")}
                                     value={tempUrl}
                                     onChange={(e) => {
                                         setTempUrl(e.target.value);
@@ -288,14 +290,14 @@ export default function ImageElement({ attributes, children, element }: any) {
 
                             {hasError && (
                                 <span className="text-[11px] text-red-500 font-medium pl-1">
-                                    image non trouvée
+                                    {t("imageNotFound")}
                                 </span>
                             )}
                         </div>
 
                         <input
                             type="text"
-                            placeholder="Nom / Texte alternatif (optionnel)"
+                            placeholder={t("altTextPlaceholder")}
                             value={alt}
                             onChange={(e) => updateElement({ alt: e.target.value })}
                             className="text-xs p-2 bg-white border rounded-lg outline-none focus:border-blue-500"
@@ -303,7 +305,7 @@ export default function ImageElement({ attributes, children, element }: any) {
 
                         <div className="border border-dashed border-gray-200 bg-white rounded-lg p-3 text-center opacity-60 cursor-not-allowed">
                             <p className="text-[11px] text-gray-400 flex items-center justify-center gap-1">
-                                <Upload size={12} /> Glisser un fichier ou parcourir (Bientôt disponible)
+                                <Upload size={12} /> {t("dragOrBrowseComingSoon")}
                             </p>
                         </div>
                     </div>

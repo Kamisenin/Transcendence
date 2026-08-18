@@ -1,12 +1,13 @@
 'use client';
 
 import Link from "next/link"
+import { useTranslations } from "next-intl";
 
 export default function LoginPage() {
+    const t = useTranslations("Auth.login");
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-
         const form = new FormData(event.currentTarget);
         const f = await fetch('/api/auth/login', {
             method: 'POST',
@@ -20,7 +21,6 @@ export default function LoginPage() {
             })
         });
         const j = await f.json();
-
         if (j.twoFactorRequired) {
             window.location.href = '/verify_2fa';
         } else {
@@ -29,38 +29,36 @@ export default function LoginPage() {
         console.log(j);
     }
 
-
     return (
         <div className="flex flex-col items-center justify-center min-h-screen">
-            <h1 className="text-2xl font-bold mb-4">Log in</h1>
-
+            <h1 className="text-2xl font-bold mb-4">{t("title")}</h1>
             <form onSubmit={handleSubmit} className="flex flex-col gap-3 w-80">
                 <input
                     type="text"
                     name="id"
-                    placeholder="Email or account name"
+                    placeholder={t("idPlaceholder")}
                     className="border p-2 rounded text-black"
                     required
                 />
                 <input
                     type="password"
                     name="password"
-                    placeholder="Password"
+                    placeholder={t("passwordPlaceholder")}
                     className="border p-2 rounded text-black"
                     required
                 />
                 <label className="flex items-center gap-2 text-sm">
                     <input type="checkbox" name="stayConnected" />
-                    Stay connected
+                    {t("stayConnected")}
                 </label>
                 <button type="submit" className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
-                    submit
+                    {t("submit")}
                 </button>
             </form>
             <p className="text-sm mt-4">
-                No account ? {" "}
+                {t("noAccount")} {" "}
                 <Link href="/register" className="text-blue-500 underline">
-                    Sign up
+                    {t("signUp")}
                 </Link>
             </p>
         </div>

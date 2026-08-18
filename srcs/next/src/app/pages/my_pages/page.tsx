@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 type Page = {
     pageId: number;
@@ -12,12 +13,13 @@ type Page = {
 }
 
 export default function MyPages() {
+    const t = useTranslations("Page");
     const [pages, setPages] = useState<Page[]>([]);
     const [loading, setLoading] = useState(true);
     return (
         <main className="pt-20 flex justify-center">
             <div className="w-96 bg-white p-6 rounded shadow flex flex-col gap-6">
-                You haven't created any page yet
+                {t("noPagesYet")}
             </div>
         </main>
     );

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { GripVertical, Trash2, Eye, Image as ImageIcon } from "lucide-react";
 import CreateTagModal from "@/components/tags/CreateTagModal";
+import { useTranslations } from "next-intl";
 
 import { Tag } from "../tags/tagType";
 import InfoboxPreview from "./InfoboxPreview";
@@ -31,6 +32,7 @@ type Props = {
 };
 
 export default function Infobox({ id, pageId, data, onChange, onDelete, isReadOnly = false }: Props) {
+    const t = useTranslations("Page");
     const [isPreview, setIsPreview] = useState(isReadOnly);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
@@ -56,7 +58,7 @@ export default function Infobox({ id, pageId, data, onChange, onDelete, isReadOn
                     <button
                         type="button"
                         className="drag-handle cursor-grab active:cursor-grabbing p-1 hover:bg-gray-100 text-gray-400"
-                        title="Déplacer l'infobox"
+                        title={t("moveInfobox")}
                     >
                         <GripVertical size={14} />
                     </button>
@@ -64,7 +66,7 @@ export default function Infobox({ id, pageId, data, onChange, onDelete, isReadOn
                         type="button"
                         onClick={() => onDelete(id)}
                         className="p-1 hover:bg-red-50 text-red-400 cursor-pointer"
-                        title="Supprimer l'infobox"
+                        title={t("deleteInfobox")}
                     >
                         <Trash2 size={14} />
                     </button>
@@ -73,13 +75,13 @@ export default function Infobox({ id, pageId, data, onChange, onDelete, isReadOn
 
             {/* En-tête */}
             <div className="pl-7 flex items-center justify-between border-b pb-2 mb-3 shrink-0">
-                <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Fiche d'information</span>
+                <span className="text-xs font-bold uppercase tracking-wider text-gray-400">{t("infoSheet")}</span>
                 <button
                     type="button"
                     onClick={() => setIsPreview(true)}
                     className="flex items-center gap-1 text-xs bg-blue-50 text-blue-600 hover:bg-blue-100 font-medium px-2 py-1 rounded-md transition cursor-pointer"
                 >
-                    <Eye size={13} /> Prévisualiser
+                    <Eye size={13} /> {t("editor.preview")}
                 </button>
             </div>
 
@@ -89,7 +91,7 @@ export default function Infobox({ id, pageId, data, onChange, onDelete, isReadOn
 
                 <div>
                     <label className="block text-xs font-medium text-gray-600 mb-1 flex items-center gap-1">
-                        <ImageIcon size={12} /> URL de l'image
+                        <ImageIcon size={12} /> {t("imageUrlLabel")}
                     </label>
                     <input
                         type="text"

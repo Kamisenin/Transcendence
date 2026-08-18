@@ -9,6 +9,7 @@ import dynamic from 'next/dynamic';
 import WikiEditor from "@/components/page/editor/WikiEditor";
 import Infobox, { type InfoboxData } from "@/components/page/Infobox";
 import { savePage } from "@/actions/pages";
+import { useTranslations } from "next-intl";
 
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
@@ -48,6 +49,8 @@ const DEFAULT_INFOBOX: InfoboxData = {
 };
 
 export default function PageBuilder({ pageId, initialTitle, initialBlocks }: Props) {
+    const t = useTranslations("Page");
+    const tCommon = useTranslations("Common");
     const [saving, setSaving] = useState(false);
     const [activeId, setActiveId] = useState<string | null>(null);
     const [activeEditor, setActiveEditor] = useState<EditorInstance | null>(null);
@@ -156,7 +159,7 @@ export default function PageBuilder({ pageId, initialTitle, initialBlocks }: Pro
         setSaving(true);
         try {
             const mainInfobox = blocks.find(b => b.type === 'infobox');
-            const pageTitle = mainInfobox?.infoboxData?.title || initialTitle || "Sans titre";
+            const pageTitle = mainInfobox?.infoboxData?.title || initialTitle || t("untitled");
 
             const content = {
                 blocks: blocks.map(block => {
@@ -189,7 +192,7 @@ export default function PageBuilder({ pageId, initialTitle, initialBlocks }: Pro
                 disabled={saving}
                 className="fixed bottom-6 right-6 z-40 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-lg text-sm font-semibold"
             >
-                {saving ? 'Saving...' : 'Save'}
+                {saving ? tCommon("saving") : tCommon("save")}
             </button>
 
             <div ref={containerRef} className="max-w-6xl mx-auto border rounded-xl bg-white p-4 min-h-[500px] shadow-sm relative mt-4">
