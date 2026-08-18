@@ -25,8 +25,9 @@ export default function TagManager({ accountId, pageId, data, onChange, onOpenMo
     const tags = data.tags || [];
     const namespaces = Array.from(new Set(tags.map((t) => t.namespace).filter((ns): ns is string => Boolean(ns && ns.trim() !== ""))));
     let namespace = "";
-    if (data.canonicalNamespace != accountId)
+    if (data.canonicalNamespace && data.canonicalNamespace !== accountId) {
         namespace = data.canonicalNamespace;
+    }
 
     useEffect(() => {
         const handler = (e: MouseEvent) => {

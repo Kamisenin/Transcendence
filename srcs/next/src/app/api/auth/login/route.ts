@@ -43,6 +43,6 @@ export async function POST(req: NextRequest) {
         await setCookies(session, stayConnected);
         return NextResponse.json({success: true, twoFactorRequired: false});
     } catch (err) {
-        NextResponse.json({success: false});
+        return NextResponse.json({ success: false }, { status: 500 });
     }
 }

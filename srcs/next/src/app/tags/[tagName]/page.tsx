@@ -5,7 +5,7 @@ import { getTagCapabilities } from '%/lib/tag_permissions';
 import TagManagement from '@/components/tags/TagManagement';
 
 type Params = {
-    params: Promise<{ tagId: string }>;
+    params: Promise<{ tagName: string }>;
 };
 
 export default async function TagManagementPage({ params }: Params) {

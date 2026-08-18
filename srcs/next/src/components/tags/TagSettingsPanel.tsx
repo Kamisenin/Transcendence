@@ -2,8 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { updateTagInfo, deleteTag } from '@/actions/tags';
-import type { TagCapabilities } from '@/lib/tag-permissions';
-
+import type { TagCapabilities } from '%/lib/tag_permissions';
 type Tag = {
     id: number;
     name: string;

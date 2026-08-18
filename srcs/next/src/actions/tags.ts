@@ -2,7 +2,8 @@
 
 import { prisma } from '%/lib/prisma/prisma';
 import { getSessionUser, getSessionCookie } from '%/lib/session';
-import { intToHex, hexToInt } from "%/lib/hex_utils"
+import { intToHex, hexToInt } from "%/lib/hex_utils";
+import { slugify } from "%/lib/page/slug";
 import { getTagCapabilities, canManageRoleRank, canAssignRoleRank } from '%/lib/tag_permissions';
 import { revalidatePath } from 'next/cache';
 import { redirect } from "next/navigation";

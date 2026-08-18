@@ -2,8 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { assignTagRole, removeTagMember } from '@/actions/tags';
-import type { TagCapabilities } from '@/lib/tag-permissions';
-import AddMember from './AddMember';
+import type { TagCapabilities } from '%/lib/tag_permissions';
 
 type Role = {
     id: number;

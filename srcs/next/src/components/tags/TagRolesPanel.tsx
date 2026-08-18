@@ -2,8 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { createTagRole, updateTagRole, deleteTagRole } from '@/actions/tags';
-import type { TagCapabilities } from '@/lib/tag-permissions';
-
+import type { TagCapabilities } from '%/lib/tag_permissions';
 type Role = {
     id: number;
     roleName: string;

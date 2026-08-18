@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
         await setCookies(session, body.stayConnected);
         return NextResponse.json({success: true, message: "User created and logged in"}, {status: 201});
     } catch (err) {
-        NextResponse.json({success: false});
+        return NextResponse.json({ success: false }, { status: 500 });
     }
 
 }

@@ -127,9 +127,8 @@ export async function getAccessiblePages() {
             title: p.title,
             preview,
             ownerAccount: p.owner?.accountId || p.owner?.user_id,
-            canonicalSlug
-
-        }
+            canonicalSlug: canonical ? { namespace: canonical.namespace, slug: canonical.slug } : null,
+        };
     });
     return results;
 }

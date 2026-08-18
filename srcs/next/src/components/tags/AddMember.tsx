@@ -4,10 +4,10 @@ import { useState, useEffect, useTransition, useRef } from 'react';
 import { addTagMember } from '@/actions/tags';
 
 type SearchUser = {
-    token: string;
-    username: string;
+    user_id: string;
+    username: string | null;
     accountId: string;
-    imgLink: string;
+    imgLink: string | null;
 };
 
 type Role = {

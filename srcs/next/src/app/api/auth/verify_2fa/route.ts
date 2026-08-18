@@ -24,12 +24,12 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({error: "invalid code"}, {status: 400});
     
     await prisma.user.update({where: {user_id: user.user_id}, data: {verifCode: null, verifExpiry: null}});
+    let session;
     try {
-        const session = await createSession(user.user_id, body.stayConnected ?? false)
+        session = await createSession(user.user_id, body.stayConnected ?? false);
     } catch (err) {
-        NextResponse.json({success: false});
+        return NextResponse.json({ success: false }, { status: 500 });
     }
     await setCookies(session, body.stayConnected ?? false);
-    cookieStore.delete("pending_2fa_user");
     return NextResponse.json({success: true});    
 }
