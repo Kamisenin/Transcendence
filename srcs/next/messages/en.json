@@ -226,13 +226,7 @@
 		"more": "more"
 	},
 	"Home": {
-		"title": "To get started, edit the page.tsx file.",
-		"subtitlePrefix": "Looking for a starting point or more instructions? Head over to",
-		"templates": "Templates",
-		"orThe": "or the",
-		"learning": "Learning",
-		"center": "center.",
-		"deployNow": "Deploy Now",
-		"documentation": "Documentation"
+		"tagline": "A wiki for wikis",
+		"title": "find any page in the wiki"
 	}
 }

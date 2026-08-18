@@ -226,13 +226,7 @@
 		"more": "más"
 	},
 	"Home": {
-		"title": "Para empezar, edita el archivo page.tsx.",
-		"subtitlePrefix": "¿Buscas un punto de partida o más instrucciones? Visita",
-		"templates": "las plantillas",
-		"orThe": "o el",
-		"learning": "centro de aprendizaje",
-		"center": ".",
-		"deployNow": "Desplegar ahora",
-		"documentation": "Documentación"
+		"tagline": "Un wiki para wikis",
+		"title": "encuentra cualquier página del wiki"
 	}
 }
