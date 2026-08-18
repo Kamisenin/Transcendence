@@ -31,9 +31,12 @@ export type SavedBlock = {
 };
 
 type Props = {
+    accountId: string;
     pageId: number;
     initialTitle?: string;
     initialBlocks: SavedBlock[];
+    visibility: boolean;
+    canonicalNamespace?: string;
 };
 
 const emptyValue = (): Descendant[] => [
@@ -44,38 +47,42 @@ const DEFAULT_INFOBOX: InfoboxData = {
     title: "",
     imageUrl: "",
     description: "",
-    tags: []
+    tags: [],
+    public: false
 };
 
-export default function PageBuilder({ pageId, initialTitle, initialBlocks }: Props) {
+export default function PageBuilder({ accountId, pageId, initialTitle, initialBlocks, visibility, canonicalNamespace}: Props) {
     const [saving, setSaving] = useState(false);
     const [activeId, setActiveId] = useState<string | null>(null);
     const [activeEditor, setActiveEditor] = useState<EditorInstance | null>(null);
     const toolbarRef = useRef<ToolbarRef>(null);
 
-    // Initialisation : s'assure qu'un bloc 'infobox' existe toujours en constante
     const [blocks, setBlocks] = useState<SavedBlock[]>(() => {
         if (initialBlocks.length > 0) {
             const hasInfobox = initialBlocks.some(b => b.type === 'infobox');
-            if (hasInfobox) return initialBlocks;
+            if (hasInfobox) {
+                return initialBlocks.map(b =>
+                    b.type === 'infobox'
+                        ? { ...b, infoboxData: { ...b.infoboxData!, public: visibility, canonicalNamespace } }
+                        : b
+                );
+            }
 
             return [
                 {
                     id: "block-infobox",
                     type: "infobox",
-                    infoboxData: { ...DEFAULT_INFOBOX, title: initialTitle || "" },
+                    infoboxData: { ...DEFAULT_INFOBOX, title: initialTitle || "", public: visibility, canonicalNamespace },
                     x: 0, y: 0, w: 4, h: 8
                 },
                 ...initialBlocks
             ];
         }
-
-        // Par défaut au démarrage : l'Infobox constante + un éditeur vide
         return [
             {
                 id: "block-infobox",
                 type: "infobox",
-                infoboxData: { ...DEFAULT_INFOBOX, title: initialTitle || "" },
+                infoboxData: { ...DEFAULT_INFOBOX, title: initialTitle || "", public: visibility, canonicalNamespace },
                 x: 0, y: 0, w: 4, h: 8
             },
             {
@@ -116,7 +123,10 @@ export default function PageBuilder({ pageId, initialTitle, initialBlocks }: Pro
         setActiveId(prev => (prev === id ? null : prev));
     }, [editors]);
 
-    // Ajouter uniquement un bloc éditeur de texte
+    /*-----------------------------------
+    * -------------HANDLERS--------------
+    * ----------------------------------*/
+
     const handleAddBlock = useCallback(() => {
         const newId = `block-${Date.now()}`;
         const newBlock: SavedBlock = { id: newId, type: 'editor', value: emptyValue(), x: 0, y: 0, w: 6, h: 4 };
@@ -129,7 +139,6 @@ export default function PageBuilder({ pageId, initialTitle, initialBlocks }: Pro
     }, []);
 
     const handleDeleteBlock = useCallback((id: string) => {
-        // L'Infobox constante ne peut pas être supprimée
         setBlocks(prev => prev.filter(b => b.id !== id || b.type === 'infobox'));
         setLayout(prev => prev.filter(item => {
             const block = blocks.find(b => b.id === item.i);
@@ -156,7 +165,9 @@ export default function PageBuilder({ pageId, initialTitle, initialBlocks }: Pro
         setSaving(true);
         try {
             const mainInfobox = blocks.find(b => b.type === 'infobox');
-            const pageTitle = mainInfobox?.infoboxData?.title || initialTitle || "Sans titre";
+            const pageTitle = mainInfobox?.infoboxData?.title || initialTitle || "untitled";
+            const visibility = mainInfobox?.infoboxData?.public || false;
+            const namespace = mainInfobox?.infoboxData?.canonicalNamespace;
 
             const content = {
                 blocks: blocks.map(block => {
@@ -173,8 +184,7 @@ export default function PageBuilder({ pageId, initialTitle, initialBlocks }: Pro
                     };
                 }),
             };
-
-            await savePage(pageId, pageTitle, content as any);
+            await savePage(pageId, pageTitle, content as any, mainInfobox?.infoboxData, visibility, namespace);
         } finally {
             setSaving(false);
         }
@@ -208,11 +218,12 @@ export default function PageBuilder({ pageId, initialTitle, initialBlocks }: Pro
                         <div key={block.id} className="relative group/grid-item">
                             {block.type === 'infobox' ? (
                                 <Infobox
+                                    accountId={{accountId}}
                                     id={block.id}
                                     pageId={pageId}
                                     data={block.infoboxData || DEFAULT_INFOBOX}
                                     onChange={(newData) => handleInfoboxChange(block.id, newData)}
-                                    // Pas d'option onDelete transmise pour l'infobox constante
+                                    namespace={canonicalNamespace}
                                 />
                             ) : (
                                 <WikiEditor
