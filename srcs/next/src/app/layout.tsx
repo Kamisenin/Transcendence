@@ -4,6 +4,7 @@ import "./globals.css";
 import { getCurrentUser } from "%/lib/session";
 import UserMenu from "@/components/UserMenu";
 import HomeButton from "@/components/HomeButton";
+import Link from "next/link"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,7 +32,15 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         </header>
         <main className="min-h-full item-center flex flex-col">{children}</main>
         <footer className={"flex z-50 h-16 w-full bg-beige items-center justify-center"}>
-            <p>Privacy Policy and Terms of Service</p>
+          <div className="flex gap-4 text-sm">
+            <Link href="/privacy" className="hover:underline">
+              <p>Privacy Policy</p>
+            </Link>
+            <p>and</p>
+            <Link href="/terms" className="hover:underline">
+              <p>Terms of Service</p>
+            </Link>
+          </div>
         </footer>
         </body>
         </html>

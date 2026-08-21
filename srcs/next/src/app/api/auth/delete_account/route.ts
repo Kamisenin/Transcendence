@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
             prisma.page.updateMany({where: {ownerId: user.user_id}, data: {ownerId: deletedUser.user_id}}),
             prisma.tag.updateMany({where: {ownerToken: user.user_id}, data: {ownerToken: deletedUser.user_id}}),
             prisma.organization.updateMany({where: {ownerToken: user.user_id}, data: {ownerToken: deletedUser.user_id}}),
-            // prisma.upload.updateMany({where: {ownerToken: user.user_id}, data: {ownerToken: deletedUser.user_id}}),
+            prisma.upload.updateMany({where: {ownerToken: user.user_id}, data: {ownerToken: deletedUser.user_id}}),
             prisma.tagPageRequest.updateMany({where: {requestedBy: user.user_id}, data: {requestedBy: deletedUser.user_id}}),
             prisma.tagPageRequest.updateMany({where: {reviewedBy: user.user_id}, data: {reviewedBy: deletedUser.user_id}}),
             prisma.user.delete({where: {user_id: user.user_id}}),
