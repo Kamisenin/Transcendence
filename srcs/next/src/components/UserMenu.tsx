@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { createPage } from "@/actions/pages"
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -32,14 +33,7 @@ export default function UserMenu({ user }: UserMenuProps) {
 
     async function handleCreatePage() {
         setCreating(true);
-        const res = await fetch("/api/pages/create", {method: "POST"});
-        const data = await res.json();
-     
-        if (res.ok) {
-            router.push(`/pages/${data.pageId}/edit`);
-        } else {
-            console.error(data.error);
-        }
+        await createPage();
         setCreating(false);
     }
     if (!user) {
