@@ -20,7 +20,7 @@ type RolePermissionsInput = {
 
 export type MemberUserOption = {
   user_id: string;
-  username: string | null;
+  username: string;
   accountId: string;
   imgLink: string | null;
 };
@@ -269,7 +269,7 @@ export async function deleteOrganizationRole(roleId: number) {
   const role = await prisma.organizationRole.findUnique({
     where: { id: roleId },
     include: {
-      members: { select: { id: true } },
+      members: { select: { userToken: true } },
     },
   });
   if (!role) throw new Error("Role not found");

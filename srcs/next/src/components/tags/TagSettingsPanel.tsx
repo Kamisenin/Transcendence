@@ -74,7 +74,7 @@ export default function TagSettingsPanel({ tag, capabilities }: Props) {
         startTransition(async () => {
             try {
                 setDeleteStatus('Suppression en cours...');
-                await deleteTag(tag.id); // ta fonction gère déjà la redirection
+                await deleteTag(tag.id);
                 setDeleteStatus('Tag supprimé, redirection...');
             } catch (e: any) {
                 setError(e.message ?? 'Erreur lors de la suppression');

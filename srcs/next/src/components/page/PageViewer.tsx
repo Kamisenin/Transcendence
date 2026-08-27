@@ -1,5 +1,8 @@
+"use server";
+
 import ReadOnlyBlock from '@/components/page/ReadOnlyBlock';
 import Infobox, { type InfoboxData } from '@/components/page/Infobox';
+import { requireUser } from "@/actions/tags"
 
 type SavedBlock = {
     id: string;
@@ -21,7 +24,7 @@ type PositionedBlock = SavedBlock & {
     };
 };
 
-export default function PageViewer({ title, blocks }: { title?: string; blocks: SavedBlock[]; }) {
+export default async function PageViewer({ title, blocks }: { title?: string; blocks: SavedBlock[]; }) {
     const COLS = 12;
     const ROW_HEIGHT = 40;
     const MARGIN_X = 16;
@@ -46,10 +49,7 @@ export default function PageViewer({ title, blocks }: { title?: string; blocks: 
             ? 500
             : Math.max(...positioned.map((b) => b._px.top + b._px.height)) + MARGIN_Y;
 
-    console.log(
-        '[PageViewerSSR] blocks',
-        blocks.map(b => ({ id: b.id, x: b.x, y: b.y, w: b.w, h: b.h, type: b.type }))
-    );
+    const user = await requireUser();
 
     return (
         <div className="min-h-screen bg-gray-50/50 p-8 pt-20">
@@ -77,9 +77,10 @@ export default function PageViewer({ title, blocks }: { title?: string; blocks: 
                         {block.type === 'infobox' ? (
                             <div className="h-full overflow-auto">
                                 <Infobox
+                                    accountId={user.accountId}
                                     id={block.id}
                                     pageId={0}
-                                    data={block.infoboxData || { title: '', imageUrl: '', description: '', tags: [] }}
+                                    data={block.infoboxData || { title: '', imageUrl: '', description: '', tags: [], public: true }}
                                     isReadOnly={true}
                                 />
                             </div>

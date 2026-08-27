@@ -32,11 +32,6 @@ services:
       - ADDRESS=${ADDRESS}
     extra_hosts:
       - "host.parent:host-gateway"
-
-  yjs:
-    container_name: yjs
-    build: srcs/yjs
-    restart: unless-stopped
   next:
     container_name: next
     build: srcs/next/

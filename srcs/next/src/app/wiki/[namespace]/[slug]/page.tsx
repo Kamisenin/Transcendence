@@ -17,6 +17,8 @@ export default async function WikiViewPage({ params }: Params) {
 
     const { page, redirectTo } = result;
     if (redirectTo) redirect(redirectTo);
+    if (!page)
+        notFound();
 
     const content = page.content as { blocks: any[] } | null;
     const blocks = content?.blocks ?? [];

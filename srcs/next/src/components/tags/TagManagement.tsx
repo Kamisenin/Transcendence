@@ -34,7 +34,7 @@ type Member = {
     tagId: number;
     userToken: string;
     roleId: number;
-    user: { token: string; username: string; imgLink: string };
+    user: { user_id: string; username: string; imgLink: string };
     role: Role;
 };
 
@@ -45,7 +45,7 @@ type PendingRequest = {
     requestedBy: string;
     createdAt: Date;
     page: { pageId: number; title: string };
-    requester: { token: string; username: string };
+    requester: { user_id: string; username: string };
 };
 
 type Props = {
@@ -66,20 +66,13 @@ const TABS = [
 
 type TabKey = typeof TABS[number]['key'];
 
-export default function TagManagement({
-                                          tag,
-                                          capabilities,
-                                          roles,
-                                          members,
-                                          pendingRequests,
-                                          currentUserToken,
-                                      }: Props) {
+export default function TagManagement({tag, capabilities, roles, members, pendingRequests, currentUserToken,}: Props) {
     const [activeTab, setActiveTab] = useState<TabKey>('members');
 
     const visibleTabs = TABS.filter(t => {
         if (t.key === 'requests') return capabilities.canReviewRequests;
         if (t.key === 'settings') return capabilities.canEditInfo || capabilities.canDeleteTag;
-        return true; // membres et rôles restent visibles en lecture même sans droit de gestion
+        return true;
     });
 
     return (

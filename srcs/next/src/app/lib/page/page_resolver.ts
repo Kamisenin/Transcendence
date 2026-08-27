@@ -11,10 +11,7 @@ type ResolvedPage = {
 * but is not the canonical address it will redirect
 * the user to the canonical address
 * */
-export async function resolvePage(
-    namespace: string,
-    slug: string
-): Promise<ResolvedPage | null> {
+export async function resolvePage(namespace: string, slug: string): Promise<ResolvedPage | null> {
 
     const pageSlug = await prisma.pageSlug.findUnique({
         where: {

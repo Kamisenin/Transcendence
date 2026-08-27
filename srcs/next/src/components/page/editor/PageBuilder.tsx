@@ -36,7 +36,7 @@ type Props = {
     initialTitle?: string;
     initialBlocks: SavedBlock[];
     visibility: boolean;
-    canonicalNamespace?: string;
+    canonicalNamespace: string | null;
 };
 
 const emptyValue = (): Descendant[] => [
@@ -94,7 +94,7 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
         ];
     });
 
-    const [layout, setLayout] = useState<Layout[]>(() =>
+    const [layout, setLayout] = useState<Layout>(() =>
         blocks.map(b => ({ i: b.id, x: b.x, y: b.y, w: b.w, h: b.h }))
     );
 
@@ -218,7 +218,7 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
                         <div key={block.id} className="relative group/grid-item">
                             {block.type === 'infobox' ? (
                                 <Infobox
-                                    accountId={{accountId}}
+                                    accountId={accountId}
                                     id={block.id}
                                     pageId={pageId}
                                     data={block.infoboxData || DEFAULT_INFOBOX}

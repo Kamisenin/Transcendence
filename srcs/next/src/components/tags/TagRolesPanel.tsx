@@ -84,12 +84,12 @@ export default function TagRolesPanel({ tagId, roles, capabilities }: Props) {
         });
     }
 
-    function handleDelete(roleId: number) {
-        if (!confirm("Supprimer ce rôle ? Les membres l'ayant perdront leur accès lié.")) return;
+    function handleDelete() {
+        if (!confirm("Supprimer ce rôle ? Les membres l'ayant perdront leur accès lié.")) return; //TODO language
         setError(null);
         startTransition(async () => {
             try {
-                await deleteTagRole(tagId, roleId);
+                await deleteTagRole(tagId);
             } catch (e: any) {
                 setError(e.message);
             }

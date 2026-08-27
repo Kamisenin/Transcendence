@@ -38,7 +38,7 @@ export default function Infobox({ accountId, id, pageId, data, onChange, onDelet
     const [isPreview, setIsPreview] = useState(isReadOnly);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
-    const updateField = (key: keyof InfoboxData, value: any) => onChange({ ...data, [key]: value });
+    const updateField = (key: keyof InfoboxData, value: any) => onChange?.({ ...data, [key]: value });
 
     if (isReadOnly || isPreview) {
         return (
@@ -84,9 +84,10 @@ export default function Infobox({ accountId, id, pageId, data, onChange, onDelet
                 <DescriptionInput value={data.description} onChange={(val) => updateField("description", val)} />
 
                 <TagManager
+                    accountId={accountId}
                     pageId={pageId}
                     data={data}
-                    onChange={onChange}
+                    onChange={onChange ?? (() => {})}
                     onOpenModal={() => setIsCreateModalOpen(true)}
                 />
             </div>
@@ -94,7 +95,7 @@ export default function Infobox({ accountId, id, pageId, data, onChange, onDelet
             <CreateTagModal
                 isOpen={isCreateModalOpen}
                 onClose={() => setIsCreateModalOpen(false)}
-                onTagCreated={(newTag) => onChange({ ...data, tags: [...(data.tags || []), newTag] })}
+                onTagCreated={(newTag) => onChange?.({ ...data, tags: [...(data.tags || []), newTag] })}
             />
 
             <VisibilityToggler
