@@ -155,7 +155,7 @@ using the following command : `npx prisma migrate dev --name init`
 
 ---
 
-## Team Organization
+# Team Organization
 
 **Product Owner :** csenelle, whose role was to organize the feature management and work with the two other roles to
 give a global direction of the project and the Team.
@@ -166,19 +166,19 @@ give a global direction of the project and the Team.
 
 **Developers :** jmassavi, humontas, csenelle, nrolland, thcaquet
 
-### Project Management
+## Project Management
 
-
-#### Tools
+### Tools
 
 While we tried using Github projects in the beginning, we found it not really user-friendly and preferred using
 **Google Docs** to organize the Module that were going to be used and the Technical Stack
 
-#### Communication
+---
+### Communication
 
 Most, or pretty much all the communication was made on discord, either in private or on the server made for the project
 
-### Features List
+## Features
 
 [x] Customizable Editor : csenelle, jmassavi
 > Multiple SlateJs editor combined with React Grid Layout placement to offer a dynamic and customizable page editor
@@ -210,8 +210,9 @@ Most, or pretty much all the communication was made on discord, either in privat
 
 [x] Notifications system : humontas
 > A notification system for any modifications made inside pages to all the admin users
+
 ---
-### Modules
+## Modules
 
 #### Web (6pts) :
 - Major: Use a framework for both the frontend and backend. (Here NextJS) 
@@ -219,7 +220,6 @@ Most, or pretty much all the communication was made on discord, either in privat
 - Minor: Server-Side Rendering (SSR) for improved performance and SEO. 
 - Minor: File upload and management system. 
 - Minor: Use an ORM for the database.
-
 
 #### Accessibility and Internationalization (2pts) :
 - Minor: Support for multiple languages (at least 3 languages). 
@@ -241,6 +241,9 @@ Most, or pretty much all the communication was made on discord, either in privat
 - Major : Advanced AI search software 
 
 TODO : Justify customs !
+
+
+### Total : 19
 
 ---
 
@@ -265,12 +268,21 @@ TODO : Justify customs !
   - nodemailer, resend (mailing libraries and API)
 
 - Microservices :
-  - FastApi and Uvicorn (easy python API creation)
+  - FastApi and Uvicorn (python API creation)
   - rapidfuzz, ntlk (librairies for fuzzy searching)
-
 
 - Languages :
   - Typescript (Next)
   - Shell (docker services)
   - Python (AI scripts)
   - Docker (services)
+
+### Database Schema
+*beware, it is fat !*
+
+
+
+# Resources
+
+- NextJs [documentation](https://nextjs.org/docs)
+- 
