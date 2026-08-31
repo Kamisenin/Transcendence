@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { X, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { checkTagNamespaceAvailability, checkTagNameAvailability, createTagAction } from "@/actions/tags";
+import { useTranslations } from "next-intl";
 
 type Props = {
     isOpen: boolean;
@@ -12,17 +13,8 @@ type Props = {
 
 const PRESET_COLORS = [
     "#3b82f6", "#ec4899", "#ef4444", "#f59e0b",
-    "#10b981", "#8b5cf6", "#6366f1", "#64748b",
-    "#dfdfdc", "#222222", "#141414", "#000000"
+    "#10b981", "#8b5cf6", "#6366f1", "#64748b"
 ];
-
-type FieldStatus = {
-    checking: boolean;
-    available: boolean | null;
-    message?: string;
-};
-
-const IDLE_STATUS: FieldStatus = { checking: false, available: null };
 
 export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props) {
     const [name, setName] = useState("");
@@ -32,32 +24,26 @@ export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props)
     const [error, setError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const [nameStatus, setNameStatus] = useState<FieldStatus>(IDLE_STATUS);
-    const [nsStatus, setNsStatus] = useState<FieldStatus>(IDLE_STATUS);
+    // État de validation du namespace
+    const [nsStatus, setNsStatus] = useState<{
+        checking: boolean;
+        available: boolean | null;
+        message?: string;
+    }>({ checking: false, available: null });
 
-    useEffect(() => {
-        if (!name.trim()) {
-            setNameStatus(IDLE_STATUS);
-            return;
-        }
-        setNameStatus({ checking: true, available: null });
-        const timer = setTimeout(async () => {
-            const res = await checkTagNameAvailability(name, namespace.trim() || undefined);
-            setNameStatus({ checking: false, available: res.available, message: res.message });
-        }, 400);
-        return () => clearTimeout(timer);
-    }, [name, namespace]);
-
+    // Vérification dynamique du namespace
     useEffect(() => {
         if (!namespace.trim()) {
-            setNsStatus(IDLE_STATUS);
+            setNsStatus({ checking: false, available: null });
             return;
         }
+
         setNsStatus({ checking: true, available: null });
         const timer = setTimeout(async () => {
             const res = await checkTagNamespaceAvailability(namespace);
             setNsStatus({ checking: false, available: res.available, message: res.message });
         }, 400);
+
         return () => clearTimeout(timer);
     }, [namespace]);
 
@@ -68,17 +54,17 @@ export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props)
         setError(null);
 
         if (!name.trim()) {
-            setError("Tag name is required.");
+            setError(tTags("tagNameRequired"));
             return;
         }
 
         if (nameStatus.available === false) {
-            setError("This tag name is not available.");
+            setError(t("namespaceUnavailable"));
             return;
         }
 
         if (namespace.trim() && nsStatus.available === false) {
-            setError("The given namespace is not valid.");
+            setError(t("")); //TODO invalid namespace
             return;
         }
 
@@ -92,14 +78,13 @@ export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props)
 
             onTagCreated(created);
 
+            // Reset
             setName("");
             setNamespace("");
             setColorHex("#3b82f6");
-            setNameStatus(IDLE_STATUS);
-            setNsStatus(IDLE_STATUS);
             onClose();
         } catch (err: any) {
-            setError(err.message || "Something went wrong.");
+            setError(err.message || tCommon("somethingWentWrong"));
         } finally {
             setIsSubmitting(false);
         }
@@ -117,7 +102,7 @@ export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props)
             <div className="bg-white w-full max-w-sm rounded-2xl shadow-xl border border-gray-100 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
                 {/* Header */}
                 <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
-                    <h3 className="text-sm font-bold text-gray-900">Create a new Tag</h3>
+                    <h3 className="text-sm font-bold text-gray-900">{t("title")}</h3>
                     <button
                         type="button"
                         onClick={onClose}
@@ -127,7 +112,7 @@ export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props)
                     </button>
                 </div>
 
-                {/* Form */}
+                {/* Formulaire */}
                 <form onSubmit={handleSubmit} className="p-5 space-y-4 text-xs">
                     {error && (
                         <div className="p-2.5 bg-red-50 text-red-600 rounded-lg flex items-center gap-2 font-medium">
@@ -136,15 +121,15 @@ export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props)
                         </div>
                     )}
 
-                    {/* Name */}
+                    {/* Nom */}
                     <div>
-                        <label className="block font-semibold text-gray-700 mb-1">Tag Name *</label>
+                        <label className="block font-semibold text-gray-700 mb-1">{t("nameLabel")}</label>
                         <input
                             type="text"
                             required
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            placeholder="e.g. Character, Lore, Universe..."
+                            placeholder={t("namePlaceholder")}
                             className="w-full text-xs px-3 py-2 border border-gray-200 rounded-lg outline-none focus:border-blue-500 transition"
                         />
                         {name.trim() !== "" && (
@@ -163,43 +148,43 @@ export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props)
                                     </span>
                                 ) : null}
                             </div>
-                        )}
+                        )} {/* TODO LANGUAGE*/}
                     </div>
 
                     {/* Namespace */}
                     <div>
                         <label className="block font-semibold text-gray-700 mb-1">
-                            Namespace <span className="font-normal text-gray-400">(Optional)</span>
+                            {t("namespaceLabel")} <span className="font-normal text-gray-400">{t("namespaceOptional")}</span>
                         </label>
                         <input
                             type="text"
                             value={namespace}
                             onChange={(e) => setNamespace(e.target.value)}
-                            placeholder="e.g. my-namespace"
+                            placeholder={t("namespacePlaceholder")}
                             className="w-full text-xs px-3 py-2 border border-gray-200 rounded-lg outline-none focus:border-blue-500 transition"
                         />
                         {namespace.trim() !== "" && (
                             <div className="mt-1 flex items-center gap-1.5">
                                 {nsStatus.checking ? (
                                     <span className="text-gray-400 flex items-center gap-1">
-                                        <Loader2 size={12} className="animate-spin" /> Checking...
+                                        <Loader2 size={12} className="animate-spin" /> {tCommon("searching")}
                                     </span>
                                 ) : nsStatus.available === true ? (
                                     <span className="text-emerald-600 flex items-center gap-1 font-medium">
-                                        <CheckCircle2 size={12} /> {nsStatus.message ?? "Valid namespace"}
+                                        <CheckCircle2 size={12} /> {nsStatus.message ?? t("namespaceAvailable")}
                                     </span>
                                 ) : nsStatus.available === false ? (
                                     <span className="text-rose-500 flex items-center gap-1 font-medium">
-                                        <AlertCircle size={12} /> {nsStatus.message ?? "Invalid namespace"}
+                                        <AlertCircle size={12} /> {nsStatus.message ?? "Invalid namespace"} {/* TODO LANGUAGE*/}
                                     </span>
                                 ) : null}
                             </div>
                         )}
                     </div>
 
-                    {/* Color */}
+                    {/* Couleur */}
                     <div>
-                        <label className="block font-semibold text-gray-700 mb-1.5">Color</label>
+                        <label className="block font-semibold text-gray-700 mb-1.5">{t("colorLabel")}</label>
                         <div className="flex items-center gap-2 mb-2">
                             <input
                                 type="color"
@@ -234,7 +219,7 @@ export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props)
                             onClick={onClose}
                             className="px-3 py-1.5 font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition"
                         >
-                            Cancel
+                            {tCommon("cancel")}
                         </button>
                         <button
                             type="submit"
@@ -242,7 +227,7 @@ export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props)
                             className="px-4 py-1.5 font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded-lg shadow-xs transition flex items-center gap-1.5"
                         >
                             {isSubmitting && <Loader2 size={12} className="animate-spin" />}
-                            Create
+                            {tCommon("create")}
                         </button>
                     </div>
                 </form>

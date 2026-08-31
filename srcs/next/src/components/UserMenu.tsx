@@ -33,7 +33,14 @@ export default function UserMenu({ user }: UserMenuProps) {
 
     async function handleCreatePage() {
         setCreating(true);
-        await createPage();
+        const res = await fetch("/api/pages/create", {method: "POST"});
+        const data = await res.json();
+     
+        if (res.ok) {
+            router.push(`/pages/${data.pageId}/edit`);
+        } else {
+            console.error(data.error);
+        }
         setCreating(false);
     }
     if (!user) {
@@ -63,10 +70,10 @@ export default function UserMenu({ user }: UserMenuProps) {
                         Account
                     </Link>
                     <Link href="/pages/" className="block px-4 py-2 hover:bg-gray-100">
-                        My pages
+                        {t("myPages")}
                     </Link>
                     <Link href="/orgs/" className="block px-4 py-2 hover:bg-gray-100">
-                        My organizations
+                        My organizations {/*TODO LANGUAGE*/}
                     </Link>
                     <button
                         onClick={handleCreatePage}

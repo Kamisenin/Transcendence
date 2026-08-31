@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 type Props = {
     twoFactorEnabled: boolean;
@@ -9,6 +10,8 @@ type Props = {
 };
 
 export default function TwoFactorToggle({ twoFactorEnabled, emailVerified }: Props) {
+    const t = useTranslations("Auth.twoFactor");
+    const tCommon = useTranslations("Common");
     const [enabled, setEnabled] = useState(twoFactorEnabled);
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
@@ -16,9 +19,8 @@ export default function TwoFactorToggle({ twoFactorEnabled, emailVerified }: Pro
 
     async function handleToggle() {
         const newValue = !enabled;
-
         if (newValue && !emailVerified) {
-            setMessage("Please verify your email first, in your account settings.");
+            setMessage(t("verifyEmailFirst"));
             return ;
         }
         setLoading(true);
@@ -32,10 +34,10 @@ export default function TwoFactorToggle({ twoFactorEnabled, emailVerified }: Pro
         
         if (res.ok) {
             setEnabled(data.twoFactorEnabled);
-            setMessage(newValue ? "Two-factor authentication enabled." : "Two-factor authentification disabled")
+            setMessage(newValue ? t("enabled") : t("disabled"))
             router.refresh();
         } else {
-            setMessage(data.error || "Something went wrong");
+            setMessage(data.error || tCommon("somethingWentWrong"));
         }
         setLoading(false);
     }
@@ -48,7 +50,7 @@ export default function TwoFactorToggle({ twoFactorEnabled, emailVerified }: Pro
                     onChange={handleToggle}
                     disabled={loading}
                 />
-                <span>Two-factor authentication (email code)</span>
+                <span>{t("label")}</span>
             </label>
             {message && <p className="text-sm text-red-600">{message}</p>}
         </div>

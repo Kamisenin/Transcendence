@@ -4,6 +4,7 @@ import "./globals.css";
 import { getCurrentUser } from "%/lib/session";
 import UserMenu from "@/components/UserMenu";
 import HomeButton from "@/components/HomeButton";
+import LocaleSwitcher from "@/components/LocaleSwitcher";
 import Link from "next/link"
 
 const geistSans = Geist({
@@ -24,7 +25,7 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode; }>) {
     const user = await getCurrentUser();
     return (
-        <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+        <html lang={locale} className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
         <body>
         <header className="fixed top-0 z-50 h-16 w-full bg-beige flex items-center justify-between px-6">
             <HomeButton />
@@ -39,7 +40,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             <p>and</p>
             <Link href="/terms" className="hover:underline">
               <p>Terms of Service</p>
-            </Link>
+            </Link> {/* TODO LANGUAGES */}
           </div>
         </footer>
         </body>

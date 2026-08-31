@@ -9,6 +9,7 @@ import dynamic from 'next/dynamic';
 import WikiEditor from "@/components/page/editor/WikiEditor";
 import Infobox, { type InfoboxData } from "@/components/page/Infobox";
 import { savePage } from "@/actions/pages";
+import { useTranslations } from "next-intl";
 
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
@@ -52,6 +53,8 @@ const DEFAULT_INFOBOX: InfoboxData = {
 };
 
 export default function PageBuilder({ accountId, pageId, initialTitle, initialBlocks, visibility, canonicalNamespace}: Props) {
+    const t = useTranslations("Page");
+    const tCommon = useTranslations("Common");
     const [saving, setSaving] = useState(false);
     const [activeId, setActiveId] = useState<string | null>(null);
     const [activeEditor, setActiveEditor] = useState<EditorInstance | null>(null);
@@ -165,7 +168,7 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
         setSaving(true);
         try {
             const mainInfobox = blocks.find(b => b.type === 'infobox');
-            const pageTitle = mainInfobox?.infoboxData?.title || initialTitle || "untitled";
+            const pageTitle = mainInfobox?.infoboxData?.title || initialTitle || t("untitled");
             const visibility = mainInfobox?.infoboxData?.public || false;
             const namespace = mainInfobox?.infoboxData?.canonicalNamespace;
 
@@ -184,7 +187,8 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
                     };
                 }),
             };
-            await savePage(pageId, pageTitle, content as any, mainInfobox?.infoboxData, visibility, namespace);
+
+            await savePage(pageId, pageTitle, content as any);
         } finally {
             setSaving(false);
         }
@@ -218,12 +222,11 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
                         <div key={block.id} className="relative group/grid-item">
                             {block.type === 'infobox' ? (
                                 <Infobox
-                                    accountId={{accountId}}
                                     id={block.id}
                                     pageId={pageId}
                                     data={block.infoboxData || DEFAULT_INFOBOX}
                                     onChange={(newData) => handleInfoboxChange(block.id, newData)}
-                                    namespace={canonicalNamespace}
+                                    // Pas d'option onDelete transmise pour l'infobox constante
                                 />
                             ) : (
                                 <WikiEditor

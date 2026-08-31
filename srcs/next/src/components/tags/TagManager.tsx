@@ -6,6 +6,7 @@ import { getTagsAction } from "@/actions/tags";
 import TagBadge from "./TagBadge";
 import { Tag } from "./tagType";
 import { InfoboxData } from "../page/Infobox"
+import { useTranslations } from "next-intl";
 
 type TagManagerProps = {
     accountId: string;
@@ -16,6 +17,8 @@ type TagManagerProps = {
 };
 
 export default function TagManager({ accountId, pageId, data, onChange, onOpenModal }: TagManagerProps) {
+    const t = useTranslations("Tags");
+    const tCommon = useTranslations("Common");
     const [isOpen, setIsOpen] = useState(false);
     const [input, setInput] = useState("");
     const [fetched, setFetched] = useState<Tag[]>([]);
@@ -77,7 +80,7 @@ export default function TagManager({ accountId, pageId, data, onChange, onOpenMo
                         onClick={() => setIsOpen(!isOpen)}
                         className="inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 border border-dashed border-gray-300 rounded-full cursor-pointer"
                     >
-                        <Plus size={12} /> Tag
+                        <Plus size={12} /> {tCommon("tags")}
                     </button>
 
                     {isOpen && (
@@ -88,7 +91,7 @@ export default function TagManager({ accountId, pageId, data, onChange, onOpenMo
                                     autoFocus
                                     value={input}
                                     onChange={(e) => setInput(e.target.value)}
-                                    placeholder="Search..."
+                                    placeholder={tCommon("search")}
                                     className="w-full px-2.5 py-1.5 border border-gray-200 rounded-lg outline-none focus:border-blue-500 pr-7"
                                 />
                                 {searching && <Loader2 size={13} className="absolute right-2 top-2 animate-spin text-gray-400" />}
@@ -112,7 +115,7 @@ export default function TagManager({ accountId, pageId, data, onChange, onOpenMo
                                     ))
                                 ) : (
                                     <p className="p-2 text-center text-gray-400 italic text-[11px]">
-                                        {searching ? "Searching..." : "No tag found"}
+                                        {searching ? tCommon("searching") : t("noTagFound")}
                                     </p>
                                 )}
                             </div>
@@ -122,7 +125,7 @@ export default function TagManager({ accountId, pageId, data, onChange, onOpenMo
                                 onClick={() => { setIsOpen(false); onOpenModal(); }}
                                 className="w-full mt-1.5 pt-1.5 border-t border-gray-100 text-left px-2 py-1 rounded text-blue-600 hover:bg-blue-50 font-semibold flex items-center gap-1 cursor-pointer"
                             >
-                                <Plus size={13} /> Create new tag
+                                <Plus size={13} /> {t("createModal.title")}
                             </button>
                         </div>
                     )}
@@ -133,14 +136,14 @@ export default function TagManager({ accountId, pageId, data, onChange, onOpenMo
                 <div className="mt-3 pt-2 border-t border-gray-100">
                     <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-600 mb-1.5">
                         <Globe size={13} className="text-gray-400" />
-                        Page Namespace
+                        {t("slugNamespace")}
                     </label>
                     <select
                         value={namespace}
                         onChange={(e) => onChange({ ...data, canonicalNamespace: e.target.value || null })}
                         className="w-full text-xs px-2.5 py-1.5 border border-gray-200 rounded-lg bg-gray-50/50 focus:bg-white focus:border-blue-500 outline-none"
                     >
-                        <option value="">None (uses your accountId)</option>
+                        <option value="">{t("noneUseAccountOnly")}</option>
                         {namespaces.map((ns) => (
                             <option key={ns} value={ns}>
                                 {ns} / [page-title]
