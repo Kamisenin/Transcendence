@@ -140,12 +140,9 @@ export async function savePage(pageId: number, title: string, content: any, info
     const titleSlug = title.trim() ? slugify(title) : null;
     if (!titleSlug) return { success: false, error: "The title cannot be empty." };
 
-    console.log("titleSlug", titleSlug);
-    console.log("canonicalNamespace", canonicalNamespace);
     const tagNamespace = canonicalNamespace?.trim() || null;
 
     const targetNamespaces = [user.accountId, ...(tagNamespace ? [tagNamespace] : [])];
-    console.log("TagNamespace", tagNamespace);
     const conflict = await prisma.pageSlug.findFirst({
         where: { slug: titleSlug, namespace: { in: targetNamespaces }, pageId: { not: pageId } }
     });
