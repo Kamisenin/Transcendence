@@ -38,9 +38,10 @@ export default function Footer({ userId }: FooterProps) {
           return;
         }
 
-        // 2. Récupérer les données détaillées de chaque page
+        // 2. Récupérer les données détaillées de chaque page SANS CACHE BROWSER
         const pagePromises = pageIds.map(async (id) => {
-          const res = await fetch(`/api/pages/${id}`);
+          // 💡 On force le navigateur à récupérer la version fraîche depuis Postgres
+          const res = await fetch(`/api/pages/${id}`, { cache: "no-store" });
           if (!res.ok) return null;
           return (await res.json()) as PageData;
         });
@@ -78,7 +79,7 @@ export default function Footer({ userId }: FooterProps) {
           ) : (
             <div className="flex gap-4 overflow-x-auto pb-4 pt-2 px-1 items-start">
               {pages.map((page) => (
-                <ForumCard key={page.pageId} page={page} className="flex-none w-64" />
+                <ForumCard key={page.pageId} page={page} userId={userId} className="flex-none w-64" />
               ))}
             </div>
           )}

@@ -1,7 +1,5 @@
 from fastapi import HTTPException
-
 from database import get_connection
-
 
 EVENT_WEIGHTS = {
     "visit": 0.3,
@@ -23,15 +21,12 @@ def process_event(user_id, page_id, event):
 
     event_weight = EVENT_WEIGHTS[event]
 
-
     with get_connection() as conn:
-
         with conn.cursor() as cursor:
 
             # ---------------------------------------
             # Récupérer les tags de la page
             # ---------------------------------------
-
             cursor.execute(
                 """
                 SELECT tag_id
@@ -43,21 +38,16 @@ def process_event(user_id, page_id, event):
 
             tags = cursor.fetchall()
 
-
             if not tags:
                 raise HTTPException(
                     status_code=404,
                     detail="Page has no tags"
                 )
 
-
             # ---------------------------------------
             # Modifier le profil utilisateur
             # ---------------------------------------
-
             for (tag_id,) in tags:
-
-                # Récupérer l'IDF
                 cursor.execute(
                     """
                     SELECT idf
@@ -69,33 +59,18 @@ def process_event(user_id, page_id, event):
 
                 result = cursor.fetchone()
 
-
-                # Le tag n'a pas encore de statistique
-                if result is None:
-                    continue
-
-
-                idf = result[0]
-
+                # Si le tag n'a pas encore de statistique IDF, on prend 1.0 par défaut au lieu de skiper
+                idf = float(result[0]) if result is not None else 1.0
 
                 value = event_weight * idf
-
 
                 # Ajouter au vecteur utilisateur
                 cursor.execute(
                     """
-                    INSERT INTO user_tag_interests
-                        (user_id, tag_id, weight)
-
-                    VALUES
-                        (%s, %s, %s)
-
+                    INSERT INTO user_tag_interests (user_id, tag_id, weight)
+                    VALUES (%s, %s, %s)
                     ON CONFLICT (user_id, tag_id)
-
-                    DO UPDATE SET
-                        weight =
-                            user_tag_interests.weight
-                            + EXCLUDED.weight
+                    DO UPDATE SET weight = user_tag_interests.weight + EXCLUDED.weight
                     """,
                     (
                         user_id,
@@ -103,6 +78,5 @@ def process_event(user_id, page_id, event):
                         value
                     )
                 )
-
 
         conn.commit()

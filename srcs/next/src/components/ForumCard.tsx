@@ -21,6 +21,7 @@ export interface PageData {
 
 interface ForumCardProps {
   page: PageData;
+  userId?: string;
   className?: string;
 }
 
@@ -36,7 +37,7 @@ function formatTagColor(color?: string | number | null): string | undefined {
   return color;
 }
 
-export default function ForumCard({ page, className = "" }: ForumCardProps) {
+export default function ForumCard({ page, userId, className = "" }: ForumCardProps) {
   const [imgError, setImgError] = useState(false);
 
   const formatImgSrc = (src: string) => {
@@ -48,9 +49,29 @@ export default function ForumCard({ page, className = "" }: ForumCardProps) {
 
   const hasValidImg = page.img && !imgError;
 
+  const handleClick = () => {
+      console.log("ForumCard click", {
+    userId,
+    pageId: page.pageId,
+  });
+
+  if (!userId) return;
+
+    fetch("http://localhost:8001/recommendation/event", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        user_id: userId,
+        page_id: page.pageId,
+        event: "visit",
+      }),
+    }).catch((err) => console.error("Erreur envoi event:", err));
+  };
+
   return (
     <Link
       href={`/wiki/${page.namespace}/${page.slug}`}
+      onClick={handleClick}
       className={`group relative bg-card text-card-foreground border border-border rounded-lg overflow-hidden hover:border-ring transition-all duration-300 hover:-translate-y-1 shadow-md flex flex-col justify-between p-4 h-56 ${className}`}
     >
       <div className="flex-1 flex flex-col min-h-0">
@@ -73,12 +94,10 @@ export default function ForumCard({ page, className = "" }: ForumCardProps) {
 
         {/* TITRE + DESCRIPTION */}
         <div className="flex-1 flex flex-col justify-start min-h-0 pb-1">
-          {/* Titre mis en avant (text-base font-semibold) et sans changement de couleur au survol */}
           <h4 className="font-semibold text-card-foreground text-base leading-snug line-clamp-2 flex-shrink-0">
             {page.title}
           </h4>
 
-          {/* Description : apparaît au survol */}
           <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed opacity-0 max-h-0 group-hover:opacity-100 group-hover:max-h-24 group-hover:mt-2 transition-all duration-300 overflow-hidden">
             {page.description || ""}
           </p>

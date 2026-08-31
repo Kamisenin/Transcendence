@@ -133,42 +133,134 @@ export async function getAccessiblePages() {
     return results;
 }
 
-export async function savePage(pageId: number, title: string, content: any, infobox: InfoboxData, visibility: boolean, canonicalNamespace?: string | null
+export async function savePage(
+    pageId: number,
+    title: string,
+    content: any,
+    infobox: InfoboxData,
+    visibility: boolean,
+    canonicalNamespace?: string | null
 ) {
     const user = await requireUser();
 
     const titleSlug = title.trim() ? slugify(title) : null;
-    if (!titleSlug) return { success: false, error: "The title cannot be empty." };
+
+    if (!titleSlug) {
+        return {
+            success: false,
+            error: "The title cannot be empty."
+        };
+    }
 
     console.log("titleSlug", titleSlug);
     console.log("canonicalNamespace", canonicalNamespace);
+
     const tagNamespace = canonicalNamespace?.trim() || null;
 
-    const targetNamespaces = [user.accountId, ...(tagNamespace ? [tagNamespace] : [])];
+    const targetNamespaces = [
+        user.accountId,
+        ...(tagNamespace ? [tagNamespace] : [])
+    ];
+
     console.log("TagNamespace", tagNamespace);
+
     const conflict = await prisma.pageSlug.findFirst({
-        where: { slug: titleSlug, namespace: { in: targetNamespaces }, pageId: { not: pageId } }
+        where: {
+            slug: titleSlug,
+            namespace: {
+                in: targetNamespaces
+            },
+            pageId: {
+                not: pageId
+            }
+        }
     });
 
     if (conflict) {
-        return { success: false, error: `The title "${title}" is already used in this namespace "${conflict.namespace}".` };
+        return {
+            success: false,
+            error: `The title "${title}" is already used in this namespace "${conflict.namespace}".`
+        };
     }
-    
+
     await prisma.page.update({
         where: { pageId },
-        data: { title, content, public: visibility, description: infobox.description, img: infobox.imageUrl }
+        data: {
+            title,
+            content,
+            public: visibility,
+            description: infobox.description,
+            img: infobox.imageUrl
+        }
     });
-    
-    await syncUserSlugs(pageId, titleSlug, user.accountId);
 
-    if (tagNamespace) {
-        await setTagSlug(pageId, titleSlug, tagNamespace);
-    } else {
-        await removeTagSlug(pageId, titleSlug);
+    const tagIds = Array.from(
+        new Set(
+            (infobox.tags ?? [])
+                .map(tag => Number(tag.id))
+                .filter(tagId => Number.isInteger(tagId))
+        )
+    );
+
+    await prisma.tagPage.deleteMany({
+        where: {
+            pageId,
+            ...(tagIds.length > 0
+                ? {
+                    tagId: {
+                        notIn: tagIds
+                    }
+                }
+                : {})
+        }
+    });
+
+    for (const tagId of tagIds) {
+
+        await prisma.tagPage.upsert({
+            where: {
+                tagId_pageId: {
+                    tagId,
+                    pageId
+                }
+            },
+            update: {},
+            create: {
+                tagId,
+                pageId
+            }
+        });
     }
 
-    return { success: true };
+    await syncUserSlugs(
+        pageId,
+        titleSlug,
+        user.accountId
+    );
+
+    if (tagNamespace) {
+
+        await setTagSlug(
+            pageId,
+            titleSlug,
+            tagNamespace
+        );
+
+    } else {
+
+        await removeTagSlug(
+            pageId,
+            titleSlug
+        );
+    }
+
+
+    return {
+        success: true
+    };
 }
+
+
 
 export async function createPage() {
     const user = await requireUser();
