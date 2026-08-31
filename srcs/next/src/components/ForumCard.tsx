@@ -6,7 +6,7 @@ import Link from "next/link";
 export interface TagData {
   id: number;
   name: string;
-  color?: number | null;
+  color?: string | number | null;
 }
 
 export interface PageData {
@@ -24,6 +24,18 @@ interface ForumCardProps {
   className?: string;
 }
 
+// Utilitaire pour convertir la couleur (nombre ou string) en format CSS valide (#RRGGBB)
+function formatTagColor(color?: string | number | null): string | undefined {
+  if (color === null || color === undefined) return undefined;
+  if (typeof color === "number") {
+    return `#${color.toString(16).padStart(6, "0")}`;
+  }
+  if (typeof color === "string" && !color.startsWith("#")) {
+    return `#${color}`;
+  }
+  return color;
+}
+
 export default function ForumCard({ page, className = "" }: ForumCardProps) {
   const [imgError, setImgError] = useState(false);
 
@@ -39,10 +51,9 @@ export default function ForumCard({ page, className = "" }: ForumCardProps) {
   return (
     <Link
       href={`/wiki/${page.namespace}/${page.slug}`}
-      /* h-52 bloque la hauteur globale pour éviter le layout shift */
-      className={`group relative bg-card text-card-foreground border border-border rounded-lg overflow-hidden hover:border-ring transition-all duration-300 hover:-translate-y-1 shadow-md flex flex-col justify-between p-4 h-52 ${className}`}
+      className={`group relative bg-card text-card-foreground border border-border rounded-lg overflow-hidden hover:border-ring transition-all duration-300 hover:-translate-y-1 shadow-md flex flex-col justify-between p-4 h-56 ${className}`}
     >
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col min-h-0">
         
         {/* CONTAINER IMAGE */}
         <div className="transition-all duration-300 group-hover:h-0 group-hover:opacity-0 group-hover:mb-0 mb-3 h-28 w-full flex-shrink-0 overflow-hidden">
@@ -61,29 +72,40 @@ export default function ForumCard({ page, className = "" }: ForumCardProps) {
         </div>
 
         {/* TITRE + DESCRIPTION */}
-        <div className="flex-1 flex flex-col justify-start overflow-hidden">
-          <h4 className="font-medium text-card-foreground text-sm line-clamp-2 group-hover:text-highlight transition-colors flex-shrink-0">
+        <div className="flex-1 flex flex-col justify-start min-h-0 pb-1">
+          {/* Titre mis en avant (text-base font-semibold) et sans changement de couleur au survol */}
+          <h4 className="font-semibold text-card-foreground text-base leading-snug line-clamp-2 flex-shrink-0">
             {page.title}
           </h4>
 
           {/* Description : apparaît au survol */}
-          <p className="text-xs text-muted-foreground line-clamp-4 leading-relaxed opacity-0 max-h-0 group-hover:opacity-100 group-hover:max-h-28 group-hover:mt-2 transition-all duration-300 overflow-hidden">
-            {page.description || "Aucune description disponible pour ce forum."}
+          <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed opacity-0 max-h-0 group-hover:opacity-100 group-hover:max-h-24 group-hover:mt-2 transition-all duration-300 overflow-hidden">
+            {page.description || ""}
           </p>
         </div>
 
       </div>
 
-      {/* TAGS */}
+      {/* TAGS avec couleur dynamique */}
       <div className="flex flex-wrap gap-1 mt-2 pt-2 border-t border-border flex-shrink-0">
-        {page.tags?.map((tag) => (
-          <span
-            key={tag.id}
-            className="text-[10px] bg-muted text-muted-foreground px-2 py-0.5 rounded-full border border-border/50"
-          >
-            #{tag.name}
-          </span>
-        ))}
+        {page.tags?.map((tag) => {
+          const bgHex = formatTagColor(tag.color);
+          return (
+            <span
+              key={tag.id}
+              style={
+                bgHex
+                  ? { backgroundColor: bgHex, color: "#ffffff" }
+                  : undefined
+              }
+              className={`text-[10px] px-2 py-0.5 rounded-full border border-border/50 ${
+                !bgHex ? "bg-muted text-muted-foreground" : ""
+              }`}
+            >
+              #{tag.name}
+            </span>
+          );
+        })}
       </div>
     </Link>
   );

@@ -62,6 +62,8 @@ model User {
 
   uploads  Upload[]  @relation("FileOwner")
 
+  userInterests UserTagInterest[]
+
   @@map("users")
 }
 
@@ -115,6 +117,9 @@ model Tag {
 
   orgTagAccess     OrgTagAccess[]
   orgTagCapability OrgTagCapability[]
+
+  userInterests UserTagInterest[]
+  statistic     TagStatistic?
 
   @@map("tags")
 }
@@ -426,4 +431,32 @@ model OrgTagCapability {
 
   @@id([orgId, tagId, roleId])
   @@map("org_tag_capability")
+}
+
+
+// ════════════════════════════════════════════
+// RECOMMENDATIONS / INTERESTS
+// ════════════════════════════════════════════
+
+model UserTagInterest {
+  userId String @map("user_id")
+  tagId  Int    @map("tag_id")
+  weight Float  @default(0)
+
+  user User @relation(fields: [userId], references: [user_id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([userId, tagId])
+  @@index([userId])
+  @@map("user_tag_interests")
+}
+
+model TagStatistic {
+  tagId             Int   @id @map("tag_id")
+  documentFrequency Int   @default(0) @map("document_frequency")
+  idf               Float @default(1)
+
+  tag Tag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@map("tag_statistics")
 }

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSession, setCookies } from "@/app/lib/session";
 import { cookies } from "next/headers";
-import { prisma } from "%/lib/prisma"
+import { prisma } from "@/app/lib/prisma/prisma"
 
 export async function POST(req: NextRequest) {
     const cookieStore = await cookies();
