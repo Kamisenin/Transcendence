@@ -2,19 +2,143 @@
 
 import { prisma } from '%/lib/prisma/prisma';
 import { getSessionUser, getSessionCookie } from '%/lib/session';
+import { requireUser } from '@/actions/tags'
 import { redirect } from "next/navigation";
 import { PermissionLevel } from "@prisma/client"
 import { init_slug, syncUserSlugs, slugify, removeTagSlug, setTagSlug } from "%/lib/page/slug";
 import { User, Page } from '@prisma/client';
 import { type InfoboxData } from "@/components/page/Infobox"
 
+function findPreviewImageFromContent(content: any): string | null {
+    try {
+        if (!content) return null;
+        const blocks = content?.blocks || [];
+        for (const b of blocks) {
+            if (!b) continue;
+            if (b.type === 'image' && b.data) {
+                if (b.data.file && (b.data.file.url || b.data.file.src)) return b.data.file.url || b.data.file.src;
+                if (b.data.url) return b.data.url;
+                if (b.data.src) return b.data.src;
+            }
+            if (b.data && (b.data.image || b.data.img || b.data.thumb)) {
+                const candidate = b.data.image?.url || b.data.image?.src || b.data.img?.url || b.data.thumb?.url;
+                if (candidate) return candidate;
+            }
+        }
+        const json = JSON.stringify(content);
+        const match = json.match(/https?:\/\/[^"\s>]+?\.(png|jpg|jpeg|webp|gif)/i);
+        if (match) return match[0];
+        return null;
+    } catch {
+        return null;
+    }
+}
+
+export async function getOwnedPages() {
+    const user = await requireUser();
+
+    const pages = await prisma.page.findMany({
+        where: { ownerId: user.user_id },
+        orderBy: { lastModified: 'desc' },
+        include: {
+            slugs: true,
+            owner: { select: { accountId: true, user_id: true } },
+        },
+        take: 200,
+    });
+
+    return pages.map(p => {
+        const canonical = (p.slugs || []).find((s: any) => s.isCanonical);
+        const preview = findPreviewImageFromContent(p.content) || null;
+        return {
+            pageId: p.pageId,
+            title: p.title,
+            preview,
+            ownerAccount: p.owner?.accountId || p.owner?.user_id,
+            canonicalSlug: canonical ? { namespace: canonical.namespace, slug: canonical.slug } : null,
+            lastModified: p.lastModified,
+        };
+    });
+}
+
+export async function getAccessiblePages() {
+    const user = await requireUser();
+
+    const userId = user.user_id;
+
+    const directPages = await prisma.page.findMany({
+        where: {
+            permissions: { some: { userToken: userId } },
+        },
+        include: {
+            slugs: true,
+            owner: { select: { accountId: true, user_id: true } },
+        },
+        take: 200,
+    });
+
+    const tagMemberships = await prisma.tagMember.findMany({
+        where: { userToken: userId },
+        select: { tagId: true },
+    });
+    const tagPagePages = tagMemberships.length
+        ? await prisma.tagPage.findMany({
+            where: { tagId: { in: tagMemberships.map(m => m.tagId) } },
+            include: { page: { include: { slugs: true, owner: { select: { accountId: true, user_id: true } } } } },
+            take: 500,
+        })
+        : [];
+
+    const memberships = await prisma.organizationMember.findMany({
+        where: { userToken: userId },
+        include: { role: true },
+    });
+    const orgIds = memberships.map(m => m.organizationId);
+    let orgAccessiblePages: any[] = [];
+    if (orgIds.length) {
+        const orgPageAccess = await prisma.orgPageAccess.findMany({
+            where: { orgId: { in: orgIds } },
+            include: {
+                page: { include: { slugs: true, owner: { select: { accountId: true, user_id: true } } } },
+                minRole: true,
+            },
+            take: 500,
+        });
+
+        const accessAllowed = orgPageAccess.filter(ap => {
+            const membership = memberships.find(m => m.organizationId === ap.orgId);
+            if (!membership || !membership.role || !ap.minRole) return false;
+            return membership.role.hierarchyLevel <= ap.minRole.hierarchyLevel;
+        });
+
+        orgAccessiblePages = accessAllowed.map(a => a.page);
+    }
+
+    const itemsMap = new Map<number, any>();
+    for (const p of directPages) itemsMap.set(p.pageId, p);
+    for (const tp of tagPagePages) if (tp.page) itemsMap.set(tp.page.pageId, tp.page);
+    for (const p of orgAccessiblePages) if (p) itemsMap.set(p.pageId, p);
+
+    const results = Array.from(itemsMap.values()).map((p: any) => {
+        const canonical = (p.slugs || []).find((s: any) => s.isCanonical);
+        const preview = findPreviewImageFromContent(p.content) || null;
+        return {
+            pageId: p.pageId,
+            title: p.title,
+            preview,
+            ownerAccount: p.owner?.accountId || p.owner?.user_id,
+            canonicalSlug: canonical ? { namespace: canonical.namespace, slug: canonical.slug } : null,
+        };
+    });
+    return results;
+}
+
 export async function savePage(pageId: number, title: string, content: any, infobox: InfoboxData, visibility: boolean, canonicalNamespace?: string | null
 ) {
-    const user = await getSessionUser(await getSessionCookie());
-    if (!user) redirect("/login");
+    const user = await requireUser();
 
     const titleSlug = title.trim() ? slugify(title) : null;
-    if (!titleSlug) return { success: false, error: "Le titre ne peut pas être vide." };
+    if (!titleSlug) return { success: false, error: "The title cannot be empty." };
 
     console.log("titleSlug", titleSlug);
     console.log("canonicalNamespace", canonicalNamespace);
@@ -27,7 +151,7 @@ export async function savePage(pageId: number, title: string, content: any, info
     });
 
     if (conflict) {
-        return { success: false, error: `Le titre "${title}" est déjà utilisé dans l'espace "${conflict.namespace}".` };
+        return { success: false, error: `The title "${title}" is already used in this namespace "${conflict.namespace}".` };
     }
     
     await prisma.page.update({
@@ -47,9 +171,7 @@ export async function savePage(pageId: number, title: string, content: any, info
 }
 
 export async function createPage() {
-    const user = await getSessionUser(await getSessionCookie());
-
-    if (!user) redirect("/login");
+    const user = await requireUser();
 
     const page = await prisma.page.create({
         data: {

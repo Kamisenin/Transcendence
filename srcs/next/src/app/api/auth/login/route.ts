@@ -38,7 +38,11 @@ export async function POST(req: NextRequest) {
     }
 
     const stayConnected = body.stayConnected as boolean;
-    const session = await createSession(user.user_id, stayConnected);
-    await setCookies(session, stayConnected);
-    return NextResponse.json({success: true, twoFactorRequired: false});
+    try {
+        const session = await createSession(user.user_id, stayConnected);
+        await setCookies(session, stayConnected);
+        return NextResponse.json({success: true, twoFactorRequired: false});
+    } catch (err) {
+        return NextResponse.json({ success: false }, { status: 500 });
+    }
 }

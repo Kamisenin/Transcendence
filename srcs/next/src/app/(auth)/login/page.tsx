@@ -1,12 +1,15 @@
 'use client';
 
 import Link from "next/link"
+import { useState } from "react";
 
 export default function LoginPage() {
+    const [error, setError] = useState("");
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
+        setError("");
         const form = new FormData(event.currentTarget);
         const f = await fetch('/api/auth/login', {
             method: 'POST',
@@ -21,11 +24,16 @@ export default function LoginPage() {
         });
         const j = await f.json();
 
+        if (!f.ok){
+            setError(j.error || "Non-existent account or incorrect password");
+            return ;
+        }
         if (j.twoFactorRequired) {
             window.location.href = '/verify_2fa';
-        } else {
-            window.location.href = '/';
+            return ;
         }
+        
+        window.location.href = '/';
         console.log(j);
     }
 
@@ -53,6 +61,11 @@ export default function LoginPage() {
                     <input type="checkbox" name="stayConnected" />
                     Stay connected
                 </label>
+                {error &&  (
+                    <p className="text-red-500 text-sm">
+                        {error}
+                    </p>
+                )}
                 <button type="submit" className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
                     submit
                 </button>

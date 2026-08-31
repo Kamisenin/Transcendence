@@ -30,3 +30,17 @@ export async function sendVerifEmail(to: string, code: string) {
         console.error("Resend error:", error);
     }
 }
+
+export async function sendAccountDeletedEmail(to: string) {
+    try {
+        const info = await transporter.sendMail({
+            from: `"transcendance" <${process.env.GMAIL_USER}>`,
+            to,
+            subject: "Your account has been deleted",
+            html: `<p>Your account and personal data have been deleted as requested. </p>`,
+        });
+        console.log("Email sent:", info.messageId);
+    }   catch (error) {
+        console.error("Email error:", error);
+    }
+}

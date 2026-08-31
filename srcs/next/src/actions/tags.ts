@@ -2,15 +2,43 @@
 
 import { prisma } from '%/lib/prisma/prisma';
 import { getSessionUser, getSessionCookie } from '%/lib/session';
-import { intToHex, hexToInt } from "%/lib/hex_utils"
+import { intToHex, hexToInt } from "%/lib/hex_utils";
+import { slugify } from "%/lib/page/slug";
 import { getTagCapabilities, canManageRoleRank, canAssignRoleRank } from '%/lib/tag_permissions';
 import { revalidatePath } from 'next/cache';
 import { redirect } from "next/navigation";
+import { TagPermissionError } from '%/lib/errors';
 
 export async function requireUser() {
     const user = await getSessionUser(await getSessionCookie());
     if (!user) redirect("/login");
     return user;
+}
+
+export async function createTag(data: FormData) {
+    const user = await requireUser();
+
+    const rawName = String(data.get('name') ?? '').trim();
+    const rawDescription = String(data.get('description') ?? '').trim();
+    const rawColor = String(data.get('color') ?? '#3b82f6').trim();
+    const rawNamespace = String(data.get('namespace') ?? '').trim();
+
+    if (!rawName) throw new Error('Tag name is required.');
+
+    const name = slugify(rawName);
+    if (!name) throw new Error('Invalid tag name.');
+
+    const namespace = rawNamespace ? slugify(rawNamespace) : null;
+    if (rawNamespace && !namespace) throw new Error('Invalid namespace.');
+
+    const hex = rawColor.startsWith('#') ? rawColor.slice(1) : rawColor;
+    if (!/^[0-9a-fA-F]{6}$/.test(hex)) {
+        throw new Error('Invalid color format. Expected #RRGGBB.');
+    }
+    const color = parseInt(hex, 16);
+    const description = rawDescription || null;
+
+    revalidatePath('/tags');
 }
 
 // ───────────── ROLES ─────────────
@@ -208,6 +236,20 @@ export async function checkTagNamespaceAvailability(namespace: string): Promise<
     return { available: true };
 }
 
+export async function checkTagNameAvailability(name: string, namespace?: string) {
+    const trimmed = name.trim();
+    if (!trimmed) return { available: null as boolean | null };
+
+    const taken = await tagNameExists(trimmed, namespace ?? null);
+    return { available: !taken, message: taken ? "This name is already taken" : undefined };
+}
+
+async function tagNameExists(name: string): Promise<boolean> {
+    return (await prisma.tag.findUnique({
+        where: { name }
+    }))
+}
+
 export async function createTagAction(data: { name: string; namespace?: string; colorHex?: string }) {
     const user = await requireUser();
     const name = data.name.trim();
@@ -292,4 +334,34 @@ export async function addTagMember(tagId: number, targetUserToken: string, roleI
         data: { tagId, userToken: targetUserToken, roleId },
     });
     revalidatePath(`/tags/${tagId}`);
+}
+
+export async function deleteTag(
+    prisma: PrismaClient,
+    tagId: number,
+    userId: string
+): Promise<void> {
+    const tag = await prisma.tag.findUnique({
+        where: { id: tagId },
+        include: {
+            permissions: { where: { userToken: userId } },
+            members: {
+                where: { userToken: userId },
+                include: { role: true },
+            },
+        },
+    });
+
+    if (!tag)
+        redirect("/");
+
+    const isOwner = tag.ownerToken === userId;
+    const hasDirectPermission = tag.permissions.some((p) => p.canDeleteTag);
+    const hasRolePermission = tag.members.some((m) => m.role.canDeleteTag);
+
+    if (!isOwner && !hasDirectPermission && !hasRolePermission)
+        throw new PermissionError("Forbidden");
+
+    await prisma.tag.delete({ where: { id: tagId } });
+    redirect("/");
 }

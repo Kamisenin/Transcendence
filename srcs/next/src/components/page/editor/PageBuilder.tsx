@@ -82,7 +82,7 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
             {
                 id: "block-infobox",
                 type: "infobox",
-                infoboxData: { ...DEFAULT_INFOBOX, title: initialTitle || "", public: false },
+                infoboxData: { ...DEFAULT_INFOBOX, title: initialTitle || "", public: visibility, canonicalNamespace },
                 x: 0, y: 0, w: 4, h: 8
             },
             {

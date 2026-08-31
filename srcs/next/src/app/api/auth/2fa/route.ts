@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+git fetch origin
+git merge origin/mainimport { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/app/lib/session";
-import { prisma } from "%/lib/prisma/prisma";
-import TwoFactorToggle from "@/components/TwoFactor";
+import { prisma } from "%/lib/prisma";
 
 export async function POST(req: NextRequest) {
     const user = await getCurrentUser();
