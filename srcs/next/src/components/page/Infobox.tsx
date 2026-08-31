@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { GripVertical, Trash2, Eye, Image as ImageIcon } from "lucide-react";
+
+import VisibilityToggler from "@/components/page/VisibilityToggler";
 import CreateTagModal from "@/components/tags/CreateTagModal";
 import { useTranslations } from "next-intl";
 
@@ -19,26 +21,28 @@ export type InfoboxData = {
     description: string;
     tags: Tag[];
     canonicalNamespace?: string | null;
+    public: boolean;
 };
 
 type Props = {
+    accountId: string
     id: string;
     pageId: number;
     data: InfoboxData;
-    onChange: (data: InfoboxData) => void;
+    onChange?: (data: InfoboxData) => void;
     onDelete?: (id: string) => void;
     isReadOnly?: boolean;
     availableTagsPool?: Tag[];
+    canonicalNamespace?: string | null;
 };
 
-export default function Infobox({ id, pageId, data, onChange, onDelete, isReadOnly = false }: Props) {
+export default function Infobox({ accountId, id, pageId, data, onChange, onDelete, isReadOnly = false, canonicalNamespace }: Props) {
     const t = useTranslations("Page");
     const [isPreview, setIsPreview] = useState(isReadOnly);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
     const updateField = (key: keyof InfoboxData, value: any) => onChange({ ...data, [key]: value });
 
-    // Mode Lecture / Aperçu
     if (isReadOnly || isPreview) {
         return (
             <InfoboxPreview
@@ -49,10 +53,9 @@ export default function Infobox({ id, pageId, data, onChange, onDelete, isReadOn
         );
     }
 
-    // Mode Édition (Compatible 100% avec React Grid Layout)
     return (
         <div className="group relative h-full w-full bg-white rounded-xl border border-blue-200 ring-1 ring-blue-50 p-4 shadow-sm flex flex-col overflow-hidden">
-            {/* Barre d'action Drag Handle & Delete */}
+            {/* Handle bar */}
             {onDelete && (
                 <div className="absolute left-2 top-2 z-20 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 backdrop-blur-xs rounded border border-gray-100 p-0.5 shadow-xs">
                     <button
@@ -85,7 +88,6 @@ export default function Infobox({ id, pageId, data, onChange, onDelete, isReadOn
                 </button>
             </div>
 
-            {/* Formulaire défilant si redimensionné petit en hauteur */}
             <div className="pl-7 pr-1 space-y-3 flex-1 overflow-y-auto">
                 <TitleInput pageId={pageId} title={data.title} onChange={(val) => updateField("title", val)} />
 
@@ -105,6 +107,7 @@ export default function Infobox({ id, pageId, data, onChange, onDelete, isReadOn
                 <DescriptionInput value={data.description} onChange={(val) => updateField("description", val)} />
 
                 <TagManager
+                    pageId={pageId}
                     data={data}
                     onChange={onChange}
                     onOpenModal={() => setIsCreateModalOpen(true)}
@@ -115,6 +118,11 @@ export default function Infobox({ id, pageId, data, onChange, onDelete, isReadOn
                 isOpen={isCreateModalOpen}
                 onClose={() => setIsCreateModalOpen(false)}
                 onTagCreated={(newTag) => onChange({ ...data, tags: [...(data.tags || []), newTag] })}
+            />
+
+            <VisibilityToggler
+                isPublic={data.public ?? true}
+                onChange={(newPublicState) => updateField("public", newPublicState)}
             />
         </div>
     );

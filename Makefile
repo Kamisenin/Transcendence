@@ -14,12 +14,14 @@ DOCKER_COMPOSE = docker compose
 export ADDRESS
 
 upb:
+	mkdir -p data/db
 	@echo "ADDRESS vaut : $(ADDRESS)"
 	@echo "running 42chan in $(MODE) mode"
 	$(DOCKER_COMPOSE) $(PROFILE_FLAG) up --build
 	$(NEXT_RUN)
 
 up:
+	mkdir -p data/db
 	@echo "running 42chan in $(MODE) mode"
 	$(DOCKER_COMPOSE) $(PROFILE_FLAG) up
 	$(NEXT_RUN)

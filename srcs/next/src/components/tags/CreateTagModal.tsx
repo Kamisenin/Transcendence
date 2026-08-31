@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { X, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
-import { checkTagNamespaceAvailability, createTagAction } from "@/actions/tags";
+import { checkTagNamespaceAvailability, checkTagNameAvailability, createTagAction } from "@/actions/tags";
 import { useTranslations } from "next-intl";
 
 type Props = {
@@ -17,9 +17,6 @@ const PRESET_COLORS = [
 ];
 
 export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props) {
-    const t = useTranslations("Tags.createModal");
-    const tTags = useTranslations("Tags");
-    const tCommon = useTranslations("Common");
     const [name, setName] = useState("");
     const [namespace, setNamespace] = useState("");
     const [colorHex, setColorHex] = useState("#3b82f6");
@@ -61,8 +58,13 @@ export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props)
             return;
         }
 
-        if (namespace.trim() && nsStatus.available === false) {
+        if (nameStatus.available === false) {
             setError(t("namespaceUnavailable"));
+            return;
+        }
+
+        if (namespace.trim() && nsStatus.available === false) {
+            setError(t("")); //TODO invalid namespace
             return;
         }
 
@@ -87,6 +89,13 @@ export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props)
             setIsSubmitting(false);
         }
     };
+
+    const canSubmit =
+        !isSubmitting &&
+        !nameStatus.checking &&
+        !nsStatus.checking &&
+        nameStatus.available !== false &&
+        (namespace.trim() === "" || nsStatus.available !== false);
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
@@ -123,6 +132,23 @@ export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props)
                             placeholder={t("namePlaceholder")}
                             className="w-full text-xs px-3 py-2 border border-gray-200 rounded-lg outline-none focus:border-blue-500 transition"
                         />
+                        {name.trim() !== "" && (
+                            <div className="mt-1 flex items-center gap-1.5">
+                                {nameStatus.checking ? (
+                                    <span className="text-gray-400 flex items-center gap-1">
+                                        <Loader2 size={12} className="animate-spin" /> Checking availability...
+                                    </span>
+                                ) : nameStatus.available === true ? (
+                                    <span className="text-emerald-600 flex items-center gap-1 font-medium">
+                                        <CheckCircle2 size={12} /> Name available
+                                    </span>
+                                ) : nameStatus.available === false ? (
+                                    <span className="text-rose-500 flex items-center gap-1 font-medium">
+                                        <AlertCircle size={12} /> {nameStatus.message ?? "This name is already taken"}
+                                    </span>
+                                ) : null}
+                            </div>
+                        )} {/* TODO LANGUAGE*/}
                     </div>
 
                     {/* Namespace */}
@@ -145,11 +171,11 @@ export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props)
                                     </span>
                                 ) : nsStatus.available === true ? (
                                     <span className="text-emerald-600 flex items-center gap-1 font-medium">
-                                        <CheckCircle2 size={12} /> {t("namespaceAvailable")}
+                                        <CheckCircle2 size={12} /> {nsStatus.message ?? t("namespaceAvailable")}
                                     </span>
                                 ) : nsStatus.available === false ? (
                                     <span className="text-rose-500 flex items-center gap-1 font-medium">
-                                        <AlertCircle size={12} /> {nsStatus.message}
+                                        <AlertCircle size={12} /> {nsStatus.message ?? "Invalid namespace"} {/* TODO LANGUAGE*/}
                                     </span>
                                 ) : null}
                             </div>
@@ -169,7 +195,6 @@ export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props)
                             <span className="font-mono text-gray-500 uppercase">{colorHex}</span>
                         </div>
 
-                        {/* Nuancier prédéfini */}
                         <div className="flex flex-wrap gap-1.5">
                             {PRESET_COLORS.map((c) => (
                                 <button
@@ -187,7 +212,7 @@ export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props)
                         </div>
                     </div>
 
-                    {/* Boutons d'action */}
+                    {/* Actions */}
                     <div className="flex items-center justify-end gap-2 pt-3 border-t border-gray-100">
                         <button
                             type="button"
@@ -198,7 +223,7 @@ export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props)
                         </button>
                         <button
                             type="submit"
-                            disabled={isSubmitting || nsStatus.checking || (namespace.trim() !== "" && nsStatus.available === false)}
+                            disabled={!canSubmit}
                             className="px-4 py-1.5 font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded-lg shadow-xs transition flex items-center gap-1.5"
                         >
                             {isSubmitting && <Loader2 size={12} className="animate-spin" />}

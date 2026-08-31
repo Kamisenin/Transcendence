@@ -5,7 +5,6 @@ type ResolvedPage = {
     redirectTo: string | null;
 };
 
-
 /*
 * This functions takes a namespace and a slug to
 * find a page to redirect to. If the address exists
@@ -16,9 +15,6 @@ export async function resolvePage(
     namespace: string,
     slug: string
 ): Promise<ResolvedPage | null> {
-
-
-    console.log(namespace, slug);
 
     const pageSlug = await prisma.pageSlug.findUnique({
         where: {
@@ -31,16 +27,11 @@ export async function resolvePage(
 
     if (!pageSlug) return null;
 
-    console.log("YEEEES");
-
     const page = await prisma.page.findUnique({
         where: { pageId: pageSlug.pageId },
     });
 
     if (!page) return null;
-
-
-    console.log("PAGE FOUND");
 
     let redirectTo: string | null = null;
 

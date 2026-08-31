@@ -1,6 +1,5 @@
 import { notFound, redirect } from 'next/navigation';
 import { resolvePage } from '%/lib/page/page_resolver';
-// On importe le client component qu'on vient de créer
 import PageViewer from '@/components/page/PageViewer';
 
 type Params = {
@@ -21,6 +20,7 @@ export default async function WikiViewPage({ params }: Params) {
 
     const content = page.content as { blocks: any[] } | null;
     const blocks = content?.blocks ?? [];
+
     return (
         <PageViewer
             title={page.title}

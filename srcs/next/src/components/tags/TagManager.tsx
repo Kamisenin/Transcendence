@@ -9,12 +9,14 @@ import { InfoboxData } from "../page/Infobox"
 import { useTranslations } from "next-intl";
 
 type TagManagerProps = {
+    accountId: string;
+    pageId: number;
     data: InfoboxData;
     onChange: (data: InfoboxData) => void;
     onOpenModal: () => void;
 };
 
-export default function TagManager({ data, onChange, onOpenModal }: TagManagerProps) {
+export default function TagManager({ accountId, pageId, data, onChange, onOpenModal }: TagManagerProps) {
     const t = useTranslations("Tags");
     const tCommon = useTranslations("Common");
     const [isOpen, setIsOpen] = useState(false);
@@ -25,6 +27,10 @@ export default function TagManager({ data, onChange, onOpenModal }: TagManagerPr
 
     const tags = data.tags || [];
     const namespaces = Array.from(new Set(tags.map((t) => t.namespace).filter((ns): ns is string => Boolean(ns && ns.trim() !== ""))));
+    let namespace = "";
+    if (data.canonicalNamespace && data.canonicalNamespace !== accountId) {
+        namespace = data.canonicalNamespace;
+    }
 
     useEffect(() => {
         const handler = (e: MouseEvent) => {
@@ -62,7 +68,7 @@ export default function TagManager({ data, onChange, onOpenModal }: TagManagerPr
 
     return (
         <div className="pt-1">
-            <label className="block text-xs font-medium text-gray-600 mb-1.5">{tCommon("tags")}</label>
+            <label className="block text-xs font-medium text-gray-600 mb-1.5">Tags</label>
             <div className="flex flex-wrap gap-1.5 items-center">
                 {tags.map((tag) => (
                     <TagBadge key={tag.id} tag={tag} onRemove={() => removeTag(tag.id)} />
@@ -133,14 +139,14 @@ export default function TagManager({ data, onChange, onOpenModal }: TagManagerPr
                         {t("slugNamespace")}
                     </label>
                     <select
-                        value={data.canonicalNamespace || ""}
+                        value={namespace}
                         onChange={(e) => onChange({ ...data, canonicalNamespace: e.target.value || null })}
                         className="w-full text-xs px-2.5 py-1.5 border border-gray-200 rounded-lg bg-gray-50/50 focus:bg-white focus:border-blue-500 outline-none"
                     >
                         <option value="">{t("noneUseAccountOnly")}</option>
                         {namespaces.map((ns) => (
                             <option key={ns} value={ns}>
-                                {ns} / [titre-page]
+                                {ns} / [page-title]
                             </option>
                         ))}
                     </select>
