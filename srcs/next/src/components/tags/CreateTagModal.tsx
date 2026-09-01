@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { X, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { checkTagNamespaceAvailability, checkTagNameAvailability, createTagAction } from "@/actions/tags";
-import { useTranslations } from "next-intl";
 
 type Props = {
     isOpen: boolean;
@@ -17,6 +16,14 @@ const PRESET_COLORS = [
     "#dfdfdc", "#222222", "#141414", "#000000"
 ];
 
+type FieldStatus = {
+    checking: boolean;
+    available: boolean | null;
+    message?: string;
+};
+
+const IDLE_STATUS: FieldStatus = { checking: false, available: null };
+
 export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props) {
     const [name, setName] = useState("");
     const [namespace, setNamespace] = useState("");
@@ -25,17 +32,25 @@ export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props)
     const [error, setError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // État de validation du namespace
-    const [nsStatus, setNsStatus] = useState<{
-        checking: boolean;
-        available: boolean | null;
-        message?: string;
-    }>({ checking: false, available: null });
+    const [nameStatus, setNameStatus] = useState<FieldStatus>(IDLE_STATUS);
+    const [nsStatus, setNsStatus] = useState<FieldStatus>(IDLE_STATUS);
 
-    // Vérification dynamique du namespace
+    useEffect(() => {
+        if (!name.trim()) {
+            setNameStatus(IDLE_STATUS);
+            return;
+        }
+        setNameStatus({ checking: true, available: null });
+        const timer = setTimeout(async () => {
+            const res = await checkTagNameAvailability(name);
+            setNameStatus({ checking: false, available: res.available, message: res.message });
+        }, 400);
+        return () => clearTimeout(timer);
+    }, [name, namespace]);
+
     useEffect(() => {
         if (!namespace.trim()) {
-            setNsStatus({ checking: false, available: null });
+            setNsStatus(IDLE_STATUS);
             return;
         }
         setNsStatus({ checking: true, available: null });
