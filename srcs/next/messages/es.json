@@ -226,13 +226,31 @@
 		"more": "más"
 	},
 	"Home": {
-		"title": "Para empezar, edita el archivo page.tsx.",
-		"subtitlePrefix": "¿Buscas un punto de partida o más instrucciones? Visita",
-		"templates": "las plantillas",
-		"orThe": "o el",
-		"learning": "centro de aprendizaje",
-		"center": ".",
-		"deployNow": "Desplegar ahora",
-		"documentation": "Documentación"
+		"tagline": "Un wiki para wikis",
+		"title": "encuentra cualquier página del wiki"
+	},
+	"Footer": {
+		"privacyPolicy": "Política de privacidad",
+		"and": "y",
+		"termsOfService": "Términos de servicio"
+	},
+	"Notifications": {
+		"ariaLabel": "Notificaciones",
+		"title": "Notificaciones",
+		"markAllRead": "Marcar todo como leído",
+		"loading": "Cargando...",
+		"empty": "No hay notificaciones",
+		"someone": "Alguien",
+		"untitled": "una página",
+		"pageEdited": "{actor} editó \"{title}\"",
+		"justNow": "justo ahora",
+		"minutesAgo": "hace {count, plural, one {# minuto} other {# minutos}}",
+		"hoursAgo": "hace {count, plural, one {# hora} other {# horas}}",
+		"daysAgo": "hace {count, plural, one {# día} other {# días}}"
+	},
+	"RecentlyEdited": {
+		"title": "editadas recientemente",
+		"editedBy": "editado por {name} · {time}",
+		"untitled": "Sin título"
 	}
 }

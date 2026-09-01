@@ -225,14 +225,32 @@
 		"less": "Moins",
 		"more": "plus"
 	},
-	"Home": {
-		"title": "Pour commencer, modifiez le fichier page.tsx.",
-		"subtitlePrefix": "Vous cherchez un point de départ ou plus d'instructions ? Consultez",
-		"templates": "les modèles",
-		"orThe": "ou le",
-		"learning": "centre d'apprentissage",
-		"center": ".",
-		"deployNow": "Déployer maintenant",
-		"documentation": "Documentation"
+	"Home":{
+		"tagline": "Un wiki pour wikis",
+		"title": "trouvez n'importe quelle page du wiki"
+	},
+	"Footer": {
+		"privacyPolicy": "Politique de confidentialité",
+		"and": "et",
+		"termsOfService": "Conditions d'utilisation"
+	},
+	"Notifications": {
+		"ariaLabel": "Notifications",
+		"title": "Notifications",
+		"markAllRead": "Tout marquer comme lu",
+		"loading": "Chargement...",
+		"empty": "Aucune notification",
+		"someone": "Quelqu'un",
+		"untitled": "une page",
+		"pageEdited": "{actor} a modifié \"{title}\"",
+		"justNow": "à l'instant",
+		"minutesAgo": "il y a {count, plural, one {# minute} other {# minutes}}",
+		"hoursAgo": "il y a {count, plural, one {# heure} other {# heures}}",
+		"daysAgo": "il y a {count, plural, one {# jour} other {# jours}}"
+	},
+	"RecentlyEdited": {
+		"title": "modifiées récemment",
+		"editedBy": "modifié par {name} · {time}",
+		"untitled": "Sans titre"
 	}
 }

@@ -24,6 +24,10 @@ enum SlugType {
   TAG
 }
 
+enum NotificationType {
+  PAGE_EDITED
+}
+
 
 // ════════════════════════════════════════════
 // USERS
@@ -61,6 +65,10 @@ model User {
   tagPageRequestsReviewed TagPageRequest[] @relation("ReviewedBy")
 
   uploads  Upload[]  @relation("FileOwner")
+
+  editedPages         Page[]         @relation("PageLastEditor")
+  notifications       Notification[] @relation("NotificationRecipient")
+  notificationsCaused Notification[] @relation("NotificationActor")
 
   @@map("users")
 }
@@ -191,9 +199,11 @@ model Page {
   ownerId      String   @map("owner_id")
   createdAt    DateTime @default(now()) @map("created_at")
   lastModified DateTime @updatedAt @map("last_modified")
+  lastEditedById String? @map("last_edited_by_id")
   public       Boolean  @default(false)
 
-  owner User @relation("PageOwner", fields: [ownerId], references: [user_id])
+  owner      User  @relation("PageOwner", fields: [ownerId], references: [user_id])
+  lastEditor User? @relation("PageLastEditor", fields: [lastEditedById], references: [user_id], onDelete: SetNull)
 
   permissions PagePermission[]
   tagPages    TagPage[]
@@ -206,6 +216,8 @@ model Page {
   orgPageCapability OrgPageCapability[]
 
   slugs             PageSlug[]
+
+  notifications Notification[]
 
   @@map("pages")
 }
@@ -253,6 +265,23 @@ model TagPage {
 
   @@id([tagId, pageId])
   @@map("tag_pages")
+}
+
+model Notification {
+  id          Int              @id @default(autoincrement())
+  recipientId String           @map("recipient_id")
+  actorId     String?          @map("actor_id")
+  pageId      Int?             @map("page_id")
+  type        NotificationType @default(PAGE_EDITED)
+  read        Boolean          @default(false)
+  createdAt   DateTime         @default(now()) @map("created_at")
+
+  recipient User  @relation("NotificationRecipient", fields: [recipientId], references: [user_id], onDelete: Cascade)
+  actor     User? @relation("NotificationActor", fields: [actorId], references: [user_id], onDelete: SetNull)
+  page      Page? @relation(fields: [pageId], references: [pageId], onDelete: Cascade)
+
+  @@index([recipientId, read])
+  @@map("notifications")
 }
 
 model TagPageRequest {
