@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 
@@ -13,6 +13,7 @@ export default function TwoFactorToggle({ twoFactorEnabled, emailVerified }: Pro
     const t = useTranslations("Auth.twoFactor");
     const tCommon = useTranslations("Common");
     const [enabled, setEnabled] = useState(twoFactorEnabled);
+    useEffect(() => {setEnabled(twoFactorEnabled);}, [twoFactorEnabled]);
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
     const router = useRouter();
