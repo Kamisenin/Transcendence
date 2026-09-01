@@ -8,6 +8,7 @@ import { PermissionLevel } from "@prisma/client"
 import { init_slug, syncUserSlugs, slugify, removeTagSlug, setTagSlug } from "%/lib/page/slug";
 import { User, Page } from '@prisma/client';
 import { type InfoboxData } from "@/components/page/Infobox"
+import { notifyPageEdit } from "%/lib/notifications";
 
 function findPreviewImageFromContent(content: any): string | null {
     try {
@@ -156,7 +157,7 @@ export async function savePage(pageId: number, title: string, content: any, info
     
     await prisma.page.update({
         where: { pageId },
-        data: { title, content, public: visibility, description: infobox.description, img: infobox.imageUrl }
+        data: { title, content, public: visibility, description: infobox.description, img: infobox.imageUrl, lastEditedById: user.user_id }
     });
     
     await syncUserSlugs(pageId, titleSlug, user.accountId);
@@ -166,6 +167,8 @@ export async function savePage(pageId: number, title: string, content: any, info
     } else {
         await removeTagSlug(pageId, titleSlug);
     }
+
+    await notifyPageEdit(pageId, user.user_id);
 
     return { success: true };
 }
@@ -323,4 +326,36 @@ export async function getCanonicalNamespace(pageId: number)
     return await prisma.pageSlug.findFirst({
         where : { pageId, isCanonical : true}
     });
+}
+
+export async function getRecentlyEditedPages(limit: number = 6) {
+    const user = await getSessionUser(await getSessionCookie());
+
+    const pages = await prisma.page.findMany({
+        where: user
+            ? {
+                OR: [
+                    { public: true },
+                    { ownerId: user.user_id },
+                    { permissions: { some: { userToken: user.user_id } } },
+                ],
+            }
+            : { public: true },
+        orderBy: { lastModified: 'desc' },
+        take: limit,
+        include: {
+            slugs: { where: { isCanonical: true } },
+            lastEditor: { select: { username: true } },
+            tagPages: { include: { tag: { select: { name: true, color: true } } }, take: 1 },
+        },
+    });
+
+    return pages.map((p: typeof pages[number]) => ({
+        pageId: p.pageId,
+        title: p.title || 'Untitled',
+        lastModified: p.lastModified,
+        canonicalSlug: p.slugs[0] ? { namespace: p.slugs[0].namespace, slug: p.slugs[0].slug } : null,
+        lastEditorName: p.lastEditor?.username ?? null,
+        tag: p.tagPages[0]?.tag ? { name: p.tagPages[0].tag.name, color: p.tagPages[0].tag.color } : null,
+    }));
 }
