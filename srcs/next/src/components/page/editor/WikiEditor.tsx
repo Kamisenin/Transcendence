@@ -2,23 +2,28 @@
 
 import { useMemo, useEffect } from "react";
 import { createEditor, Editor, BaseEditor, Descendant } from "slate";
-import { Slate, Editable, withReact } from "slate-react";
+import { Slate, Editable, withReact, ReactEditor } from "slate-react";
 import { withHistory, HistoryEditor } from "slate-history";
 import { GripVertical, Trash2 } from "lucide-react";
 import { renderElement, renderLeaf } from "%/lib/slate_renderer";
 
+export type EditorInstance = BaseEditor & ReactEditor & HistoryEditor;
 type CustomElement = { type: "paragraph"; children: CustomText[] };
-type CustomText = { text: string };
+type CustomText = {
+    text: string;
+    bold?: boolean;
+    italic?: boolean;
+    underline?: boolean;
+    strikethrough?: boolean;
+}
 
 declare module "slate" {
     interface CustomTypes {
-        Editor: BaseEditor & ReactEditor & HistoryEditor;
+        Editor: EditorInstance;
         Element: CustomElement;
         Text: CustomText;
     }
 }
-
-type EditorInstance = BaseEditor & ReactEditor;
 
 type Props = {
     id: string;
@@ -46,7 +51,7 @@ export default function WikiEditor({ id, value, onValueChange, isActive, onFocus
         return () => onUnmount(id);
     }, [id, editor, onMount, onUnmount]);
 
-    const toggleMark = (mark: string) => {
+    const toggleMark = (mark: keyof Omit<CustomText, "text">) => {
         const marks = Editor.marks(editor);
         const isMarkActive = marks ? marks[mark] === true : false;
 
@@ -131,7 +136,7 @@ export default function WikiEditor({ id, value, onValueChange, isActive, onFocus
                         onKeyDown={(event) => {
                             keyHandler(event);
                         }}
-                    />
+                    /> {/* TODO LANGUAGE PLACEHOLDER*/}
                 </Slate>
             </div>
         </div>

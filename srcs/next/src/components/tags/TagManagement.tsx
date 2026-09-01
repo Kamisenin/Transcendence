@@ -1,17 +1,20 @@
 "use client";
 
 import { useState } from 'react';
-import type { TagCapabilities } from '%/lib/tag_permissions';
 import TagMembersPanel from './TagMembersPanel';
 import TagRolesPanel from './TagRolesPanel';
 import TagRequestsPanel from './TagRequestsPanel';
 import TagSettingsPanel from './TagSettingsPanel';
+import type { TagCapabilities } from '%/lib/tag_permissions';
+import { type Member } from "./TagMembersPanel"
 
-type Tag = {
+
+export type Tag = {
     id: number;
     name: string;
     description: string | null;
     color: number | null;
+    namespace : string | null;
     ownerToken: string;
 };
 
@@ -28,14 +31,6 @@ type Role = {
     canRevokePage: boolean;
     canManagePageGrants: boolean;
     canReviewRequests: boolean;
-};
-
-type Member = {
-    tagId: number;
-    userToken: string;
-    roleId: number;
-    user: { user_id: string; username: string; imgLink: string };
-    role: Role;
 };
 
 type PendingRequest = {

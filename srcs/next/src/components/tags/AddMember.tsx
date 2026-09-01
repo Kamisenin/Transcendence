@@ -30,7 +30,7 @@ export default function AddMember({ tagId, assignableRoles, existingMemberTokens
     const [selectedRoleId, setSelectedRoleId] = useState<number | null>(assignableRoles[0]?.id ?? null);
     const [isPending, startTransition] = useTransition();
     const [error, setError] = useState<string | null>(null);
-    const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+    const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     useEffect(() => {
         if (debounceRef.current) clearTimeout(debounceRef.current);

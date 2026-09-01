@@ -5,9 +5,8 @@ import { ReactEditor } from "slate-react";
 import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Bold, Italic, Strikethrough, Underline, Plus, Minus, Type, ChevronDown, PlusCircle, Image as ImageIcon,
  Undo, Redo } from "lucide-react";
-
-
-type EditorInstance = Editor & ReactEditor;
+import { HistoryEditor } from "slate-history";
+import { type EditorInstance } from "./WikiEditor"
 
 type Props = {
     editor: EditorInstance | null;
@@ -146,8 +145,6 @@ const Toolbar = forwardRef<ToolbarRef, Props>(({ editor, disabled, onAddBlock },
                     <div className="h-6 w-[1px] bg-gray-200 mx-0.5" />
                 </>
             )}
-
-            {/* STYLES DE BASE */}
             <button type="button" onClick={() => toggleMark("bold")} className={btnClass(isMarkActive("bold"))} title="Gras">
                 <Bold size={16} />
             </button>

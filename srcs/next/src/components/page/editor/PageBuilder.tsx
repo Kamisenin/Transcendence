@@ -7,6 +7,7 @@ import type { ToolbarRef } from "@/components/page/editor/Toolbar";
 import ReactGridLayout, { type Layout } from 'react-grid-layout';
 import dynamic from 'next/dynamic';
 import WikiEditor from "@/components/page/editor/WikiEditor";
+import { type EditorInstance } from "./WikiEditor"
 import Infobox, { type InfoboxData } from "@/components/page/Infobox";
 import { savePage } from "@/actions/pages";
 
@@ -14,8 +15,6 @@ import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 
 const Toolbar = dynamic(() => import('@/components/page/editor/Toolbar'), { ssr: false });
-
-type EditorInstance = BaseEditor & ReactEditor;
 
 export type BlockType = 'editor' | 'infobox';
 
@@ -193,7 +192,7 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
                     };
                 }),
             };
-            const infoboxData = mainInfobox.infoboxData;
+            const infoboxData = mainInfobox.infoboxData!;
             await savePage(pageId, pageTitle, content as any, infoboxData, visibility, namespace);
         } catch (err) {
             setError("An unexpected error occurred while saving.");
@@ -235,12 +234,7 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
                     className="layout"
                     layout={layout}
                     onLayoutChange={(newLayout) => setLayout(newLayout)}
-                    cols={12}
-                    rowHeight={40}
-                    margin={[16, 16]}
                     width={width}
-                    draggableHandle=".drag-handle"
-                    draggableCancel="input, textarea, [contenteditable], button"
                 >
                     {blocks.map(block => (
                         <div key={block.id} className="relative group/grid-item">
@@ -251,7 +245,7 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
                                     pageId={pageId}
                                     data={block.infoboxData || DEFAULT_INFOBOX}
                                     onChange={(newData) => handleInfoboxChange(block.id, newData)}
-                                    namespace={canonicalNamespace}
+                                    canonicalNamespace={canonicalNamespace}
                                 />
                             ) : (
                                 <WikiEditor

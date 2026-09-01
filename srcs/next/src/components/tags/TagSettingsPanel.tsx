@@ -3,13 +3,7 @@
 import { useState, useTransition } from 'react';
 import { updateTagInfo, deleteTag } from '@/actions/tags';
 import type { TagCapabilities } from '%/lib/tag_permissions';
-type Tag = {
-    id: number;
-    name: string;
-    description: string | null;
-    color: number | null;
-    namespace: string | null;
-};
+import { type Tag } from './TagManagement';
 
 type Props = {
     tag: Tag;
