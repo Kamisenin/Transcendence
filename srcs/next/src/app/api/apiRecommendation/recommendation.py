@@ -24,6 +24,28 @@ def load_user_profile(cursor, user_id):
 
     return vector
 
+# ============================================================
+# EXCLUDED PAGES
+# ============================================================
+
+def load_excluded_pages(cursor, user_id, current_page_id=None):
+    cursor.execute(
+        """
+        SELECT page_id
+        FROM page_reactions
+        WHERE user_id = %s
+          AND type IN ('FAVORITE', 'DISLIKE')
+        """,
+        (user_id,)
+    )
+
+    excluded = {page_id for (page_id,) in cursor.fetchall()}
+
+    if current_page_id is not None:
+        excluded.add(current_page_id)
+
+    return excluded
+
 
 # ============================================================
 # PAGE VECTORS
@@ -92,20 +114,46 @@ def cosine_similarity(user_vector, page_vector):
 # RECOMMENDATIONS
 # ============================================================
 
-def get_recommendations(user_id, limit=5):
+def get_recommendations(user_id, current_page_id=None, limit=10):
     with get_connection() as conn:
         with conn.cursor() as cursor:
-
             user_vector = load_user_profile(cursor, user_id)
 
             if not user_vector:
                 return []
+            
+            cursor.execute(
+                """
+                SELECT page_id
+                FROM page_reactions
+                WHERE user_id = %s
+                """,
+                (user_id,)
+            )
+
+            excluded_pages = {
+                row[0]
+                for row in cursor.fetchall()
+            }
+
+            if current_page_id is not None:
+                excluded_pages.add(current_page_id)
 
             pages = load_page_vectors(cursor)
+
             results = []
 
             for page_id, page_vector in pages.items():
-                score = cosine_similarity(user_vector, page_vector)
+
+                # Exclusion
+                if page_id in excluded_pages:
+                    continue
+
+                score = cosine_similarity(
+                    user_vector,
+                    page_vector
+                )
+
                 results.append(
                     {
                         "page_id": page_id,

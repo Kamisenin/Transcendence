@@ -2,11 +2,11 @@ from fastapi import HTTPException
 from database import get_connection
 
 EVENT_WEIGHTS = {
-    "visit": 0.3,
-    "message": 1.0,
-    "stay": 0.6,
-    "like": 0.8,
-    "quit": -0.2
+    "visit": 0.2,
+    "favorite": 1.0,
+    "dislike": -0.8,
+    "cancel_favorite" : -1,
+    "cancel_dislike" : 0.8,
 }
 
 

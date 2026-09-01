@@ -56,6 +56,7 @@ model User {
   tagPermissions  TagPermission[]
   pagePermissions PagePermission[]
   orgMemberships  OrganizationMember[]
+  pageReactions PageReaction[]
 
   tagPageRequestsMade     TagPageRequest[] @relation("RequestedBy")
   tagPageRequestsReviewed TagPageRequest[] @relation("ReviewedBy")
@@ -209,6 +210,8 @@ model Page {
 
   orgPageAccess     OrgPageAccess[]
   orgPageCapability OrgPageCapability[]
+
+  pageReactions PageReaction[]
 
   slugs             PageSlug[]
 
@@ -459,4 +462,24 @@ model TagStatistic {
   tag Tag @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   @@map("tag_statistics")
+}
+
+
+enum PageReactionType {
+  FAVORITE
+  DISLIKE
+}
+
+model PageReaction {
+  userId    String           @map("user_id")
+  pageId    Int              @map("page_id")
+  type      PageReactionType
+  createdAt DateTime         @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [user_id], onDelete: Cascade)
+  page Page @relation(fields: [pageId], references: [pageId], onDelete: Cascade)
+
+  @@id([userId, pageId])
+  @@index([userId, type])
+  @@map("page_reactions")
 }
