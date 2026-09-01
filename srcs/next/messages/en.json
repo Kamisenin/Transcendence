@@ -226,13 +226,31 @@
 		"more": "more"
 	},
 	"Home": {
-		"title": "To get started, edit the page.tsx file.",
-		"subtitlePrefix": "Looking for a starting point or more instructions? Head over to",
-		"templates": "Templates",
-		"orThe": "or the",
-		"learning": "Learning",
-		"center": "center.",
-		"deployNow": "Deploy Now",
-		"documentation": "Documentation"
+		"tagline": "A wiki for wikis",
+		"title": "find any page in the wiki"
+	},
+	"Footer": {
+		"privacyPolicy": "Privacy Policy",
+		"and": "and",
+		"termsOfService": "Terms of Service"
+	},
+	"Notifications": {
+		"ariaLabel": "Notifications",
+		"title": "Notifications",
+		"markAllRead": "Mark all as read",
+		"loading": "Loading...",
+		"empty": "No notifications yet",
+		"someone": "Someone",
+		"untitled": "a page",
+		"pageEdited": "{actor} edited \"{title}\"",
+		"justNow": "just now",
+		"minutesAgo": "{count, plural, one {# minute ago} other {# minutes ago}}",
+		"hoursAgo": "{count, plural, one {# hour ago} other {# hours ago}}",
+		"daysAgo": "{count, plural, one {# day ago} other {# days ago}}"
+	},
+	"RecentlyEdited": {
+		"title": "recently edited",
+		"editedBy": "edited by {name} · {time}",
+		"untitled": "Untitled"
 	}
 }

@@ -27,23 +27,26 @@ export default function SearchBar()
 		const timer = setTimeout(() => 
 		{
 			fetch(`/api/search?query=${encodeURIComponent(query)}`)
-				.then((res) => res.json())
-				.then((data) => { setResults(data) });
+			  .then((res) => res.json())
+			  .then((data) => { setResults(Array.isArray(data) ? data : []); });
 		}, 300);
 		return () => clearTimeout(timer);
 	}, [query]);
 
 	return (
-		<div>
+		<div className="relative">
 			<input
 				type="text"
 				value={query}
 				onChange={(e) => setQuery(e.target.value)}
 				placeholder={t("search")}
+				className="w-full px-4 py-3 border border-border rounded-full bg-background"
 			/>
-			<ul>
+			<ul className="absolute top-full w-full mt-2 bg-popover border border-border rounded-lg z-10">
 				{results.map((item) => (
-					<li key={item.id}>{item.title}</li>
+					<li key={item.id} className="px-4 py-2 hover:bg-accent cursor-pointer">
+						{item.title}
+					</li>
 				))}
 			</ul>
 		</div>
