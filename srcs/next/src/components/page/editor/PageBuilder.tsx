@@ -10,6 +10,7 @@ import WikiEditor from "@/components/page/editor/WikiEditor";
 import { type EditorInstance } from "./WikiEditor"
 import Infobox, { type InfoboxData } from "@/components/page/Infobox";
 import { savePage } from "@/actions/pages";
+import { useTranslations } from "next-intl";
 
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
@@ -51,6 +52,8 @@ const DEFAULT_INFOBOX: InfoboxData = {
 };
 
 export default function PageBuilder({ accountId, pageId, initialTitle, initialBlocks, visibility, canonicalNamespace}: Props) {
+    const t = useTranslations("Page");
+    const tCommon = useTranslations("Common");
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [activeId, setActiveId] = useState<string | null>(null);
@@ -94,7 +97,7 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
         ];
     });
 
-    const [layout, setLayout] = useState<Layout>(() =>
+    const [layout, setLayout] = useState<Layout[]>(() =>
         blocks.map(b => ({ i: b.id, x: b.x, y: b.y, w: b.w, h: b.h }))
     );
 
@@ -163,8 +166,6 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
 
     async function handleSave() {
         setSaving(true);
-        setError(null);
-
         try {
             const mainInfobox = blocks.find(b => b.type === 'infobox');
 
@@ -173,7 +174,7 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
                 return;
             }
 
-            const pageTitle = mainInfobox.infoboxData?.title || initialTitle || "untitled";
+            const pageTitle = mainInfobox.infoboxData?.title || initialTitle || t("untitled");
             const visibility = mainInfobox.infoboxData?.public || false;
             const namespace = mainInfobox.infoboxData?.canonicalNamespace;
 
@@ -214,27 +215,16 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
             </button>
 
             <div ref={containerRef} className="max-w-6xl mx-auto border rounded-xl bg-white p-4 min-h-[500px] shadow-sm relative mt-4">
-                {error && (
-                    <div className="max-w-6xl mx-auto mb-4 p-4 rounded-lg bg-red-50 border border-red-200 text-red-700 flex items-center justify-between shadow-sm">
-                        <div className="flex items-center space-x-3">
-                            <svg className="w-5 h-5 text-red-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                            </svg>
-                            <span className="text-sm font-medium">{error}</span>
-                        </div>
-                        <button
-                            onClick={() => setError(null)}
-                            className="text-red-500 hover:text-red-700 font-semibold text-sm px-2 py-1 rounded hover:bg-red-100 transition-colors"
-                        >
-                            Close
-                        </button>
-                    </div>
-                )}
                 <ReactGridLayout
                     className="layout"
                     layout={layout}
                     onLayoutChange={(newLayout) => setLayout(newLayout)}
+                    cols={12}
+                    rowHeight={40}
+                    margin={[16, 16]}
                     width={width}
+                    draggableHandle=".drag-handle"
+                    draggableCancel="input, textarea, [contenteditable], button"
                 >
                     {blocks.map(block => (
                         <div key={block.id} className="relative group/grid-item">

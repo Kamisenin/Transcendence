@@ -5,6 +5,7 @@ import { GripVertical, Trash2, Eye, Image as ImageIcon } from "lucide-react";
 
 import VisibilityToggler from "@/components/page/VisibilityToggler";
 import CreateTagModal from "@/components/tags/CreateTagModal";
+import { useTranslations } from "next-intl";
 import { Tag } from "../tags/tagType";
 import InfoboxPreview from "./InfoboxPreview";
 import TitleInput from "./TitleInput";
@@ -35,6 +36,7 @@ type Props = {
 };
 
 export default function Infobox({ accountId, id, pageId, data, onChange, onDelete, isReadOnly = false, canonicalNamespace }: Props) {
+    const t = useTranslations("Page");
     const [isPreview, setIsPreview] = useState(isReadOnly);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
@@ -84,10 +86,9 @@ export default function Infobox({ accountId, id, pageId, data, onChange, onDelet
                 <DescriptionInput value={data.description} onChange={(val) => updateField("description", val)} />
 
                 <TagManager
-                    accountId={accountId}
                     pageId={pageId}
                     data={data}
-                    onChange={onChange ?? (() => {})}
+                    onChange={onChange}
                     onOpenModal={() => setIsCreateModalOpen(true)}
                 />
             </div>

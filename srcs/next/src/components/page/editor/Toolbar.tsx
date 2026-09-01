@@ -7,6 +7,7 @@ import { Bold, Italic, Strikethrough, Underline, Plus, Minus, Type, ChevronDown,
  Undo, Redo } from "lucide-react";
 import { HistoryEditor } from "slate-history";
 import { type EditorInstance } from "./WikiEditor"
+import { useTranslations } from "next-intl";
 
 type Props = {
     editor: EditorInstance | null;

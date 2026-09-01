@@ -6,6 +6,7 @@ import { Slate, Editable, withReact, ReactEditor } from "slate-react";
 import { withHistory, HistoryEditor } from "slate-history";
 import { GripVertical, Trash2 } from "lucide-react";
 import { renderElement, renderLeaf } from "%/lib/slate_renderer";
+import { useTranslations } from "next-intl";
 
 export type EditorInstance = BaseEditor & ReactEditor & HistoryEditor;
 type CustomElement = { type: "paragraph"; children: CustomText[] };
@@ -38,6 +39,7 @@ type Props = {
 };
 
 export default function WikiEditor({ id, value, onValueChange, isActive, onFocus, onMount, onUnmount, onDelete }: Props) {
+    const t = useTranslations("Page.editor");
 
     const editor = useMemo(() => {
         const e = withHistory(withReact(createEditor()));
@@ -100,7 +102,7 @@ export default function WikiEditor({ id, value, onValueChange, isActive, onFocus
                 <button
                     type="button"
                     className="drag-handle cursor-grab active:cursor-grabbing p-1 rounded hover:bg-gray-100 text-gray-400"
-                    title="Déplacer le bloc"
+                    title={t("moveBlock")}
                 >
                     <GripVertical size={14} />
                 </button>
@@ -112,7 +114,7 @@ export default function WikiEditor({ id, value, onValueChange, isActive, onFocus
                             onDelete(id);
                         }}
                         className="p-1 rounded hover:bg-red-50 text-red-400 hover:text-red-600 transition"
-                        title="Supprimer le bloc"
+                        title={t("deleteBlock")}
                     >
                         <Trash2 size={14} />
                     </button>
@@ -129,7 +131,7 @@ export default function WikiEditor({ id, value, onValueChange, isActive, onFocus
                 >
                     <Editable
                         className="slate-editor-content w-full h-full outline-none text-gray-800 leading-normal"
-                        placeholder="Type your text here..."
+                        placeholder={t("typeHere")}
                         onFocus={() => onFocus(id)}
                         renderElement={renderElement}
                         renderLeaf={renderLeaf}

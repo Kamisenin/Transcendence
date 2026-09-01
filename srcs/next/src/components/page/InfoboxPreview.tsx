@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Edit3, ChevronDown, ChevronUp } from "lucide-react";
 import TagBadge from "../tags/TagBadge";
 import { InfoboxData } from "./Infobox";
+import { useTranslations } from "next-intl";
 
 type InfoboxPreviewProps = {
     data: InfoboxData;
@@ -12,6 +13,7 @@ type InfoboxPreviewProps = {
 };
 
 export default function InfoboxPreview({ data, isReadOnly, onEdit }: InfoboxPreviewProps) {
+    const t = useTranslations("Page");
     const [showAllTags, setShowAllTags] = useState(false);
     const maxVisible = 4;
     const tags = data.tags || [];
@@ -21,19 +23,19 @@ export default function InfoboxPreview({ data, isReadOnly, onEdit }: InfoboxPrev
         <div className="h-full w-full bg-white rounded-xl border border-gray-200 shadow-xs p-4 flex flex-col gap-2.5 overflow-y-auto">
             {!isReadOnly && onEdit && (
                 <div className="flex items-center justify-between pb-2 border-b border-gray-100 text-xs shrink-0">
-                    <span className="font-semibold text-blue-600 uppercase tracking-wider">Mode Prévisualisation</span>
+                    <span className="font-semibold text-blue-600 uppercase tracking-wider">{t("previewMode")}</span>
                     <button
                         type="button"
                         onClick={onEdit}
                         className="flex items-center gap-1 text-gray-600 hover:text-blue-600 bg-gray-100 px-2 py-1 rounded cursor-pointer"
                     >
-                        <Edit3 size={13} /> Éditer
+                        <Edit3 size={13} /> {t("edit")}
                     </button>
                 </div>
             )}
 
             <h2 className="text-lg font-bold text-gray-900 border-b border-gray-100 pb-1.5 leading-tight shrink-0">
-                {data.title || <span className="text-gray-300 italic">Sans titre</span>}
+                {data.title || <span className="text-gray-300 italic">{t("untitled")}</span>}
             </h2>
 
             {data.imageUrl?.trim() && (
@@ -59,7 +61,7 @@ export default function InfoboxPreview({ data, isReadOnly, onEdit }: InfoboxPrev
                             onClick={() => setShowAllTags(!showAllTags)}
                             className="text-xs text-gray-500 hover:text-blue-600 font-medium flex items-center gap-0.5 ml-1 cursor-pointer"
                         >
-                            {showAllTags ? <>Moins <ChevronUp size={12} /></> : <>+{tags.length - maxVisible} plus <ChevronDown size={12} /></>}
+                            {showAllTags ? <>{t("less")} <ChevronUp size={12} /></> : <>+{tags.length - maxVisible} {t("more")} <ChevronDown size={12} /></>}
                         </button>
                     )}
                 </div>
