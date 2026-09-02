@@ -13,6 +13,14 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const emailChanged = body.email !== user.email;
 
+    const usernameChanged = body.username !== user.username;
+
+    if (usernameChanged){
+        const existing = await prisma.user.findFirst({where: {username: body.username}});
+        if (existing && existing.user_id !== user.user_id) {
+            return NextResponse.json({error: "Username already in use"}, {status: 409});
+        }
+    }
     if (emailChanged) {
         const existing = await prisma.user.findUnique({ where : { email: body.email }});
         if (existing && existing.user_id !== user.user_id) {
@@ -29,6 +37,7 @@ export async function POST(req: NextRequest) {
                 username: body.username,
                 email: body.email,
                 emailVerified: false,
+                twoFactorEnabled: false,
                 verifCode: code,
                 verifExpiry: expiry,
             },

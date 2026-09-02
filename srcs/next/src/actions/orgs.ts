@@ -203,12 +203,17 @@ export async function createOrganizationRole(
   const user = await requireUser();
   const can = await userHasOrgPermission(orgId, "canManageRoles", user);
   if (!can) throw new OrgPermissionError("Forbidden");
+  
+  const hierarchyLevel = data.hierarchyLevel ?? 200;
 
+  if (!Number.isInteger(hierarchyLevel) || hierarchyLevel < 0 || hierarchyLevel > 200) {
+      throw new Error("Hierarchy level must be an integer between 0 and 200");
+  }
   return prisma.organizationRole.create({
     data: {
       organizationId: orgId,
       roleName: data.roleName,
-      hierarchyLevel: data.hierarchyLevel ?? 100,
+      hierarchyLevel: hierarchyLevel,
       canManageMembers: !!data.canManageMembers,
       canManageRoles: !!data.canManageRoles,
       canEditInfo: !!data.canEditInfo,

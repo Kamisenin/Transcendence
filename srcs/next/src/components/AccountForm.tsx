@@ -34,7 +34,11 @@ export default function AccountForm({ user }: Props) {
         });
         const data = await res.json();
         if (res.ok) {
-            setMessage(tCommon("saved"));
+            if (email !== user.email){
+                setMessage("Email updated. 2FA has been disabled.")
+            } else {
+                setMessage(tCommon("saved"));
+            }
             router.refresh();
         } else {
             setMessage(data.error || tCommon("error"));
