@@ -25,7 +25,6 @@ interface ForumCardProps {
   className?: string;
 }
 
-// Utilitaire pour convertir la couleur (nombre ou string) en format CSS valide (#RRGGBB)
 function formatTagColor(color?: string | number | null): string | undefined {
   if (color === null || color === undefined) return undefined;
   if (typeof color === "number") {
@@ -76,7 +75,6 @@ export default function ForumCard({ page, userId, className = "" }: ForumCardPro
     >
       <div className="flex-1 flex flex-col min-h-0">
         
-        {/* CONTAINER IMAGE */}
         <div className="transition-all duration-300 group-hover:h-0 group-hover:opacity-0 group-hover:mb-0 mb-3 h-28 w-full flex-shrink-0 overflow-hidden">
           {hasValidImg ? (
             <img
@@ -92,7 +90,6 @@ export default function ForumCard({ page, userId, className = "" }: ForumCardPro
           )}
         </div>
 
-        {/* TITRE + DESCRIPTION */}
         <div className="flex-1 flex flex-col justify-start min-h-0 pb-1">
           <h4 className="font-semibold text-card-foreground text-base leading-snug line-clamp-2 flex-shrink-0">
             {page.title}
@@ -105,26 +102,49 @@ export default function ForumCard({ page, userId, className = "" }: ForumCardPro
 
       </div>
 
-      {/* TAGS avec couleur dynamique */}
-      <div className="flex flex-wrap gap-1 mt-2 pt-2 border-t border-border flex-shrink-0">
-        {page.tags?.map((tag) => {
-          const bgHex = formatTagColor(tag.color);
-          return (
-            <span
-              key={tag.id}
-              style={
-                bgHex
-                  ? { backgroundColor: bgHex, color: "#ffffff" }
-                  : undefined
-              }
-              className={`text-[10px] px-2 py-0.5 rounded-full border border-border/50 ${
-                !bgHex ? "bg-muted text-muted-foreground" : ""
-              }`}
-            >
-              #{tag.name}
-            </span>
-          );
-        })}
+      <div className="flex flex-wrap items-center gap-1 mt-2 pt-2 border-t border-border flex-shrink-0 overflow-hidden max-h-7">
+        {(() => {
+          const MAX_CHARS = 35;
+          let currentChars = 0;
+          const visibleTags = [];
+
+          if (!page.tags) return null;
+
+          for (let i = 0; i < page.tags.length; i++) {
+            const tag = page.tags[i];
+            const tagLen = tag.name.length;
+
+            if (currentChars + tagLen > MAX_CHARS && visibleTags.length > 0) {
+              break;
+            }
+
+            visibleTags.push(tag);
+            currentChars += tagLen;
+
+            if (currentChars >= MAX_CHARS) {
+              break;
+            }
+          }
+
+          return visibleTags.map((tag) => {
+            const bgHex = formatTagColor(tag.color);
+            return (
+              <span
+                key={tag.id}
+                style={
+                  bgHex
+                    ? { backgroundColor: bgHex, color: "#ffffff" }
+                    : undefined
+                }
+                className={`text-[10px] px-2 py-0.5 rounded-full border border-border/50 truncate max-w-[120px] ${
+                  !bgHex ? "bg-muted text-muted-foreground" : ""
+                }`}
+              >
+                #{tag.name}
+              </span>
+            );
+          });
+        })()}
       </div>
     </Link>
   );

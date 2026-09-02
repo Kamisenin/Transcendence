@@ -8,6 +8,7 @@ import ForumCard, { PageData } from "@/components/ForumCard";
 interface FooterProps {
   userId?: string;
   currentPageId: number;
+  hasTags: boolean;
 }
 
 type Mode = "recommendations" | "favorites";
@@ -15,6 +16,7 @@ type Mode = "recommendations" | "favorites";
 export default function Footer({
   userId,
   currentPageId,
+  hasTags,
 }: FooterProps) {
   const [mode, setMode] = useState<Mode>("recommendations");
   const [pages, setPages] = useState<PageData[]>([]);
@@ -247,7 +249,7 @@ const handleModeChange = (newMode: Mode) => {
     <footer className="relative w-full bg-muted border-t border-border py-6 px-4 text-foreground">
       <div className="max-w-7xl mx-auto flex flex-col gap-6">
 
-    {userId && (
+    {userId && hasTags && (
       <div className="absolute left-4 -top-14 flex gap-2">
 
         {/* FAVORITE */}
@@ -333,24 +335,26 @@ const handleModeChange = (newMode: Mode) => {
             </div>
           </div>
 
-          {pages.length === 0 && loading ? (
-            <div className="flex gap-4 overflow-x-auto pb-4 pt-1">
-              {[1, 2, 3].map((i) => (
-                <div
-                  key={i}
-                  className="flex-none w-64 h-48 bg-card animate-pulse rounded-lg border border-border"
-                />
-              ))}
-            </div>
-          ) : pages.length === 0 ? (
-            <p className="text-xs text-muted-foreground italic text-center">
-              {mode === "favorites"
-                ? "No favorites yet."
-                : "No recommendations available."}
-            </p>
-          ) : (
-            <div className="relative overflow-hidden min-h-[224px]">
+          <div className="relative overflow-hidden h-[300px]">
+            {pages.length === 0 && loading ? (
               <div className="flex gap-4 overflow-x-auto pb-4 pt-2 px-1 items-start">
+                {[1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className="flex-none w-64 h-48 bg-card animate-pulse rounded-lg border border-border"
+                  />
+                ))}
+              </div>
+            ) : pages.length === 0 ? (
+              <div className="h-full flex items-center justify-center">
+                <p className="text-xs text-muted-foreground italic text-center">
+                  {mode === "favorites"
+                    ? "No favorites yet."
+                    : "No recommendations available."}
+                </p>
+              </div>
+            ) : (
+              <div className="flex gap-4 overflow-x-auto pb-4 pt-2 px-1 items-start h-full">
                 {pages.map((page, index) => (
                   <div
                     key={`${mode}-${page.pageId}`}
@@ -359,12 +363,12 @@ const handleModeChange = (newMode: Mode) => {
                         ? "recommendation-card-from-right"
                         : "recommendation-card-from-left"
                     }
-                  style={{
-                    animationDelay: `${(pages.length - 1 - index) * 20}ms`,
-                    animationDuration: "900ms",
-                    animationTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
-                    animationFillMode: "both",
-                  }}
+                    style={{
+                      animationDelay: `${(pages.length - 1 - index) * 20}ms`,
+                      animationDuration: "900ms",
+                      animationTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
+                      animationFillMode: "both",
+                    }}
                   >
                     <ForumCard
                       page={page}
@@ -374,8 +378,8 @@ const handleModeChange = (newMode: Mode) => {
                   </div>
                 ))}
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
 
