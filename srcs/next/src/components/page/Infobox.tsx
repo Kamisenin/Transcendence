@@ -86,6 +86,7 @@ export default function Infobox({ accountId, id, pageId, data, onChange, onDelet
                 <DescriptionInput value={data.description} onChange={(val) => updateField("description", val)} />
 
                 <TagManager
+                    accountId={accountId}
                     pageId={pageId}
                     data={data}
                     onChange={onChange}

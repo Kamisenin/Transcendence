@@ -4,7 +4,7 @@ import { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import type { BaseEditor, Descendant } from 'slate';
 import type { ReactEditor } from 'slate-react';
 import type { ToolbarRef } from "@/components/page/editor/Toolbar";
-import ReactGridLayout, { type Layout } from 'react-grid-layout';
+import ReactGridLayout, { type LayoutItem } from 'react-grid-layout';
 import dynamic from 'next/dynamic';
 import WikiEditor from "@/components/page/editor/WikiEditor";
 import { type EditorInstance } from "./WikiEditor"
@@ -97,7 +97,7 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
         ];
     });
 
-    const [layout, setLayout] = useState<Layout[]>(() =>
+    const [layout, setLayout] = useState<readonly LayoutItem[]>(() =>
         blocks.map(b => ({ i: b.id, x: b.x, y: b.y, w: b.w, h: b.h }))
     );
 
@@ -219,12 +219,7 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
                     className="layout"
                     layout={layout}
                     onLayoutChange={(newLayout) => setLayout(newLayout)}
-                    cols={12}
-                    rowHeight={40}
-                    margin={[16, 16]}
                     width={width}
-                    draggableHandle=".drag-handle"
-                    draggableCancel="input, textarea, [contenteditable], button"
                 >
                     {blocks.map(block => (
                         <div key={block.id} className="relative group/grid-item">

@@ -12,7 +12,7 @@ type TagManagerProps = {
     accountId: string;
     pageId: number;
     data: InfoboxData;
-    onChange: (data: InfoboxData) => void;
+    onChange?: (data: InfoboxData) => void;
     onOpenModal: () => void;
 };
 
@@ -57,13 +57,14 @@ export default function TagManager({ accountId, pageId, data, onChange, onOpenMo
     const availableTags = fetched.filter((f) => !tags.some((t) => t.id === f.id));
 
     const addTag = (tag: Tag) => {
-        if (!tags.some((t) => t.id === tag.id)) {
+        if (!tags.some((t) => t.id === tag.id) && onChange) {
             onChange({ ...data, tags: [...tags, tag] });
         }
     };
 
     const removeTag = (id: string) => {
-        onChange({ ...data, tags: tags.filter((t) => t.id !== id) });
+        if (onChange)
+            onChange({ ...data, tags: tags.filter((t) => t.id !== id) });
     };
 
     return (
@@ -140,7 +141,7 @@ export default function TagManager({ accountId, pageId, data, onChange, onOpenMo
                     </label>
                     <select
                         value={namespace}
-                        onChange={(e) => onChange({ ...data, canonicalNamespace: e.target.value || null })}
+                        onChange={(e) => onChange?.({ ...data, canonicalNamespace: e.target.value || null })}
                         className="w-full text-xs px-2.5 py-1.5 border border-gray-200 rounded-lg bg-gray-50/50 focus:bg-white focus:border-blue-500 outline-none"
                     >
                         <option value="">{t("noneUseAccountOnly")}</option>
