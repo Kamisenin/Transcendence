@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
+import { createPage } from "@/actions/pages";
 import Link from "next/link";
 
 type UserMenuProps = {
@@ -15,7 +15,6 @@ export default function UserMenu({ user }: UserMenuProps) {
     const [open, setOpen] = useState(false);
     const [creating, setCreating] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
-    const router = useRouter();
 
     useEffect(() => {
         function handleClick(event: MouseEvent) {
@@ -35,15 +34,14 @@ export default function UserMenu({ user }: UserMenuProps) {
 
     async function handleCreatePage() {
         setCreating(true);
-        const res = await fetch("/api/pages/create", {method: "POST"});
-        const data = await res.json();
-     
-        if (res.ok) {
-            router.push(`/pages/${data.pageId}/edit`);
-        } else {
-            console.error(data.error);
+
+        try {
+            await createPage();
+        } catch (error) {
+            console.error("error creating page :", error);
+        } finally {
+            setCreating(false);
         }
-        setCreating(false);
     }
     if (!user) {
         return (

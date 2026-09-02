@@ -18,7 +18,14 @@ export default async function WikiEditPage({ params }: Params) {
 
     const { namespace, slug } = await params;
 
-    const { page } = await resolvePage(namespace, slug);
+    const resolved = await resolvePage(namespace, slug);
+
+    if (!resolved) {
+        notFound();
+    }
+
+    const { page } = resolved;
+
     if (!page) notFound();
     if (!await canEditPage(page.pageId, user.user_id)) {
         redirect(`/wiki/${namespace}/${slug}`);
@@ -34,7 +41,7 @@ export default async function WikiEditPage({ params }: Params) {
             initialTitle={page.title}
             initialBlocks={content?.blocks ?? []}
             visibility={page.public}
-            canonicalNamespace={canoNamespace.namespace}
+            canonicalNamespace={canoNamespace ? canoNamespace.namespace : null}
         />
     );
 }

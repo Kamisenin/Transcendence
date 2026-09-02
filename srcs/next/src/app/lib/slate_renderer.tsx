@@ -29,5 +29,4 @@ export function renderLeaf(props: any){
             {children}
         </span>
     );
-    return el;
 }

@@ -35,7 +35,7 @@ enum NotificationType {
 
 model User {
   user_id   String   @id @default(uuid())
-  accountId String?  @map("account_id") @unique
+  accountId String   @map("account_id") @unique
   username  String
   firstName String?  @map("first_name")
   lastName  String?  @map("last_name")
@@ -108,7 +108,7 @@ model Tag {
   name        String   @unique
   description String?
   createdAt   DateTime @default(now()) @map("created_at")
-  namespace   String?
+  namespace   String?  @unique
   color       Int?
 
   owner       User            @relation("TagOwner", fields: [ownerToken], references: [user_id])

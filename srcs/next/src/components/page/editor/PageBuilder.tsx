@@ -4,9 +4,10 @@ import { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import type { BaseEditor, Descendant } from 'slate';
 import type { ReactEditor } from 'slate-react';
 import type { ToolbarRef } from "@/components/page/editor/Toolbar";
-import ReactGridLayout, { type Layout } from 'react-grid-layout';
+import ReactGridLayout, { type LayoutItem } from 'react-grid-layout';
 import dynamic from 'next/dynamic';
 import WikiEditor from "@/components/page/editor/WikiEditor";
+import { type EditorInstance } from "./WikiEditor"
 import Infobox, { type InfoboxData } from "@/components/page/Infobox";
 import { savePage } from "@/actions/pages";
 import { useTranslations } from "next-intl";
@@ -15,8 +16,6 @@ import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 
 const Toolbar = dynamic(() => import('@/components/page/editor/Toolbar'), { ssr: false });
-
-type EditorInstance = BaseEditor & ReactEditor;
 
 export type BlockType = 'editor' | 'infobox';
 
@@ -37,7 +36,7 @@ type Props = {
     initialTitle?: string;
     initialBlocks: SavedBlock[];
     visibility: boolean;
-    canonicalNamespace?: string;
+    canonicalNamespace: string | null;
 };
 
 const emptyValue = (): Descendant[] => [
@@ -56,6 +55,7 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
     const t = useTranslations("Page");
     const tCommon = useTranslations("Common");
     const [saving, setSaving] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const [activeId, setActiveId] = useState<string | null>(null);
     const [activeEditor, setActiveEditor] = useState<EditorInstance | null>(null);
     const toolbarRef = useRef<ToolbarRef>(null);
@@ -97,7 +97,7 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
         ];
     });
 
-    const [layout, setLayout] = useState<Layout[]>(() =>
+    const [layout, setLayout] = useState<readonly LayoutItem[]>(() =>
         blocks.map(b => ({ i: b.id, x: b.x, y: b.y, w: b.w, h: b.h }))
     );
 
@@ -168,9 +168,15 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
         setSaving(true);
         try {
             const mainInfobox = blocks.find(b => b.type === 'infobox');
-            const pageTitle = mainInfobox?.infoboxData?.title || initialTitle || t("untitled");
-            const visibility = mainInfobox?.infoboxData?.public || false;
-            const namespace = mainInfobox?.infoboxData?.canonicalNamespace;
+
+            if (!mainInfobox) {
+                setError("There was an error while saving, it seems the page was not created correctly, try creating a new one");
+                return;
+            }
+
+            const pageTitle = mainInfobox.infoboxData?.title || initialTitle || t("untitled");
+            const visibility = mainInfobox.infoboxData?.public || false;
+            const namespace = mainInfobox.infoboxData?.canonicalNamespace;
 
             const content = {
                 blocks: blocks.map(block => {
@@ -187,8 +193,10 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
                     };
                 }),
             };
-
-            await savePage(pageId, pageTitle, content as any);
+            const infoboxData = mainInfobox.infoboxData!;
+            await savePage(pageId, pageTitle, content as any, infoboxData, visibility, namespace);
+        } catch (err) {
+            setError("An unexpected error occurred while saving.");
         } finally {
             setSaving(false);
         }
@@ -211,22 +219,18 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
                     className="layout"
                     layout={layout}
                     onLayoutChange={(newLayout) => setLayout(newLayout)}
-                    cols={12}
-                    rowHeight={40}
-                    margin={[16, 16]}
                     width={width}
-                    draggableHandle=".drag-handle"
-                    draggableCancel="input, textarea, [contenteditable], button"
                 >
                     {blocks.map(block => (
                         <div key={block.id} className="relative group/grid-item">
                             {block.type === 'infobox' ? (
                                 <Infobox
+                                    accountId={accountId}
                                     id={block.id}
                                     pageId={pageId}
                                     data={block.infoboxData || DEFAULT_INFOBOX}
                                     onChange={(newData) => handleInfoboxChange(block.id, newData)}
-                                    // Pas d'option onDelete transmise pour l'infobox constante
+                                    canonicalNamespace={canonicalNamespace}
                                 />
                             ) : (
                                 <WikiEditor

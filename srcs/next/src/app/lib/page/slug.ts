@@ -9,7 +9,6 @@ export function slugify(text: string): string {
 }
 
 export async function syncUserSlugs(pageId: number, titleSlug: string, ownerAccountId: string) {
-    console.log("call syncUserSlugs");
     await prisma.pageSlug.upsert({
         where: { namespace_slug: { namespace: ownerAccountId, slug: `${pageId}` } },
         create: { pageId, namespace: ownerAccountId, slug: `${pageId}`, type: "USER", isCanonical: false },
@@ -33,12 +32,11 @@ export async function syncUserSlugs(pageId: number, titleSlug: string, ownerAcco
 }
 
 export async function setTagSlug(pageId: number, title: string | null, namespace: string) {
-    console.log("call setTagSlugs");
-    const titleSlug = title.trim() ? slugify(title) : null;
-
-    await removeTagSlug(pageId, title, false);
+    const titleSlug = title ? title.trim() ? slugify(title) : null : null;
 
     if (!titleSlug || !namespace) return;
+
+    await removeTagSlug(pageId, title, false);
 
     await prisma.pageSlug.create({
         data: {
@@ -56,8 +54,7 @@ export async function setTagSlug(pageId: number, title: string | null, namespace
     })
 }
 
-export async function removeTagSlug(pageId: number, title: string, restoreUserCanonical = true) {
-    console.log("call removeTagSlugs");
+export async function removeTagSlug(pageId: number, title: string | null, restoreUserCanonical = true) {
     await prisma.pageSlug.deleteMany({
         where: { pageId, type: 'TAG' }
     });

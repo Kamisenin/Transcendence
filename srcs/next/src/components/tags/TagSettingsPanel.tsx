@@ -3,13 +3,7 @@
 import { useState, useTransition } from 'react';
 import { updateTagInfo, deleteTag } from '@/actions/tags';
 import type { TagCapabilities } from '%/lib/tag_permissions';
-type Tag = {
-    id: number;
-    name: string;
-    description: string | null;
-    color: number | null;
-    namespace: string | null;
-};
+import { type Tag } from './TagManagement';
 
 type Props = {
     tag: Tag;
@@ -74,7 +68,7 @@ export default function TagSettingsPanel({ tag, capabilities }: Props) {
         startTransition(async () => {
             try {
                 setDeleteStatus('Suppression en cours...');
-                await deleteTag(tag.id); // ta fonction gère déjà la redirection
+                await deleteTag(tag.id);
                 setDeleteStatus('Tag supprimé, redirection...');
             } catch (e: any) {
                 setError(e.message ?? 'Erreur lors de la suppression');

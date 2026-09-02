@@ -1,17 +1,20 @@
 "use client";
 
 import { useState } from 'react';
-import type { TagCapabilities } from '%/lib/tag_permissions';
 import TagMembersPanel from './TagMembersPanel';
 import TagRolesPanel from './TagRolesPanel';
 import TagRequestsPanel from './TagRequestsPanel';
 import TagSettingsPanel from './TagSettingsPanel';
+import type { TagCapabilities } from '%/lib/tag_permissions';
+import { type Member } from "./TagMembersPanel"
 
-type Tag = {
+
+export type Tag = {
     id: number;
     name: string;
     description: string | null;
     color: number | null;
+    namespace : string | null;
     ownerToken: string;
 };
 
@@ -30,14 +33,6 @@ type Role = {
     canReviewRequests: boolean;
 };
 
-type Member = {
-    tagId: number;
-    userToken: string;
-    roleId: number;
-    user: { token: string; username: string; imgLink: string };
-    role: Role;
-};
-
 type PendingRequest = {
     id: number;
     tagId: number;
@@ -45,7 +40,7 @@ type PendingRequest = {
     requestedBy: string;
     createdAt: Date;
     page: { pageId: number; title: string };
-    requester: { token: string; username: string };
+    requester: { user_id: string; username: string };
 };
 
 type Props = {
@@ -66,20 +61,13 @@ const TABS = [
 
 type TabKey = typeof TABS[number]['key'];
 
-export default function TagManagement({
-                                          tag,
-                                          capabilities,
-                                          roles,
-                                          members,
-                                          pendingRequests,
-                                          currentUserToken,
-                                      }: Props) {
+export default function TagManagement({tag, capabilities, roles, members, pendingRequests, currentUserToken,}: Props) {
     const [activeTab, setActiveTab] = useState<TabKey>('members');
 
     const visibleTabs = TABS.filter(t => {
         if (t.key === 'requests') return capabilities.canReviewRequests;
         if (t.key === 'settings') return capabilities.canEditInfo || capabilities.canDeleteTag;
-        return true; // membres et rôles restent visibles en lecture même sans droit de gestion
+        return true;
     });
 
     return (

@@ -8,7 +8,7 @@ type PendingRequest = {
     pageId: number;
     createdAt: Date;
     page: { pageId: number; title: string };
-    requester: { token: string; username: string };
+    requester: { user_id: string; username: string };
 };
 
 type Props = {

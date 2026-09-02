@@ -2,13 +2,16 @@
 
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
 
 export default function RegisterPage() {
     const t = useTranslations("Auth.register");
     const router = useRouter();
 
+    const [error, setError] = useState("");
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        setError("");
         const form = new FormData(event.currentTarget);
         console.log(form);
         const f = await fetch('/api/auth/register', {
@@ -28,10 +31,12 @@ export default function RegisterPage() {
             console.log(j);
             window.location.href = '/verify';
         } else if (f.status === 409) {
-            console.log("email already in use")
+            setError("email or username already in use")
         }
-        else
+        else{
+            setError("An error occurred. Please try again");
             console.log('server has sent an error');
+        }
     }
 
     return (
@@ -59,6 +64,11 @@ export default function RegisterPage() {
                     className="border p-2 rounded text-black"
                     required
                 />
+                {error && (
+                    <p className="text-red-500 text-sm">
+                        {error}
+                    </p>
+                )}
                 <button type="submit" className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
                     {t("submit")}
                 </button>

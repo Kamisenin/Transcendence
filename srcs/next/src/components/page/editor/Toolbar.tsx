@@ -5,10 +5,9 @@ import { ReactEditor } from "slate-react";
 import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Bold, Italic, Strikethrough, Underline, Plus, Minus, Type, ChevronDown, PlusCircle, Image as ImageIcon,
  Undo, Redo } from "lucide-react";
+import { HistoryEditor } from "slate-history";
+import { type EditorInstance } from "./WikiEditor"
 import { useTranslations } from "next-intl";
-
-
-type EditorInstance = Editor & ReactEditor;
 
 type Props = {
     editor: EditorInstance | null;
@@ -21,17 +20,16 @@ export type ToolbarRef = {
 };
 
 const PRESET_SIZES = ["12", "14", "16", "18", "24", "32", "48"];
-const COLOR_VALUES = [
-    { key: "black", value: "#000000" },
-    { key: "gray", value: "#4b5563" },
-    { key: "red", value: "#ef4444" },
-    { key: "blue", value: "#3b82f6" },
-    { key: "green", value: "#10b981" },
-    { key: "orange", value: "#f97316" }
+const COLORS = [
+    { name: "Noir", value: "#000000" },
+    { name: "Gris", value: "#4b5563" },
+    { name: "Rouge", value: "#ef4444" },
+    { name: "Bleu", value: "#3b82f6" },
+    { name: "Vert", value: "#10b981" },
+    { name: "Orange", value: "#f97316" }
 ];
 
 const Toolbar = forwardRef<ToolbarRef, Props>(({ editor, disabled, onAddBlock }, ref) => {
-    const t = useTranslations("Page.editor");
     const [currentSize, setCurrentSize] = useState("16");
     const [currentColor, setCurrentColor] = useState("#000000");
     disabled = disabled ?? true;
@@ -140,26 +138,24 @@ const Toolbar = forwardRef<ToolbarRef, Props>(({ editor, disabled, onAddBlock },
                         type="button"
                         onClick={onAddBlock}
                         className="flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg text-xs font-semibold border border-blue-200 transition"
-                        title={t("addBlock")}
+                        title="Ajouter un bloc"
                     >
                         <PlusCircle size={15} />
-                        <span>{t("block")}</span>
+                        <span>Bloc</span>
                     </button>
                     <div className="h-6 w-[1px] bg-gray-200 mx-0.5" />
                 </>
             )}
-
-            {/* STYLES DE BASE */}
-            <button type="button" onClick={() => toggleMark("bold")} className={btnClass(isMarkActive("bold"))} title={t("bold")}>
+            <button type="button" onClick={() => toggleMark("bold")} className={btnClass(isMarkActive("bold"))} title="Gras">
                 <Bold size={16} />
             </button>
-            <button type="button" onClick={() => toggleMark("italic")} className={btnClass(isMarkActive("italic"))} title={t("italic")}>
+            <button type="button" onClick={() => toggleMark("italic")} className={btnClass(isMarkActive("italic"))} title="Italique">
                 <Italic size={16} />
             </button>
-            <button type="button" onClick={() => toggleMark("underline")} className={btnClass(isMarkActive("underline"))} title={t("underline")}>
+            <button type="button" onClick={() => toggleMark("underline")} className={btnClass(isMarkActive("underline"))} title="Souligné">
                 <Underline size={16} />
             </button>
-            <button type="button" onClick={() => toggleMark("strikethrough")} className={btnClass(isMarkActive("strikethrough"))} title={t("strikethrough")}>
+            <button type="button" onClick={() => toggleMark("strikethrough")} className={btnClass(isMarkActive("strikethrough"))} title="Barré">
                 <Strikethrough size={16} />
             </button>
 
@@ -169,7 +165,7 @@ const Toolbar = forwardRef<ToolbarRef, Props>(({ editor, disabled, onAddBlock },
                 type="button"
                 onClick={insertImage}
                 className="p-1.5 rounded text-gray-600 hover:bg-gray-100 border border-transparent transition"
-                title={t("insertImage")}
+                title="Insérer une image"
             >
                 <ImageIcon size={16} />
             </button>
@@ -210,7 +206,7 @@ const Toolbar = forwardRef<ToolbarRef, Props>(({ editor, disabled, onAddBlock },
                         onClick={() => changeSizeOffset(1)}
                         className="p-0.5 hover:bg-gray-200 text-gray-500 rounded-t flex items-center justify-center border-b border-gray-200"
                         style={{ fontSize: '8px', lineHeight: '1' }}
-                        title={t("increaseBy1px")}
+                        title="Augmenter de 1px"
                     >
                         <Plus size={10} />
                     </button>
@@ -219,7 +215,7 @@ const Toolbar = forwardRef<ToolbarRef, Props>(({ editor, disabled, onAddBlock },
                         onClick={() => changeSizeOffset(-1)}
                         className="p-0.5 hover:bg-gray-200 text-gray-500 rounded-b flex items-center justify-center"
                         style={{ fontSize: '8px', lineHeight: '1' }}
-                        title={t("decreaseBy1px")}
+                        title="Diminuer de 1px"
                     >
                         <Minus size={10} />
                     </button>
@@ -228,15 +224,15 @@ const Toolbar = forwardRef<ToolbarRef, Props>(({ editor, disabled, onAddBlock },
 
             <div className="h-6 w-[1px] bg-gray-200 mx-0.5" />
 
-            <div className="flex items-center gap-1" title={t("textColor")}>
+            <div className="flex items-center gap-1" title="Couleur d'écriture">
                 <Type size={16} style={{ color: currentColor }} className="drop-shadow-sm ml-1" />
                 <select
                     value={currentColor}
                     onChange={(e) => applyColor(e.target.value)}
                     className="text-xs bg-gray-50 border rounded-lg px-2 py-1 outline-none cursor-pointer font-medium text-gray-600"
                 >
-                    {COLOR_VALUES.map(color => (
-                        <option key={color.value} value={color.value}>{t(`colors.${color.key}`)}</option>
+                    {COLORS.map(color => (
+                        <option key={color.value} value={color.value}>{color.name}</option>
                     ))}
                 </select>
             </div>
@@ -249,7 +245,7 @@ const Toolbar = forwardRef<ToolbarRef, Props>(({ editor, disabled, onAddBlock },
                     onClick={handleUndo}
                     disabled={disabled}
                     className="p-1.5 hover:bg-gray-100 text-gray-600 rounded disabled:opacity-40"
-                    title={t("undo")}
+                    title="Annuler (Ctrl+Z)"
                 >
                     <Undo size={16} />
                 </button>
@@ -258,7 +254,7 @@ const Toolbar = forwardRef<ToolbarRef, Props>(({ editor, disabled, onAddBlock },
                     onClick={handleRedo}
                     disabled={disabled}
                     className="p-1.5 hover:bg-gray-100 text-gray-600 rounded disabled:opacity-40"
-                    title={t("redo")}
+                    title="Rétablir (Ctrl+Y)"
                 >
                     <Redo size={16} />
                 </button>
