@@ -6,9 +6,9 @@ import ReadOnlyBlock from '@/components/page/ReadOnlyBlock';
 import Infobox, { type InfoboxData } from '@/components/page/Infobox';
 
 const ReactGridLayout = dynamic(
-    () => import('react-grid-layout').then((mod) => mod.default || mod),
+    () => import('react-grid-layout').then((mod: any) => mod.default || mod),
     { ssr: false }
-);
+) as React.ComponentType<any>;
 
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
@@ -24,7 +24,13 @@ type SavedBlock = {
     h: number;
 };
 
-export default function PageViewer({ title, blocks }: { title?: string; blocks: SavedBlock[] }) {
+type PageViewerProps = {
+    title?: string;
+    blocks: SavedBlock[];
+    accountId?: string;
+};
+
+export default function PageViewer({ title, blocks, accountId }: PageViewerProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const [width, setWidth] = useState(1200);
 
@@ -74,10 +80,10 @@ export default function PageViewer({ title, blocks }: { title?: string; blocks: 
                         >
                             {block.type === 'infobox' ? (
                                 <Infobox
-                                    accountId={user.accountId}
+                                    accountId={accountId || ''}
                                     id={block.id}
                                     pageId={0}
-                                    data={block.infoboxData || { title: '', imageUrl: '', description: '', tags: [] }}
+                                    data={block.infoboxData || { title: '', imageUrl: '', description: '', tags: [], public: true }}
                                     onChange={() => {}}
                                     isReadOnly={true}
                                 />
