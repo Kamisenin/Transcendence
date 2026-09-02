@@ -32,6 +32,9 @@ services:
       - ADDRESS=${ADDRESS}
     extra_hosts:
       - "host.parent:host-gateway"
+    networks :
+      - 42chan
+
   next:
     container_name: next
     build: srcs/next/
@@ -41,6 +44,8 @@ services:
     depends_on:
       - postgres
     profiles: ["prod"]
+    networks:
+      - 42chan
 
   search-engine:
     container_name: search
