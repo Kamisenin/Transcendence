@@ -1,8 +1,17 @@
-"use server";
+"use client";
 
+import { useState, useEffect, useRef } from 'react';
+import dynamic from 'next/dynamic';
 import ReadOnlyBlock from '@/components/page/ReadOnlyBlock';
 import Infobox, { type InfoboxData } from '@/components/page/Infobox';
-import { requireUser } from "@/actions/tags"
+
+const ReactGridLayout = dynamic(
+    () => import('react-grid-layout').then((mod) => mod.default || mod),
+    { ssr: false }
+);
+
+import 'react-grid-layout/css/styles.css';
+import 'react-resizable/css/styles.css';
 
 type SavedBlock = {
     id: string;
@@ -15,41 +24,29 @@ type SavedBlock = {
     h: number;
 };
 
-type PositionedBlock = SavedBlock & {
-    _px: {
-        left: number;
-        top: number;
-        width: number;
-        height: number;
-    };
-};
+export default function PageViewer({ title, blocks }: { title?: string; blocks: SavedBlock[] }) {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [width, setWidth] = useState(1200);
 
-export default async function PageViewer({ title, blocks }: { title?: string; blocks: SavedBlock[]; }) {
-    const COLS = 12;
-    const ROW_HEIGHT = 40;
-    const MARGIN_X = 16;
-    const MARGIN_Y = 16;
-    const CONTAINER_WIDTH = 1156;
-    const COL_WIDTH = (CONTAINER_WIDTH - (COLS - 1) * MARGIN_X) / COLS;
+    useEffect(() => {
+        if (!containerRef.current) return;
+        const observer = new ResizeObserver((entries) => {
+            for (let entry of entries) {
+                setWidth(entry.contentRect.width);
+            }
+        });
+        observer.observe(containerRef.current);
+        return () => observer.disconnect();
+    }, []);
 
-    const positioned: PositionedBlock[] = blocks.map((b) => {
-        const left = b.x * (COL_WIDTH + MARGIN_X);
-        const top = b.y * (ROW_HEIGHT + MARGIN_Y);
-        const width = b.w * COL_WIDTH + (b.w - 1) * MARGIN_X;
-        const height = b.h * ROW_HEIGHT + (b.h - 1) * MARGIN_Y * 10; // Need a 10x multiplier to have a correct height rendering
-
-        return {
-            ...b,
-            _px: { left, top, width, height }
-        };
-    });
-
-    const totalHeight =
-        positioned.length === 0
-            ? 500
-            : Math.max(...positioned.map((b) => b._px.top + b._px.height)) + MARGIN_Y;
-
-    const user = await requireUser();
+    const layout = blocks.map((b) => ({
+        i: b.id,
+        x: b.x,
+        y: b.y,
+        w: b.w,
+        h: b.h,
+        static: true
+    }));
 
     return (
         <div className="min-h-screen bg-gray-50/50 p-8 pt-20">
@@ -59,38 +56,39 @@ export default async function PageViewer({ title, blocks }: { title?: string; bl
                 </h1>
             )}
 
-            <div
-                className="max-w-6xl mx-auto bg-transparent relative"
-                style={{ minHeight: `${totalHeight}px` }}
-            >
-                {positioned.map((block) => (
-                    <div
-                        key={block.id}
-                        className="absolute bg-white border border-gray-100 shadow-sm rounded overflow-hidden"
-                        style={{
-                            left: `${block._px.left}px`,
-                            top: `${block._px.top}px`,
-                            width: `${block._px.width}px`,
-                            height: `${block._px.height}px`
-                        }}
-                    >
-                        {block.type === 'infobox' ? (
-                            <div className="h-full overflow-auto">
+            <div ref={containerRef} className="max-w-6xl mx-auto bg-transparent min-h-[500px] relative">
+                <ReactGridLayout
+                    className="layout"
+                    layout={layout}
+                    cols={12}
+                    rowHeight={40}
+                    margin={[16, 16]}
+                    width={width}
+                    isDraggable={false}
+                    isResizable={false}
+                >
+                    {blocks.map((block) => (
+                        <div
+                            key={block.id}
+                            className="relative bg-white border border-gray-100 shadow-sm rounded overflow-y-auto"
+                        >
+                            {block.type === 'infobox' ? (
                                 <Infobox
                                     accountId={user.accountId}
                                     id={block.id}
                                     pageId={0}
-                                    data={block.infoboxData || { title: '', imageUrl: '', description: '', tags: [], public: true }}
+                                    data={block.infoboxData || { title: '', imageUrl: '', description: '', tags: [] }}
+                                    onChange={() => {}}
                                     isReadOnly={true}
                                 />
-                            </div>
-                        ) : (
-                            <div className="p-2 h-full overflow-auto">
-                                <ReadOnlyBlock value={block.value || []} />
-                            </div>
-                        )}
-                    </div>
-                ))}
+                            ) : (
+                                <div className="p-2 h-full overflow-auto">
+                                    <ReadOnlyBlock value={block.value || []} />
+                                </div>
+                            )}
+                        </div>
+                    ))}
+                </ReactGridLayout>
             </div>
         </div>
     );

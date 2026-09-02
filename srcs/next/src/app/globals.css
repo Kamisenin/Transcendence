@@ -146,3 +146,158 @@
     @apply font-sans;
   }
 }
+
+
+
+
+/* ================================== { slide ForumCard } */
+
+@keyframes recommendation-card-from-right {
+  0% {
+    opacity: 0;
+    transform: translateX(180px);
+  }
+
+  60% {
+    opacity: 1;
+    transform: translateX(-12px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes recommendation-card-from-left {
+  0% {
+    opacity: 0;
+    transform: translateX(-180px);
+  }
+
+  60% {
+    opacity: 1;
+    transform: translateX(12px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.recommendation-card-from-right {
+  animation-name: recommendation-card-from-right;
+  will-change: transform, opacity;
+}
+
+.recommendation-card-from-left {
+  animation-name: recommendation-card-from-left;
+  will-change: transform, opacity;
+}
+
+/* ================================== { button up favorit/dislike } */
+
+.favorite-icon,
+.dislike-icon {
+  --reaction-multiplier: 2.5;
+
+  display: inline-block;
+  font-size: 1.25rem;
+  line-height: 1;
+  transform-origin: center;
+}
+
+
+.favorite-button.active,
+.dislike-button.active {
+  width: 48px;
+  height: 48px;
+}
+
+.favorite-icon.pop,
+.dislike-icon.pop {
+  animation: reaction-pop 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes reaction-pop {
+  0% {
+    transform: scale(1);
+  }
+
+  35% {
+    transform: scale(calc(2.0 * var(--reaction-multiplier)));
+  }
+
+  60% {
+    transform: scale(calc(1.25 * var(--reaction-multiplier)));
+  }
+
+  100% {
+    transform: scale(calc(1.45 * var(--reaction-multiplier)));
+  }
+}
+
+
+.favorite-icon.active,
+.dislike-icon.active {
+  transform: scale(calc(1.30 * var(--reaction-multiplier)));
+}
+
+
+.favorite-icon.shrink,
+.dislike-icon.shrink {
+  animation: reaction-shrink 300ms ease-out;
+}
+
+@keyframes reaction-shrink {
+  0% {
+    transform: scale(calc(1.30 * var(--reaction-multiplier)));
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.favorite-button,
+.dislike-button {
+  transition:
+    width 300ms ease,
+    height 300ms ease,
+    transform 300ms ease;
+}
+
+.favorite-button:hover,
+.dislike-button:hover {
+  transform: translateY(-4px);
+}
+
+/* ================================== { Button hide / show } */
+
+.favorite-button,
+.dislike-button {
+  position: relative;
+  transition:
+    transform 400ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 350ms ease;
+}
+
+/*
+ * Le bouton disparaît vers le bas,
+ * comme s'il passait derrière le footer.
+ */
+.reaction-hidden {
+  opacity: 0;
+  transform: translateY(70px);
+  pointer-events: none;
+}
+
+/*
+ * Quand le bouton revient,
+ * il remonte à sa position normale.
+ */
+.favorite-button:not(.reaction-hidden),
+.dislike-button:not(.reaction-hidden) {
+  pointer-events: auto;
+}
