@@ -1,5 +1,5 @@
 {
-	"languages": ["french"],
+	"languages": ["french", "english", "spanish"],
 	"limit": 15,
 	"score_threshold": 65,
 	"title_weight": 0.2
