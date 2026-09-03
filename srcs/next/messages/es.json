@@ -92,12 +92,25 @@
 	},
 	"Account": {
 		"title": "Mi cuenta",
+		"accountName": "Nombre de la cuenta",
+		"firstName": "Nombre",
+		"lastName": "Apellido",
 		"emailVerified": "✓ Correo verificado",
 		"emailNotVerified": "✗ Correo no verificado",
 		"verifyMyEmail": "Verificar mi correo",
 		"changePassword": "Cambiar contraseña",
 		"username": "Nombre de usuario",
-		"email": "Correo electrónico"
+		"email": "Correo electrónico",
+		"2fa disable": "Correo electrónico actualizado. La autenticación de dos factores (2FA) se ha desactivado."
+
+	},
+		"Session": {
+		"loading": "Cargando sesiones...",
+		"Active_sessions": "Sesiones activas",
+		"device": "este dispositivo",
+		"2fa disable": "Correo electrónico actualizado. La 2FA ha sido desactivada.",
+		"Since": "Desde",
+		"Revoke": "Revocar"
 	},
 	"Orgs": {
 		"myOrganizations": "Mis organizaciones",

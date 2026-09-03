@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import AccountForm from "@/components/AccountForm";
 import { getTranslations } from "next-intl/server";
 import DeleteAccountButton from "@/components/DeleteAccountButton";
+import SessionList from "@/components/SessionsList";
 
 export default async function AccountPage() {
     const user = await getCurrentUser();
@@ -17,6 +18,9 @@ export default async function AccountPage() {
                     My Account
                 </h1>
                 <AccountForm user={user}/>
+                <div className="border-t pt-4">
+                    <SessionList/>
+                </div>
             </div>
         </main>
     );

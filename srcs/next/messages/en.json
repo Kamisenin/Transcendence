@@ -92,12 +92,25 @@
 	},
 	"Account": {
 		"title": "My Account",
+		"accountName": "Account name",
+		"firstName": "First name",
+		"lastName": "Last name",
 		"emailVerified": "✓ Email verified",
 		"emailNotVerified": "✗ Email not verified",
 		"verifyMyEmail": "Verify my email",
 		"changePassword": "Change password",
 		"username": "Username",
-		"email": "Email"
+		"email": "Email",
+		"2fa disable": "Email updated. 2FA has been disabled."
+
+	},
+	"Session": {
+		"loading": "Loading sessions...",
+		"Active_sessions": "Active sessions",
+		"device": "this device",
+		"2fa disable": "Email updated. 2FA has been disabled.",
+		"Since": "Since",
+		"Revoke": "Revoke"
 	},
 	"Orgs": {
 		"myOrganizations": "My organizations",

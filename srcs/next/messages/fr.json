@@ -92,12 +92,25 @@
 	},
 	"Account": {
 		"title": "Mon compte",
+		"accountName": "Nom du compte",
+		"firstName": "Prénom",
+		"lastName": "Nom",
 		"emailVerified": "✓ Email vérifié",
 		"emailNotVerified": "✗ Email non vérifié",
 		"verifyMyEmail": "Vérifier mon email",
 		"changePassword": "Changer le mot de passe",
 		"username": "Nom d'utilisateur",
-		"email": "Email"
+		"email": "Email",
+		"2fa disable": "Email updated. 2FA has been disabled."
+
+	},
+		"Session": {
+		"loading": "Chargement des sessions...",
+		"Active_sessions": "Sessions actives",
+		"device": "cet appareil",
+		"2fa disable": "E-mail mis à jour. La 2FA a été désactivée.",
+		"Since": "Depuis",
+		"Revoke": "Révoquer"
 	},
 	"Orgs": {
 		"myOrganizations": "Mes organisations",
