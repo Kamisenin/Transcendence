@@ -1,5 +1,3 @@
-"use server";
-
 import ReadOnlyBlock from '@/components/page/ReadOnlyBlock';
 import Infobox, { type InfoboxData } from '@/components/page/Infobox';
 import { requireUser } from "@/actions/tags"
@@ -26,9 +24,9 @@ type PositionedBlock = SavedBlock & {
 
 export default async function PageViewer({ title, blocks }: { title?: string; blocks: SavedBlock[]; }) {
     const COLS = 12;
-    const ROW_HEIGHT = 40;
-    const MARGIN_X = 16;
-    const MARGIN_Y = 16;
+    const ROW_HEIGHT = 150;
+    const MARGIN_X = 5;
+    const MARGIN_Y = 5;
     const CONTAINER_WIDTH = 1156;
     const COL_WIDTH = (CONTAINER_WIDTH - (COLS - 1) * MARGIN_X) / COLS;
 
@@ -36,7 +34,7 @@ export default async function PageViewer({ title, blocks }: { title?: string; bl
         const left = b.x * (COL_WIDTH + MARGIN_X);
         const top = b.y * (ROW_HEIGHT + MARGIN_Y);
         const width = b.w * COL_WIDTH + (b.w - 1) * MARGIN_X;
-        const height = b.h * ROW_HEIGHT + (b.h - 1) * MARGIN_Y * 10; // Need a 10x multiplier to have a correct height rendering
+        const height = b.h * ROW_HEIGHT + (b.h - 1) * MARGIN_Y
 
         return {
             ...b,
@@ -66,7 +64,11 @@ export default async function PageViewer({ title, blocks }: { title?: string; bl
                 {positioned.map((block) => (
                     <div
                         key={block.id}
-                        className="absolute bg-white border border-gray-100 shadow-sm rounded overflow-hidden"
+                        className={
+                            block.type === 'infobox'
+                                ? "absolute overflow-hidden"
+                                : "absolute bg-white border border-gray-100 shadow-sm rounded overflow-hidden"
+                        }
                         style={{
                             left: `${block._px.left}px`,
                             top: `${block._px.top}px`,
