@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 
 interface Page 
 {
@@ -9,6 +10,8 @@ interface Page
 	title: string;
 	tags: string[];
 	score: number;
+	namespace: string;
+	slug: string;
 }
 
 export default function SearchBar() 
@@ -27,8 +30,8 @@ export default function SearchBar()
 		const timer = setTimeout(() => 
 		{
 			fetch(`/api/search?query=${encodeURIComponent(query)}`)
-			  .then((res) => res.json())
-			  .then((data) => { setResults(Array.isArray(data) ? data : []); });
+			 .then((res) => res.json())
+			 .then((data) => { setResults(Array.isArray(data) ? data : []); });
 		}, 300);
 		return () => clearTimeout(timer);
 	}, [query]);
@@ -44,8 +47,13 @@ export default function SearchBar()
 			/>
 			<ul className="absolute top-full w-full mt-2 bg-popover border border-border rounded-lg z-10">
 				{results.map((item) => (
-					<li key={item.id} className="px-4 py-2 hover:bg-accent cursor-pointer">
-						{item.title}
+					<li key={item.id}>
+						<Link
+							href={`/wiki/${item.namespace}/${item.slug}`}
+							className="block px-4 py-2 hover:bg-accent cursor-pointer"
+						>
+							{item.title}
+						</Link>
 					</li>
 				))}
 			</ul>
