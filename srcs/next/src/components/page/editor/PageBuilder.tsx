@@ -164,43 +164,55 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
         setBlocks(prev => prev.map(b => (b.id === id ? { ...b, infoboxData } : b)));
     }, []);
 
+
     async function handleSave() {
-        setSaving(true);
-        try {
-            const mainInfobox = blocks.find(b => b.type === 'infobox');
+    setSaving(true);
 
-            if (!mainInfobox) {
-                setError("There was an error while saving, it seems the page was not created correctly, try creating a new one");
-                return;
-            }
+    try {
+        const mainInfobox = blocks.find(b => b.type === 'infobox');
 
-            const pageTitle = mainInfobox.infoboxData?.title || initialTitle || t("untitled");
-            const visibility = mainInfobox.infoboxData?.public || false;
-            const namespace = mainInfobox.infoboxData?.canonicalNamespace;
+        const infoboxData = mainInfobox?.infoboxData || DEFAULT_INFOBOX;
 
-            const content = {
-                blocks: blocks.map(block => {
-                    const layoutItem = layout.find(l => l.i === block.id)!;
-                    return {
-                        id: block.id,
-                        type: block.type || 'editor',
-                        x: layoutItem.x,
-                        y: layoutItem.y,
-                        w: layoutItem.w,
-                        h: layoutItem.h,
-                        value: block.value,
-                        infoboxData: block.infoboxData
-                    };
-                }),
+        const pageTitle =
+        infoboxData.title || initialTitle || t("untitled");
+
+        const visibility =
+        infoboxData.public || false;
+
+        const namespace =
+        infoboxData.canonicalNamespace;
+
+        const content = {
+        blocks: blocks.map(block => {
+            const layoutItem = layout.find(l => l.i === block.id)!;
+
+            return {
+            id: block.id,
+            type: block.type || 'editor',
+            x: layoutItem.x,
+            y: layoutItem.y,
+            w: layoutItem.w,
+            h: layoutItem.h,
+            value: block.value,
+            infoboxData: block.infoboxData
             };
-            const infoboxData = mainInfobox.infoboxData!;
-            await savePage(pageId, pageTitle, content as any, infoboxData, visibility, namespace);
-        } catch (err) {
-            setError("An unexpected error occurred while saving.");
-        } finally {
-            setSaving(false);
-        }
+        }),
+        };
+
+        await savePage(
+        pageId,
+        pageTitle,
+        content as any,
+        infoboxData,
+        visibility,
+        namespace
+        );
+
+    } finally {
+        setSaving(false);
     }
+    }
+
 
     return (
         <div className="min-h-screen bg-gray-50/50 p-8 pt-20">

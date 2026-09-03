@@ -134,41 +134,120 @@ export async function getAccessiblePages() {
     return results;
 }
 
-export async function savePage(pageId: number, title: string, content: any, infobox: InfoboxData, visibility: boolean, canonicalNamespace?: string | null
+export async function savePage(
+    pageId: number,
+    title: string,
+    content: any,
+    infobox: InfoboxData,
+    visibility: boolean,
+    canonicalNamespace?: string | null
 ) {
     const user = await requireUser();
 
     const titleSlug = title.trim() ? slugify(title) : null;
-    if (!titleSlug) return { success: false, error: "The title cannot be empty." };
+
+    if (!titleSlug) {
+        return {
+            success: false,
+            error: "The title cannot be empty."
+        };
+    }
 
     const tagNamespace = canonicalNamespace?.trim() || null;
 
     const targetNamespaces = [user.accountId, ...(tagNamespace ? [tagNamespace] : [])];
     const conflict = await prisma.pageSlug.findFirst({
-        where: { slug: titleSlug, namespace: { in: targetNamespaces }, pageId: { not: pageId } }
+        where: {
+            slug: titleSlug,
+            namespace: {
+                in: targetNamespaces
+            },
+            pageId: {
+                not: pageId
+            }
+        }
     });
 
     if (conflict) {
-        return { success: false, error: `The title "${title}" is already used in this namespace "${conflict.namespace}".` };
+        return {
+            success: false,
+            error: `The title "${title}" is already used in this namespace "${conflict.namespace}".`
+        };
     }
-    
+
     await prisma.page.update({
         where: { pageId },
         data: { title, content, public: visibility, description: infobox.description, img: infobox.imageUrl, lastEditedById: user.user_id }
     });
-    
-    await syncUserSlugs(pageId, titleSlug, user.accountId);
+
+    const tagIds = Array.from(
+        new Set(
+            (infobox.tags ?? [])
+                .map(tag => Number(tag.id))
+                .filter(tagId => Number.isInteger(tagId))
+        )
+    );
+
+    await prisma.tagPage.deleteMany({
+        where: {
+            pageId,
+            ...(tagIds.length > 0
+                ? {
+                    tagId: {
+                        notIn: tagIds
+                    }
+                }
+                : {})
+        }
+    });
+
+    for (const tagId of tagIds) {
+
+        await prisma.tagPage.upsert({
+            where: {
+                tagId_pageId: {
+                    tagId,
+                    pageId
+                }
+            },
+            update: {},
+            create: {
+                tagId,
+                pageId
+            }
+        });
+    }
+
+    await syncUserSlugs(
+        pageId,
+        titleSlug,
+        user.accountId
+    );
 
     if (tagNamespace) {
-        await setTagSlug(pageId, titleSlug, tagNamespace);
+
+        await setTagSlug(
+            pageId,
+            titleSlug,
+            tagNamespace
+        );
+
     } else {
-        await removeTagSlug(pageId, titleSlug);
+
+        await removeTagSlug(
+            pageId,
+            titleSlug
+        );
     }
 
     await notifyPageEdit(pageId, user.user_id);
 
-    return { success: true };
+    return {
+        success: true
+    };
 }
+
+
 
 export async function createPage() {
     const user = await requireUser();

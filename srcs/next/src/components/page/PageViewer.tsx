@@ -22,7 +22,7 @@ type PositionedBlock = SavedBlock & {
     };
 };
 
-export default async function PageViewer({ title, blocks }: { title?: string; blocks: SavedBlock[]; }) {
+export default async function PageViewer({ title, blocks, accountId }: { title?: string; blocks: SavedBlock[]; accountId : string | undefined; }) {
     const COLS = 12;
     const ROW_HEIGHT = 150;
     const MARGIN_X = 5;
