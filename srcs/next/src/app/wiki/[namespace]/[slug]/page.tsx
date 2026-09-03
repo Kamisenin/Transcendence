@@ -26,7 +26,6 @@ export default async function WikiViewPage({ params }: Params) {
     if (!page)
         notFound();
 
-    // Vérifier si la page possède au moins un tag associé
     const pageTags = await prisma.tagPage.findMany({
         where: {
             pageId: page.pageId
@@ -47,6 +46,7 @@ export default async function WikiViewPage({ params }: Params) {
         <div className="min-h-screen flex flex-col">
             <main className="flex-grow">
                 <PageViewer
+                    accountId={user?.accountId}
                     title={page.title}
                     blocks={blocks}
                 />
