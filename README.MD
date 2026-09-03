@@ -35,10 +35,10 @@ to a specific role inside the tag, which will allow the people with this role an
 
 Now there is a last situation you can be in. Maybe the person with th **Longsword** tag has a lot of tags, Like the **Sword** tag,
 the **saber** tag, the *One Handed sword* tag and would want to centralize all the permissions of those tags inside one role. <br/>
-Introducing ===**Organizations**=== <br/>
+Introducing **Organizations** <br/>
 Organizations allows you to add tags to them and associate roles inside the organization to role inside the managed Tags ! 
 
-[^1]: Federschwert are a type of Longsword that was made in germany during the 16^th^ century with no cutting edge to use it for sports
+[^1]: Federschwert are a type of Longsword that was made in germany during the 16th century with no cutting edge to use it for sports
 
 ---
 # Instructions
@@ -100,6 +100,8 @@ if they are not strong enough someone could break through the password and have 
 ```bash
 db_root_pwd.txt # is the password of the root user of the database
 db_website_pwd.txt # is the password of the WEBSITE database admin
+gmail_app_pwd.txt # Your gmail application password for sending automated mail
+gmail_user # The associated google account
 ```
 
 ---
