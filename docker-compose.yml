@@ -58,16 +58,14 @@ services:
 
   recommendation:
     container_name: recommendation
-    build:
-      context: srcs/next/src/app/api/apiRecommendation
-      dockerfile: Dockerfile
-    ports:
-      - "8001:8001"
+    build: srcs/apiRecommendation/
     restart: unless-stopped
-    environment:
-      DATABASE_URL: "postgresql://website_db_admin:pass@postgres:5432/WEBSITE"
+    secrets:
+      - db_website_pwd
     depends_on:
       - postgres
+    ports:
+      - "8001:8001"
     networks:
       - 42chan
 
