@@ -41,6 +41,8 @@ services:
     restart: unless-stopped
     secrets:
       - db_website_pwd
+      - gmail_app_pwd
+      - gmail_user
     depends_on:
       - postgres
     profiles: ["prod"]
@@ -74,6 +76,10 @@ secrets:
     file: secrets/db_root_pwd.txt
   db_website_pwd:
     file : secrets/db_website_pwd.txt
+  gmail_app_pwd:
+    file : secrets/gmail_app_pwd.txt
+  gmail_user:
+    file : secrets/gmail_user.txt
 
 volumes:
   pgdata:
