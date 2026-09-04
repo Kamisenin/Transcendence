@@ -20,12 +20,13 @@ export async function GET(req: NextRequest) {
   const pages = await prisma.$queryRaw`
 	SELECT DISTINCT p.page_id, p.title,
 	 ps.namespace, ps.slug,
-	 array_agg(t.name) as tags
+	 array_agg(t.name) FILTER (WHERE t.name IS NOT NULL) as tags
 	FROM pages p
-	JOIN tag_pages tp ON tp.page_id = p.page_id
-	JOIN tags t ON t.id = tp.tag_id
-	JOIN page_slugs ps ON ps.page_id = p.page_id
-		AND ps.is_canonical = true
+    LEFT JOIN tag_pages tp ON tp.page_id = p.page_id
+    LEFT JOIN tags t ON t.id = tp.tag_id
+    JOIN page_slugs ps ON ps.page_id = p.page_id
+        AND ps.is_canonical = true
+    JOIN users u ON u.user_id = p.owner_id
 	WHERE (
 		p.public = true
 		OR p.owner_id = ${userId}
@@ -42,7 +43,7 @@ export async function GET(req: NextRequest) {
 			AND tm.user_token = ${userId}
 		)
 	)
-	AND similarity(t.name, ${queryWords}) > 0.15
+    AND (similarity(t.name, ${queryWords}) > 0.15 OR similarity(p.title, ${queryWords}) > 0.15)
 	GROUP BY p.page_id, p.title, ps.namespace, ps.slug
   `
 
