@@ -104,6 +104,23 @@ gmail_app_pwd.txt # Your gmail application password for sending automated mail
 gmail_user # The associated google account
 ```
 
+### Gmail Configuration
+
+Inside the `/next` folder, create a `.env` file:
+
+```env
+GMAIL_USER="your-gmail-address@gmail.com"
+GMAIL_APP_PASSWORD="xxxx xxxx xxxx xxxx"
+```
+
+To get a **Gmail App Password**:
+
+1. Go to your Google Account → **Security**.
+2. Enable **2-Step Verification** if it is not already enabled.
+3. Search for **App passwords**.
+4. Create a new app password for the project, for example `Transcendence`.
+5. Copy the generated password into `GMAIL_APP_PASSWORD`.
+
 ---
 
 ## HOW TO RUN

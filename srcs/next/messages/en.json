@@ -92,12 +92,51 @@
 	},
 	"Account": {
 		"title": "My Account",
+		"accountName": "Account name",
+		"firstName": "First name",
+		"lastName": "Last name",
 		"emailVerified": "✓ Email verified",
 		"emailNotVerified": "✗ Email not verified",
 		"verifyMyEmail": "Verify my email",
 		"changePassword": "Change password",
 		"username": "Username",
-		"email": "Email"
+		"email": "Email",
+		"2fa disable": "Email updated. 2FA has been disabled."
+
+	},
+	"Session": {
+		"loading": "Loading sessions...",
+		"Active_sessions": "Active sessions",
+		"device": "this device",
+		"2fa disable": "Email updated. 2FA has been disabled.",
+		"Since": "Since",
+		"Revoke": "Revoke"
+	},
+		"Terms": {
+		"title": "Terms of Service",
+		"intro": "By using this forum, you agree to follow these Terms of Service.",
+		"respectTitle": "Respect other users",
+		"respectText": "Do not post content that is illegal, threatening, abusive, discriminatory or intended to harass other users.",
+		"accountTitle": "Your account",
+		"accountText": "You are responsible for keeping your account secure and for everything posted using your account.",
+		"contentTitle": "Content",
+		"contentText": "You remain responsible for the content you publish. We may remove content that violates these rules.",
+		"terminationTitle": "Account termination",
+		"terminationText": "Accounts that seriously or repeatedly violate these rules may be suspended or removed.",
+		"changesTitle": "Changes",
+		"changesText": "These terms may be updated when necessary. Continued use of the forum means that you accept the updated terms."
+	},
+		"Privacy": {
+		"title": "Privacy Policy",
+		"intro": "Your privacy is important to us. This Privacy Policy explains how information is handled when you use our forum.",
+		"informationTitle": "Information we collect",
+		"informationText": "We may collect information such as your account name, email address and content that you choose to post on the forum.",
+		"usageTitle": "How we use your information",
+		"usageText": "Your information is used to provide and maintain the forum, authenticate your account and allow you to interact with other users.",
+		"rightsTitle": "Your rights",
+		"rightsText": "You can request access to, correction of, or deletion of your personal information through your account settings or by contacting the forum administrators.",
+		"contactTitle": "Contact",
+		"contactText": "If you have questions about this Privacy Policy, please contact the forum administrators."
 	},
 	"Orgs": {
 		"myOrganizations": "My organizations",

@@ -92,12 +92,51 @@
 	},
 	"Account": {
 		"title": "Mon compte",
+		"accountName": "Nom du compte",
+		"firstName": "Prénom",
+		"lastName": "Nom",
 		"emailVerified": "✓ Email vérifié",
 		"emailNotVerified": "✗ Email non vérifié",
 		"verifyMyEmail": "Vérifier mon email",
 		"changePassword": "Changer le mot de passe",
 		"username": "Nom d'utilisateur",
-		"email": "Email"
+		"email": "Email",
+		"2fa disable": "Email updated. 2FA has been disabled."
+
+	},
+		"Session": {
+		"loading": "Chargement des sessions...",
+		"Active_sessions": "Sessions actives",
+		"device": "cet appareil",
+		"2fa disable": "E-mail mis à jour. La 2FA a été désactivée.",
+		"Since": "Depuis",
+		"Revoke": "Révoquer"
+	},
+		"Terms": {
+		"title": "Conditions d'utilisation",
+		"intro": "En utilisant ce forum, vous acceptez de respecter les présentes conditions d'utilisation.",
+		"respectTitle": "Respect des autres utilisateurs",
+		"respectText": "Ne publiez pas de contenu illégal, menaçant, abusif, discriminatoire ou destiné à harceler d'autres utilisateurs.",
+		"accountTitle": "Votre compte",
+		"accountText": "Vous êtes responsable de la sécurité de votre compte et de tout ce qui est publié à l'aide de votre compte.",
+		"contentTitle": "Contenu",
+		"contentText": "Vous restez responsable du contenu que vous publiez. Nous pouvons supprimer tout contenu qui enfreint ces règles.",
+		"terminationTitle": "Suppression du compte",
+		"terminationText": "Les comptes qui enfreignent gravement ou de manière répétée ces règles peuvent être suspendus ou supprimés.",
+		"changesTitle": "Modifications",
+		"changesText": "Ces conditions peuvent être mises à jour si nécessaire. La poursuite de l'utilisation du forum signifie que vous acceptez les conditions mises à jour."
+	},
+		"Privacy": {
+		"title": "Politique de confidentialité",
+		"intro": "Votre vie privée est importante pour nous. Cette politique de confidentialité explique comment vos informations sont traitées lorsque vous utilisez notre forum.",
+		"informationTitle": "Informations que nous collectons",
+		"informationText": "Nous pouvons collecter des informations telles que le nom de votre compte, votre adresse e-mail et le contenu que vous choisissez de publier sur le forum.",
+		"usageTitle": "Comment nous utilisons vos informations",
+		"usageText": "Vos informations sont utilisées pour fournir et maintenir le forum, authentifier votre compte et vous permettre d'interagir avec les autres utilisateurs.",
+		"rightsTitle": "Vos droits",
+		"rightsText": "Vous pouvez demander l'accès à vos informations personnelles, leur rectification ou leur suppression depuis les paramètres de votre compte ou en contactant les administrateurs du forum.",
+		"contactTitle": "Contact",
+		"contactText": "Si vous avez des questions concernant cette politique de confidentialité, veuillez contacter les administrateurs du forum."
 	},
 	"Orgs": {
 		"myOrganizations": "Mes organisations",

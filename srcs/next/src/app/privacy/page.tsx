@@ -1,32 +1,44 @@
-export default function PrivacyPage() {
+import { getTranslations } from "next-intl/server";
+
+export default async function PrivacyPage() {
+    const t = await getTranslations("Privacy");
+
     return (
         <main className="max-w-3xl mx-auto px-6 pt-20 pb-12">
-            <h1 className="text-3xl font-bold mb-6">Privacy Policy</h1>
+            <h1 className="text-3xl font-bold mb-6">
+                {t("title")}
+            </h1>
+
             <p className="mb-6">
-                Your privacy is important to us. This Privacy Policy explains
-                how information is handled when you use our forum.
+                {t("intro")}
             </p>
-            <h2 className="text-xl font-semibold mb-2">Information we collect</h2>
+
+            <h2 className="text-xl font-semibold mb-2">
+                {t("informationTitle")}
+            </h2>
             <p className="mb-6">
-                We may collect information such as your account name, email
-                address and content that you choose to post on the forum.
+                {t("informationText")}
             </p>
-            <h2 className="text-xl font-semibold mb-2">How we use your information</h2>
+
+            <h2 className="text-xl font-semibold mb-2">
+                {t("usageTitle")}
+            </h2>
             <p className="mb-6">
-                Your information is used to provide and maintain the forum,
-                authenticate your account and allow you to interact with other
-                users.
+                {t("usageText")}
             </p>
-            <h2 className="text-xl font-semibold mb-2">Your rights</h2>
+
+            <h2 className="text-xl font-semibold mb-2">
+                {t("rightsTitle")}
+            </h2>
             <p className="mb-6">
-                You can request access to, correction of, or deletion of your
-                personal information through your account settings or by
-                contacting the forum administrators.
+                {t("rightsText")}
             </p>
-            <h2 className="text-xl font-semibold mb-2">Contact</h2>
+
+            <h2 className="text-xl font-semibold mb-2">
+                {t("contactTitle")}
+            </h2>
             <p>
-                If you have questions about this Privacy Policy, please contact
-                the forum administrators.
+                {t("contactText")}
             </p>
         </main>
     );
