@@ -112,6 +112,32 @@
 		"Since": "Desde",
 		"Revoke": "Revocar"
 	},
+		"Terms": {
+		"title": "Términos de servicio",
+		"intro": "Al utilizar este foro, aceptas cumplir estos términos de servicio.",
+		"respectTitle": "Respeto a los demás usuarios",
+		"respectText": "No publiques contenido ilegal, amenazante, abusivo, discriminatorio o destinado a acosar a otros usuarios.",
+		"accountTitle": "Tu cuenta",
+		"accountText": "Eres responsable de mantener tu cuenta segura y de todo lo que se publique utilizando tu cuenta.",
+		"contentTitle": "Contenido",
+		"contentText": "Sigues siendo responsable del contenido que publiques. Podemos eliminar cualquier contenido que infrinja estas normas.",
+		"terminationTitle": "Cancelación de la cuenta",
+		"terminationText": "Las cuentas que infrinjan estas normas de forma grave o reiterada pueden ser suspendidas o eliminadas.",
+		"changesTitle": "Modificaciones",
+		"changesText": "Estos términos pueden actualizarse cuando sea necesario. El uso continuado del foro significa que aceptas los términos actualizados."
+	},
+		"Privacy": {
+		"title": "Política de privacidad",
+		"intro": "Tu privacidad es importante para nosotros. Esta política de privacidad explica cómo se gestionan tus datos cuando utilizas nuestro foro.",
+		"informationTitle": "Información que recopilamos",
+		"informationText": "Podemos recopilar información como el nombre de tu cuenta, tu dirección de correo electrónico y el contenido que decidas publicar en el foro.",
+		"usageTitle": "Cómo utilizamos tu información",
+		"usageText": "Tu información se utiliza para proporcionar y mantener el foro, autenticar tu cuenta y permitirte interactuar con otros usuarios.",
+		"rightsTitle": "Tus derechos",
+		"rightsText": "Puedes solicitar acceso, corrección o eliminación de tus datos personales a través de la configuración de tu cuenta o contactando con los administradores del foro.",
+		"contactTitle": "Contacto",
+		"contactText": "Si tienes preguntas sobre esta política de privacidad, ponte en contacto con los administradores del foro."
+	},
 	"Orgs": {
 		"myOrganizations": "Mis organizaciones",
 		"noOrganizationsFound": "No se encontraron organizaciones",

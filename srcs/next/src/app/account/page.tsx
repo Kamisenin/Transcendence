@@ -21,6 +21,9 @@ export default async function AccountPage() {
                 <div className="border-t pt-4">
                     <SessionList/>
                 </div>
+                <div className="border-t pt-4">
+                    <DeleteAccountButton/>
+                </div>
             </div>
         </main>
     );
