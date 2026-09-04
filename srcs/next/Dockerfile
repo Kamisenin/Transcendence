@@ -66,7 +66,6 @@ ENV HOSTNAME="0.0.0.0"
 # Copy production assets
 COPY --from=builder --chown=node:node /app/public ./public
 
-# Set the correct permission for prerender cache
 RUN mkdir .next
 RUN chown node:node .next
 
