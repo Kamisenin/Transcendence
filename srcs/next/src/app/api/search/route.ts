@@ -50,11 +50,11 @@ const pages = await prisma.$queryRaw`
   const items = (pages as any[]).map(page => ({
 	id: page.page_id,
 	title: page.title,
-	tags: page.tags,
+	tags: page.tags ?? [],
 	namespace: page.namespace,
 	slug: page.slug,
 	owner: page.owner_username
-  }))
+}))
 
   console.log("SEARCH QUERY:", query)
   console.log("SEARCH USER:", userId)
