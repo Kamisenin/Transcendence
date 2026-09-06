@@ -6,6 +6,7 @@ import FooterRecommendations from "@/components/FooterRecommendations";
 import { getCurrentUser } from "@/app/lib/session";
 import { prisma } from "%/lib/prisma/prisma";
 import { canViewPage } from '@/actions/pages';
+import { canEditPage } from "@/actions/pages";
 
 type Params = {
     params: Promise<{
@@ -41,13 +42,14 @@ export default async function WikiViewPage({ params }: Params) {
     const content = page.content as { blocks: any[] } | null;
     const blocks = content?.blocks ?? [];
 
-    let user = undefined;
+    const user = await getCurrentUser();
     if (!page.public)
     {
-        user = await getCurrentUser();
         if (!user || !await canViewPage(page.pageId, user.user_id))
             notFound();
     }
+    const canEdit = user ? await canEditPage(page.pageId, user.user_id) : false;
+
     return (
         <div className="min-h-screen flex flex-col">
             <main className="flex-grow">
@@ -55,6 +57,8 @@ export default async function WikiViewPage({ params }: Params) {
                     accountId={user?.accountId}
                     title={page.title}
                     blocks={blocks}
+                    canEdit={canEdit}
+                    editHref={`/wiki/${namespace}/${slug}/edit`}
                 />
             </main>
 
