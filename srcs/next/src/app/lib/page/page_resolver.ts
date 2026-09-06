@@ -32,7 +32,6 @@ export async function resolvePage(namespace: string, slug: string): Promise<Reso
 
     let redirectTo: string | null = null;
 
-    // Redirection
     if (!pageSlug.isCanonical) {
         const canonicalSlug = await prisma.pageSlug.findFirst({
             where: { pageId: page.pageId, isCanonical: true },
