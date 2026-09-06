@@ -9,11 +9,10 @@ export default function RegisterPage() {
     const router = useRouter();
 
     const [error, setError] = useState("");
-    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.SubmitEvent<HTMLFormElement>) => {
         event.preventDefault();
         setError("");
         const form = new FormData(event.currentTarget);
-        console.log(form);
         const f = await fetch('/api/auth/register', {
             method: 'POST',
             headers: {
@@ -56,6 +55,12 @@ export default function RegisterPage() {
                     placeholder={t("accountNamePlaceholder")}
                     className="border p-2 rounded text-black"
                     required
+                />
+                <input
+                    type="text"
+                    name="username"
+                    placeholder={t("userNamePlaceholder")}
+                    className="border p-2 rounded text-black"
                 />
                 <input
                     type="password"
