@@ -55,12 +55,6 @@ const pages = await prisma.$queryRaw`
 	slug: page.slug,
 	owner: page.owner_username
 }))
-
-  console.log("SEARCH QUERY:", query)
-  console.log("SEARCH USER:", userId)
-  console.log("SEARCH QUERY WORDS:", queryWords)
-  console.log("SEARCH PAGES:", pages)
-  console.log("SEARCH ITEMS:", items)
   let response
   try {
 	response = await fetch(`${process.env.SEARCH_ENGINE_URL || "http://search-engine:8000"}/search`, {
@@ -76,7 +70,6 @@ const pages = await prisma.$queryRaw`
 	return NextResponse.json({ error: "Search service error" }, { status: 502 })
 
   const searchResult = await response.json()
-  console.log("SEARCH ENGINE RESPONSE:", searchResult)
 
   return NextResponse.json(searchResult);
 }

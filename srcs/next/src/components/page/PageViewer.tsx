@@ -1,6 +1,7 @@
 import ReadOnlyBlock from '@/components/page/ReadOnlyBlock';
 import Infobox, { type InfoboxData } from '@/components/page/Infobox';
 import { requireUser } from "@/actions/tags"
+import Link from "next/link";
 
 type SavedBlock = {
     id: string;
@@ -22,7 +23,7 @@ type PositionedBlock = SavedBlock & {
     };
 };
 
-export default async function PageViewer({ title, blocks, accountId }: { title?: string; blocks: SavedBlock[]; accountId : string | undefined; }) {
+export default async function PageViewer({ title, blocks, accountId, canEdit, editHref }: { title?: string; blocks: SavedBlock[]; accountId : string | undefined; canEdit?: boolean; editHref?: string; }) {
     const COLS = 12;
     const ROW_HEIGHT = 150;
     const MARGIN_X = 5;
@@ -52,9 +53,19 @@ export default async function PageViewer({ title, blocks, accountId }: { title?:
     return (
         <div className="min-h-screen bg-gray-50/50 p-8 pt-20">
             {title && (
-                <h1 className="text-3xl font-bold mb-8 w-full max-w-6xl mx-auto block text-gray-950 border-b pb-4">
-                    {title}
-                </h1>
+                <div className="w-full max-w-6xl mx-auto flex items-center justify-between border-b pb-4 mb-8">
+                    <h1 className="text-3xl font-bold text-gray-950">
+                        {title}
+                    </h1>
+                    {canEdit && editHref && (
+                        <Link
+                            href={editHref}
+                            className="shrink-0 px-3 py-1 rounded bg-blue-600 text-white text-sm hover:opacity-95"
+                        >
+                            Edit
+                        </Link>
+                    )}
+                </div>
             )}
 
             <div

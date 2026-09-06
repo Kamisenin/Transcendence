@@ -40,6 +40,7 @@
 			"title": "Crear una cuenta",
 			"emailPlaceholder": "Correo electrónico",
 			"accountNamePlaceholder": "Nombre de cuenta",
+			"userNamePlaceholder" : "Usuario (opcional)",
 			"passwordPlaceholder": "Contraseña",
 			"submit": "Registrarse"
 		},
