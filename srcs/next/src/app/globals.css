@@ -148,8 +148,6 @@
 }
 
 
-
-
 /* ================================== { slide ForumCard } */
 
 @keyframes recommendation-card-from-right {
@@ -283,20 +281,14 @@
     opacity 350ms ease;
 }
 
-/*
- * Le bouton disparaît vers le bas,
- * comme s'il passait derrière le footer.
- */
+
 .reaction-hidden {
   opacity: 0;
   transform: translateY(70px);
   pointer-events: none;
 }
 
-/*
- * Quand le bouton revient,
- * il remonte à sa position normale.
- */
+
 .favorite-button:not(.reaction-hidden),
 .dislike-button:not(.reaction-hidden) {
   pointer-events: auto;

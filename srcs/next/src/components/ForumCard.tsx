@@ -81,6 +81,8 @@ export default function ForumCard({ page, userId, className = "" }: ForumCardPro
               src={formatImgSrc(page.img!)}
               alt={page.title}
               onError={() => setImgError(true)}
+              loading="eager"
+              style={{ width: "auto", height: "100%" }}
               className="h-28 w-full object-cover rounded"
             />
           ) : (

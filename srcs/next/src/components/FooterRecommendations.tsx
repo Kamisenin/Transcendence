@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -23,18 +22,39 @@ export default function Footer({
   const [loading, setLoading] = useState<boolean>(true);
   const [reaction, setReaction] = useState<"favorite" | "dislike" | null>(null);
   const [animationDirection, setAnimationDirection] = useState<
-  "left" | "right"
->("right");
+    "left" | "right"
+  >("right");
 
-const handleReaction = async (event: "favorite" | "dislike") => {
-  if (!userId) return;
+  const handleReaction = async (event: "favorite" | "dislike") => {
+    if (!userId) return;
 
-  try {
-    if (reaction === event) {
-      const cancelEvent =
-        event === "favorite"
-          ? "cancel_favorite"
-          : "cancel_dislike";
+    try {
+      if (reaction === event) {
+        const cancelEvent =
+          event === "favorite" ? "cancel_favorite" : "cancel_dislike";
+
+        const response = await fetch(
+          "http://localhost:8001/recommendation/event",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              user_id: userId,
+              page_id: currentPageId,
+              event: cancelEvent,
+            }),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Cancel reaction API error");
+        }
+
+        setReaction(null);
+        return;
+      }
 
       const response = await fetch(
         "http://localhost:8001/recommendation/event",
@@ -46,65 +66,34 @@ const handleReaction = async (event: "favorite" | "dislike") => {
           body: JSON.stringify({
             user_id: userId,
             page_id: currentPageId,
-            event: cancelEvent,
+            event,
           }),
         }
       );
 
       if (!response.ok) {
-        throw new Error("Cancel reaction API error");
+        const errorData = await response.text();
+        console.error("Reaction API error:", response.status, errorData);
+        return;
       }
 
-      setReaction(null);
-      return;
+      setReaction(event);
+    } catch (error) {
+      console.error("Error handling reaction:", error);
+    }
+  };
+
+  const handleModeChange = (newMode: Mode) => {
+    if (newMode === mode) return;
+
+    if (mode === "recommendations" && newMode === "favorites") {
+      setAnimationDirection("right");
+    } else {
+      setAnimationDirection("left");
     }
 
-    const response = await fetch(
-      "http://localhost:8001/recommendation/event",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          user_id: userId,
-          page_id: currentPageId,
-          event,
-        }),
-      }
-    );
-
-    if (!response.ok) {
-      const errorData = await response.text();
-
-      console.error(
-        "Reaction API error:",
-        response.status,
-        errorData
-      );
-
-      return;
-    }
-
-    setReaction(event);
-
-  } catch (error) {
-    console.error("Error handling reaction:", error);
-  }
-};
-
-
-const handleModeChange = (newMode: Mode) => {
-  if (newMode === mode) return;
-
-  if (mode === "recommendations" && newMode === "favorites") {
-    setAnimationDirection("right");
-  } else {
-    setAnimationDirection("left");
-  }
-
-  setMode(newMode);
-};
+    setMode(newMode);
+  };
 
   useEffect(() => {
     if (!userId) {
@@ -116,14 +105,10 @@ const handleModeChange = (newMode: Mode) => {
       try {
         const response = await fetch(
           `http://localhost:8001/recommendation/reaction?user_id=${userId}&page_id=${currentPageId}`,
-          {
-            cache: "no-store",
-          }
+          { cache: "no-store" }
         );
 
-        if (!response.ok) {
-          throw new Error("Reaction API error");
-        }
+        if (!response.ok) return;
 
         const data = await response.json();
 
@@ -135,14 +120,12 @@ const handleModeChange = (newMode: Mode) => {
           setReaction(null);
         }
       } catch (error) {
-        console.error("Error loading reaction:", error);
-        setReaction(null);
+        // Ignorer silencieusement si le service de reco est éteint pour éviter de polluer les logs
       }
     }
 
     fetchReaction();
   }, [userId, currentPageId]);
-
 
   useEffect(() => {
     if (!userId) {
@@ -153,89 +136,68 @@ const handleModeChange = (newMode: Mode) => {
     async function fetchPages() {
       try {
         setLoading(true);
-
         let pageIds: number[] = [];
 
-        // ========================================================
-        // RECOMMENDATIONS
-        // ========================================================
         if (mode === "recommendations") {
-          const recResponse = await fetch(
-            `http://localhost:8001/recommendation?user_id=${userId}&page_id=${currentPageId}`,
-            {
-              cache: "no-store",
+          try {
+            const recResponse = await fetch(
+              `http://localhost:8001/recommendation?user_id=${userId}&page_id=${currentPageId}`,
+              { cache: "no-store" }
+            );
+
+            if (recResponse.ok) {
+              const data = await recResponse.json();
+              pageIds = (data.recommendations || []).map(
+                (rec: { page_id: number; score: number }) => rec.page_id
+              );
             }
-          );
-
-          if (!recResponse.ok) {
-            throw new Error("Recommendation API error");
+          } catch (err) {
+            console.warn("Recommendation service unreachable");
           }
-
-          const data = await recResponse.json();
-
-          pageIds = data.recommendations.map(
-            (rec: { page_id: number; score: number }) => rec.page_id
-          );
         }
 
-        // ========================================================
-        // FAVORITES
-        // ========================================================
         if (mode === "favorites") {
-          const response = await fetch(
-            `http://localhost:8001/recommendation/favorites?user_id=${userId}`,
-            {
-              cache: "no-store",
+          try {
+            const response = await fetch(
+              `http://localhost:8001/recommendation/favorites?user_id=${userId}`,
+              { cache: "no-store" }
+            );
+
+            if (response.ok) {
+              const data = await response.json();
+              pageIds = data.favorites || [];
             }
-          );
-
-          if (!response.ok) {
-            throw new Error("Favorites API error");
+          } catch (err) {
+            console.warn("Favorites service unreachable");
           }
-
-          const data = await response.json();
-
-          pageIds = data.favorites;
         }
 
-        // Ne pas afficher la page actuellement ouverte
-        pageIds = pageIds.filter(
-          (pageId) => pageId !== currentPageId
-        );
+        pageIds = pageIds.filter((pageId) => pageId !== currentPageId);
 
         if (pageIds.length === 0) {
           setPages([]);
           return;
         }
 
-        // ========================================================
-        // LOAD PAGE DATA
-        // ========================================================
         const pagePromises = pageIds.map(async (id) => {
-          const response = await fetch(`/api/pages/${id}`, {
-            cache: "no-store",
-          });
-
-          if (!response.ok) {
+          try {
+            const response = await fetch(`/api/pages/${id}`, {
+              cache: "no-store",
+            });
+            if (!response.ok) return null;
+            return (await response.json()) as PageData;
+          } catch {
             return null;
           }
-
-          return (await response.json()) as PageData;
         });
 
         const results = await Promise.all(pagePromises);
-
         const validPages = results.filter(
-          (page: PageData | null): page is PageData =>
-            page !== null
+          (page): page is PageData => page !== null
         );
 
         setPages(validPages);
       } catch (error) {
-        console.error(
-          "Error loading footer pages:",
-          error
-        );
         setPages([]);
       } finally {
         setLoading(false);
@@ -248,66 +210,53 @@ const handleModeChange = (newMode: Mode) => {
   return (
     <footer className="relative w-full bg-muted border-t border-border py-6 px-4 text-foreground">
       <div className="max-w-7xl mx-auto flex flex-col gap-6">
+        {userId && hasTags && (
+          <div className="absolute left-4 -top-14 flex gap-2">
+            <button
+              type="button"
+              onClick={() => handleReaction("favorite")}
+              disabled={reaction === "dislike"}
+              className={`favorite-button w-11 h-11 shrink-0 rounded-full bg-card border border-border shadow-md flex items-center justify-center text-muted-foreground hover:text-foreground ${
+                reaction === "favorite" ? "active" : ""
+              } ${reaction === "dislike" ? "reaction-hidden" : ""}`}
+              title={
+                reaction === "favorite"
+                  ? "Remove from favorites"
+                  : "Add to favorites"
+              }
+            >
+              <span
+                className={`favorite-icon ${
+                  reaction === "favorite" ? "pop active" : ""
+                }`}
+              >
+                ♥
+              </span>
+            </button>
 
-    {userId && hasTags && (
-      <div className="absolute left-4 -top-14 flex gap-2">
+            <button
+              type="button"
+              onClick={() => handleReaction("dislike")}
+              disabled={reaction === "favorite"}
+              className={`dislike-button w-11 h-11 shrink-0 rounded-full bg-card border border-border shadow-md flex items-center justify-center text-muted-foreground hover:text-foreground ${
+                reaction === "dislike" ? "active" : ""
+              } ${reaction === "favorite" ? "reaction-hidden" : ""}`}
+              title={reaction === "dislike" ? "Remove dislike" : "Dislike"}
+            >
+              <span
+                className={`dislike-icon ${
+                  reaction === "dislike" ? "pop active" : ""
+                }`}
+              >
+                ×
+              </span>
+            </button>
+          </div>
+        )}
 
-        {/* FAVORITE */}
-        <button
-          type="button"
-          onClick={() => handleReaction("favorite")}
-          disabled={reaction === "dislike"}
-          className={`favorite-button w-11 h-11 shrink-0 rounded-full bg-card border border-border shadow-md
-                      flex items-center justify-center
-                      text-muted-foreground hover:text-foreground
-                      ${reaction === "favorite" ? "active" : ""}
-                      ${reaction === "dislike" ? "reaction-hidden" : ""}`}
-          title={
-            reaction === "favorite"
-              ? "Remove from favorites"
-              : "Add to favorites"
-          }
-        >
-          <span
-            className={`favorite-icon ${
-              reaction === "favorite" ? "pop active" : ""
-            }`}
-          >
-            ♥
-          </span>
-        </button>
-
-        {/* DISLIKE */}
-        <button
-          type="button"
-          onClick={() => handleReaction("dislike")}
-          disabled={reaction === "favorite"}
-          className={`dislike-button w-11 h-11 shrink-0 rounded-full bg-card border border-border shadow-md
-                      flex items-center justify-center
-                      text-muted-foreground hover:text-foreground
-                      ${reaction === "dislike" ? "active" : ""}
-                      ${reaction === "favorite" ? "reaction-hidden" : ""}`}
-          title={
-            reaction === "dislike"
-              ? "Remove dislike"
-              : "Dislike"
-          }
-        >
-          <span
-            className={`dislike-icon ${
-              reaction === "dislike" ? "pop active" : ""
-            }`}
-          >
-            ×
-          </span>
-        </button>
-
-      </div>
-    )}
         <div>
           <div className="flex justify-start mb-4">
             <div className="inline-flex rounded-full bg-card border border-border p-1">
-
               <button
                 type="button"
                 onClick={() => handleModeChange("recommendations")}
@@ -331,26 +280,18 @@ const handleModeChange = (newMode: Mode) => {
               >
                 Favorites
               </button>
-
             </div>
           </div>
 
-          <div className="relative overflow-hidden h-[300px]">
-            {pages.length === 0 && loading ? (
-              <div className="flex gap-4 overflow-x-auto pb-4 pt-2 px-1 items-start">
-                {[1, 2, 3].map((i) => (
-                  <div
-                    key={i}
-                    className="flex-none w-64 h-48 bg-card animate-pulse rounded-lg border border-border"
-                  />
-                ))}
-              </div>
-            ) : pages.length === 0 ? (
+        <div className="relative overflow-hidden h-[300px]">
+            {pages.length === 0 ? (
               <div className="h-full flex items-center justify-center">
                 <p className="text-xs text-muted-foreground italic text-center">
-                  {mode === "favorites"
-                    ? "No favorites yet."
-                    : "No recommendations available."}
+                  {loading 
+                    ? "Loading..." 
+                    : mode === "favorites" 
+                      ? "No favorites yet." 
+                      : "No recommendations available."}
                 </p>
               </div>
             ) : (
@@ -382,20 +323,14 @@ const handleModeChange = (newMode: Mode) => {
           </div>
         </div>
 
-
         <div className="flex flex-col md:flex-row justify-between items-center pt-4 border-t border-border text-xs text-muted-foreground">
           <p>© 2026 42chan - Transcendence Project</p>
-
           <div className="flex gap-4">
-            <Link
-              href="/"
-              className="hover:underline text-foreground"
-            >
+            <Link href="/" className="hover:underline text-foreground">
               Home
             </Link>
           </div>
         </div>
-
       </div>
     </footer>
   );

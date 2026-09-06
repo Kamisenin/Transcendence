@@ -52,7 +52,6 @@ def load_excluded_pages(cursor, user_id, current_page_id=None):
 # ============================================================
 
 def load_page_vectors(cursor):
-    # 💡 LEFT JOIN + COALESCE(ts.idf, 1.0) pour accepter les nouveaux tags non calculés
     cursor.execute(
         """
         SELECT
@@ -60,8 +59,10 @@ def load_page_vectors(cursor):
             tp.tag_id,
             COALESCE(ts.idf, 1.0) AS idf
         FROM tag_pages tp
+        JOIN pages p ON tp.page_id = p.page_id
         LEFT JOIN tag_statistics ts
             ON ts.tag_id = tp.tag_id
+        WHERE p.public = TRUE
         """
     )
 

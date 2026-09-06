@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/app/lib/prisma/prisma";
 
-// 💡 Force Next.js à ne JAMAIS mettre cette route en cache
+// Force Next.js à ne JAMAIS mettre cette route en cache
 export const dynamic = "force-dynamic"; 
 export const revalidate = 0;
 
