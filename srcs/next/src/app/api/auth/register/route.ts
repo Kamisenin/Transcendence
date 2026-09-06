@@ -9,7 +9,6 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     let username = '';
 
-    console.log(body)
     if (!body.password || !body.email || !body.accountId) {
         return NextResponse.json({error: "Field Required"}, {status: 400});
     }
