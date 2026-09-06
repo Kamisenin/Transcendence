@@ -18,7 +18,6 @@ export async function POST(req: NextRequest) {
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(body.password, salt);
-    console.log("Password ready to be registered : ", hashedPassword);
 
     if (body.username) username = body.username;
 
