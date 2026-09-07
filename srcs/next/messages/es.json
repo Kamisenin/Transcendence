@@ -390,5 +390,18 @@
 		"title": "editadas recientemente",
 		"editedBy": "editado por {name} · {time}",
 		"untitled": "Sin título"
+	},
+	"LocaleSwitcher": {
+		"ariaLabel": "Cambiar idioma"
+	},
+	"DeleteAccount": {
+		"exportData": "Exportar mis datos",
+		"deleteAccount": "Eliminar mi cuenta",
+		"irreversible": "Esta acción es irreversible.",
+		"password": "Contraseña",
+		"deleting": "Eliminando...",
+		"confirmDeletion": "Confirmar eliminación",
+		"cancel": "Cancelar",
+		"error": "Algo salió mal"
 	}
 }

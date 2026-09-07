@@ -408,5 +408,18 @@
 		"title": "modifiées récemment",
 		"editedBy": "modifié par {name} · {time}",
 		"untitled": "Sans titre"
+	},
+	"LocaleSwitcher": {
+		"ariaLabel": "Changer de langue"
+	},
+	"DeleteAccount": {
+		"exportData": "Exporter mes données",
+		"deleteAccount": "Supprimer mon compte",
+		"irreversible": "Cette action est irréversible.",
+		"password": "Mot de passe",
+		"deleting": "Suppression...",
+		"confirmDeletion": "Confirmer la suppression",
+		"cancel": "Annuler",
+		"error": "Une erreur est survenue"
 	}
 }
