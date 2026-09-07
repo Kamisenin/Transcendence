@@ -147,7 +147,16 @@
 		"organizationNotFound": "Organización no encontrada",
 		"manageDescription": "Gestiona tus organizaciones y controles de acceso",
 		"dangerousZone": "Zona peligrosa",
-		"deleteOrganization": "Eliminar organización"
+		"deleteOrganization": "Eliminar organización",
+		"searchMemberPlaceholder": "Buscar por ID de cuenta o nombre de usuario",
+		"roleNamePlaceholder": "Nombre del rol",
+		"hierarchyLevelPlaceholder": "Nivel jerárquico",
+		"permissionDenied": "Permiso denegado",
+		"deleteFailed": "Error al eliminar",
+		"remove": "Quitar",
+		"addSelected": "Añadir seleccionados ({count})",
+		"deleteOrgWarning": "Esto eliminará permanentemente {name} y no se puede deshacer.",
+		"deleting": "Eliminando…"
 	},
 	"Tags": {
 		"myTags": "Mis etiquetas",
@@ -198,7 +207,8 @@
 			"roleCreated": "Rol creado",
 			"failedToCreateRole": "Error al crear el rol",
 			"roleDeleted": "Rol eliminado",
-			"failedToDeleteRole": "Error al eliminar el rol"
+			"failedToDeleteRole": "Error al eliminar el rol",
+			"creating": "Creando..."
 		},
 		"slugNamespace": "Espacio de nombres del slug (Opcional)",
 		"noneUseAccountOnly": "Ninguno (Usar solo mi cuenta)"
@@ -266,6 +276,16 @@
 		"less": "Menos",
 		"more": "más",
 		"noImage": "Sin imagen"
+	},
+	"MyPages": {
+		"myPages": "Mis páginas",
+		"sharedPages": "Páginas compartidas",
+		"preview": "Vista previa",
+		"owner": "Propietario: {owner}",
+		"edit": "Editar",
+		"noPagesFound": "No se encontraron páginas",
+		"failedToFetch": "Error al cargar",
+		"error": "Error: {message}"
 	},
 	"Home": {
 		"tagline": "Un wiki para wikis",

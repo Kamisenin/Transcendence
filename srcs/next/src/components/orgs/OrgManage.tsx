@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import {
     addOrganizationMembers,
     createOrganizationRole,
@@ -38,6 +39,12 @@ type SearchUser = {
 };
 
 export default function OrgManageClient({ org, canManage }: { org: any; canManage: boolean }) {
+    const t = useTranslations("Orgs");
+    const tMembers = useTranslations("Tags.members");
+    const tRoles = useTranslations("Tags.roles");
+    const tCommon = useTranslations("Common");
+    const tTags = useTranslations("Tags");
+
     const [isDeleting, setIsDeleting] = useState(false);
     const [confirmingDelete, setConfirmingDelete] = useState(false);
     const [toast, setToast] = useState<{ message: string; tone: "error" | "success" } | null>(null);
@@ -100,7 +107,7 @@ export default function OrgManageClient({ org, canManage }: { org: any; canManag
     }, [sortedRoles, memberRoleId]);
 
     useEffect(() => {
-        const t = setTimeout(async () => {
+        const timeout = setTimeout(async () => {
             const q = userQuery.trim();
             if (!q) {
                 setSearchResults([]);
@@ -114,11 +121,11 @@ export default function OrgManageClient({ org, canManage }: { org: any; canManag
                 setSearchResults([]);
             }
         }, 200);
-        return () => clearTimeout(t);
+        return () => clearTimeout(timeout);
     }, [userQuery, selectedUsers]);
 
     if (!canManage) {
-        return <div className="p-6">You don't have access</div>;
+        return <div className="p-6">{tTags("youDontHaveAccess")}</div>;
     }
 
     const pickUser = (u: SearchUser) => {
@@ -133,8 +140,8 @@ export default function OrgManageClient({ org, canManage }: { org: any; canManag
     };
 
     const handleAddSelectedUsers = async () => {
-        if (!selectedUsers.length) return showToast("Select at least one user");
-        if (!memberRoleId) return showToast("Please select a role");
+        if (!selectedUsers.length) return showToast(tMembers("selectAtLeastOneUser"));
+        if (!memberRoleId) return showToast(tMembers("pleaseSelectRole"));
 
         setBusyKey("add-members");
         try {
@@ -152,9 +159,9 @@ export default function OrgManageClient({ org, canManage }: { org: any; canManag
             setSelectedUsers([]);
             setUserQuery("");
             setSearchResults([]);
-            showToast("Users added", "success");
+            showToast(tMembers("usersAdded"), "success");
         } catch (e) {
-            showToast(e instanceof Error ? e.message : "Failed to add users");
+            showToast(e instanceof Error ? e.message : tMembers("failedToAddUsers"));
         } finally {
             setBusyKey(null);
         }
@@ -173,28 +180,28 @@ export default function OrgManageClient({ org, canManage }: { org: any; canManag
         try {
             await deleteOrganization(org.id);
         } catch (e) {
-            if (e instanceof OrgPermissionError) showToast("Permission denied");
-            else showToast("Delete failed");
+            if (e instanceof OrgPermissionError) showToast(t("permissionDenied"));
+            else showToast(t("deleteFailed"));
             setIsDeleting(false);
         }
     };
 
     const handleRemoveMember = async (member: Member) => {
-        if (member.userToken === ownerToken) return showToast("Owner cannot be removed");
+        if (member.userToken === ownerToken) return showToast(tMembers("ownerCannotBeRemoved"));
         setBusyKey(`remove-member-${member.userToken}`);
         try {
             await removeOrganizationMember(org.id, member.userToken);
             setMembers((prev) => prev.filter((m) => m.userToken !== member.userToken));
-            showToast("Member removed", "success");
+            showToast(tMembers("memberRemoved"), "success");
         } catch (e) {
-            showToast(e instanceof Error ? e.message : "Failed to remove member");
+            showToast(e instanceof Error ? e.message : tMembers("failedToRemoveMember"));
         } finally {
             setBusyKey(null);
         }
     };
 
     const handleChangeMemberRole = async (member: Member, roleId: number) => {
-        if (member.userToken === ownerToken) return showToast("Owner role cannot be changed");
+        if (member.userToken === ownerToken) return showToast(tMembers("ownerRoleCannotBeChanged"));
         setBusyKey(`member-role-${member.userToken}`);
         try {
             await updateOrganizationMemberRole(org.id, member.userToken, roleId);
@@ -203,16 +210,16 @@ export default function OrgManageClient({ org, canManage }: { org: any; canManag
             setMembers((prev) =>
                 prev.map((m) => (m.userToken === member.userToken ? { ...m, roleId: role.id, role } : m))
             );
-            showToast("Member role updated", "success");
+            showToast(tMembers("memberRoleUpdated"), "success");
         } catch (e) {
-            showToast(e instanceof Error ? e.message : "Failed to change member role");
+            showToast(e instanceof Error ? e.message : tMembers("failedToChangeMemberRole"));
         } finally {
             setBusyKey(null);
         }
     };
 
     const handleCreateRole = async () => {
-        if (!newRole.roleName.trim()) return showToast("Role name is required");
+        if (!newRole.roleName.trim()) return showToast(tRoles("roleNameRequired"));
         setBusyKey("create-role");
         try {
             const created = await createOrganizationRole(org.id, {
@@ -230,9 +237,9 @@ export default function OrgManageClient({ org, canManage }: { org: any; canManag
                 canManageOrgPageGrants: false,
                 canManageOrgTagGrants: false,
             });
-            showToast("Role created", "success");
+            showToast(tRoles("roleCreated"), "success");
         } catch (e) {
-            showToast(e instanceof Error ? e.message : "Failed to create role");
+            showToast(e instanceof Error ? e.message : tRoles("failedToCreateRole"));
         } finally {
             setBusyKey(null);
         }
@@ -243,9 +250,9 @@ export default function OrgManageClient({ org, canManage }: { org: any; canManag
         try {
             await deleteOrganizationRole(role.id);
             setRoles((prev) => prev.filter((r) => r.id !== role.id));
-            showToast("Role deleted", "success");
+            showToast(tRoles("roleDeleted"), "success");
         } catch (e) {
-            showToast(e instanceof Error ? e.message : "Failed to delete role");
+            showToast(e instanceof Error ? e.message : tRoles("failedToDeleteRole"));
         } finally {
             setBusyKey(null);
         }
@@ -258,7 +265,7 @@ export default function OrgManageClient({ org, canManage }: { org: any; canManag
 
                 <section className="mb-8 overflow-visible rounded-xl border border-slate-200">
                     <div className="border-b border-slate-100 bg-slate-50/60 px-5 py-3">
-                        <h2 className="text-sm font-semibold text-slate-900">Add users</h2>
+                        <h2 className="text-sm font-semibold text-slate-900">{tMembers("addUsers")}</h2>
                     </div>
 
                     <div className="space-y-3 px-5 py-4">
@@ -294,7 +301,7 @@ export default function OrgManageClient({ org, canManage }: { org: any; canManag
                                     setShowMenu(true);
                                 }}
                                 onFocus={() => setShowMenu(true)}
-                                placeholder="Search by accountId or username"
+                                placeholder={t("searchMemberPlaceholder")}
                                 className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-indigo-500 focus:ring-2"
                             />
 
@@ -344,7 +351,7 @@ export default function OrgManageClient({ org, canManage }: { org: any; canManag
                                 disabled={busyKey === "add-members"}
                                 className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60"
                             >
-                                {busyKey === "add-members" ? "Adding..." : `Add selected (${selectedUsers.length})`}
+                                {busyKey === "add-members" ? tMembers("adding") : t("addSelected", { count: selectedUsers.length })}
                             </button>
                         </div>
                     </div>
@@ -352,7 +359,7 @@ export default function OrgManageClient({ org, canManage }: { org: any; canManag
 
                 <section className="mb-8 overflow-hidden rounded-xl border border-slate-200">
                     <div className="border-b border-slate-100 bg-slate-50/60 px-5 py-3">
-                        <h2 className="text-sm font-semibold text-slate-900">Members</h2>
+                        <h2 className="text-sm font-semibold text-slate-900">{tCommon("members")}</h2>
                     </div>
                     <ul className="divide-y divide-slate-100">
                         {members.map((m) => (
@@ -391,7 +398,7 @@ export default function OrgManageClient({ org, canManage }: { org: any; canManag
                                     onClick={() => handleRemoveMember(m)}
                                     className="rounded-lg bg-red-600 px-3 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-60"
                                 >
-                                    Remove
+                                    {t("remove")}
                                 </button>
                             </li>
                         ))}
@@ -400,20 +407,20 @@ export default function OrgManageClient({ org, canManage }: { org: any; canManag
 
                 <section className="mb-10 overflow-hidden rounded-xl border border-slate-200">
                     <div className="border-b border-slate-100 bg-slate-50/60 px-5 py-3">
-                        <h2 className="text-sm font-semibold text-slate-900">Create role</h2>
+                        <h2 className="text-sm font-semibold text-slate-900">{tRoles("createRole")}</h2>
                     </div>
                     <div className="grid gap-3 px-5 py-4 md:grid-cols-2">
                         <input
                             value={newRole.roleName}
                             onChange={(e) => setNewRole((p) => ({ ...p, roleName: e.target.value }))}
-                            placeholder="Role name"
+                            placeholder={t("roleNamePlaceholder")}
                             className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
                         />
                         <input
                             type="number"
                             value={newRole.hierarchyLevel}
                             onChange={(e) => setNewRole((p) => ({ ...p, hierarchyLevel: Number(e.target.value) || 100 }))}
-                            placeholder="Hierarchy level"
+                            placeholder={t("hierarchyLevelPlaceholder")}
                             className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
                         />
                         <button
@@ -421,7 +428,7 @@ export default function OrgManageClient({ org, canManage }: { org: any; canManag
                             disabled={busyKey === "create-role"}
                             className="w-fit rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60"
                         >
-                            {busyKey === "create-role" ? "Creating..." : "Create role"}
+                            {busyKey === "create-role" ? tRoles("creating") : tRoles("createRole")}
                         </button>
                     </div>
 
@@ -436,7 +443,7 @@ export default function OrgManageClient({ org, canManage }: { org: any; canManag
                                     disabled={r.roleName === "Owner" || busyKey === `delete-role-${r.id}`}
                                     className="rounded bg-red-600 px-3 py-1 text-xs text-white disabled:opacity-60"
                                 >
-                                    Delete
+                                    {tCommon("delete")}
                                 </button>
                             </div>
                         ))}
@@ -446,9 +453,9 @@ export default function OrgManageClient({ org, canManage }: { org: any; canManag
                 <section className="rounded-xl border border-red-200 bg-red-50/40">
                     <div className="flex items-center justify-between px-5 py-4">
                         <div>
-                            <h2 className="text-sm font-semibold text-red-900">Delete organization</h2>
+                            <h2 className="text-sm font-semibold text-red-900">{t("deleteOrganization")}</h2>
                             <p className="mt-0.5 text-sm text-red-700/80">
-                                This will permanently remove {org.name} and cannot be undone.
+                                {t("deleteOrgWarning", { name: org.name })}
                             </p>
                         </div>
                         <button
@@ -458,7 +465,7 @@ export default function OrgManageClient({ org, canManage }: { org: any; canManag
                                 confirmingDelete ? "bg-red-800 hover:bg-red-900" : "bg-red-600 hover:bg-red-700"
                             }`}
                         >
-                            {isDeleting ? "Deleting…" : confirmingDelete ? "Click again to confirm" : "Delete organization"}
+                            {isDeleting ? t("deleting") : confirmingDelete ? tCommon("clickAgainToConfirm") : t("deleteOrganization")}
                         </button>
                     </div>
                 </section>
