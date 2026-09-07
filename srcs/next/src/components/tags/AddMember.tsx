@@ -92,7 +92,7 @@ export default function AddMember({ tagId, assignableRoles, existingMemberTokens
                     type="text"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Rechercher par pseudo ou identifiant..."
+                    placeholder={t("searchPlaceholder")}
                     className="flex-1 border rounded px-2 py-1.5 text-sm bg-white"
                 />
                 <select

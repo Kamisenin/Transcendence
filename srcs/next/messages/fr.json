@@ -148,7 +148,16 @@
 		"organizationNotFound": "Organisation introuvable",
 		"manageDescription": "Gérez vos organisations et contrôles d'accès",
 		"dangerousZone": "Zone dangereuse",
-		"deleteOrganization": "Supprimer l'organisation"
+		"deleteOrganization": "Supprimer l'organisation",
+		"searchMemberPlaceholder": "Rechercher par identifiant ou nom d'utilisateur",
+		"roleNamePlaceholder": "Nom du rôle",
+		"hierarchyLevelPlaceholder": "Niveau hiérarchique",
+		"permissionDenied": "Permission refusée",
+		"deleteFailed": "Échec de la suppression",
+		"remove": "Retirer",
+		"addSelected": "Ajouter la sélection ({count})",
+		"deleteOrgWarning": "Cette action supprimera définitivement {name} et ne pourra pas être annulée.",
+		"deleting": "Suppression…"
 	},
 	"Tags": {
 		"myTags": "Mes tags",
@@ -199,7 +208,8 @@
 			"roleCreated": "Rôle créé",
 			"failedToCreateRole": "Échec de la création du rôle",
 			"roleDeleted": "Rôle supprimé",
-			"failedToDeleteRole": "Échec de la suppression du rôle"
+			"failedToDeleteRole": "Échec de la suppression du rôle",
+			"creating": "Création..."
 		},
 		"slugNamespace": "Namespace du Slug (Optionnel)",
 		"noneUseAccountOnly": "Aucun (Utiliser uniquement mon compte)"
@@ -266,6 +276,16 @@
 		"edit": "Éditer",
 		"less": "Moins",
 		"more": "plus"
+	},
+	"MyPages": {
+		"myPages": "Mes pages",
+		"sharedPages": "Pages partagées",
+		"preview": "Aperçu",
+		"owner": "Propriétaire : {owner}",
+		"edit": "Éditer",
+		"noPagesFound": "Aucune page trouvée",
+		"failedToFetch": "Échec du chargement",
+		"error": "Erreur : {message}"
 	},
 	"Home":{
 		"tagline": "Un wiki pour wikis",

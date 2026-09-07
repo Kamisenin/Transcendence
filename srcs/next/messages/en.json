@@ -147,7 +147,16 @@
 		"organizationNotFound": "Organization not found",
 		"manageDescription": "Manage your organizations and access controls",
 		"dangerousZone": "Dangerous Zone",
-		"deleteOrganization": "Delete organization"
+		"deleteOrganization": "Delete organization",
+		"searchMemberPlaceholder": "Search by accountId or username",
+		"roleNamePlaceholder": "Role name",
+		"hierarchyLevelPlaceholder": "Hierarchy level",
+		"permissionDenied": "Permission denied",
+		"deleteFailed": "Delete failed",
+		"remove": "Remove",
+		"addSelected": "Add selected ({count})",
+		"deleteOrgWarning": "This will permanently remove {name} and cannot be undone.",
+		"deleting": "Deleting…"
 	},
 	"Tags": {
 		"myTags": "My Tags",
@@ -198,7 +207,8 @@
 			"roleCreated": "Role created",
 			"failedToCreateRole": "Failed to create role",
 			"roleDeleted": "Role deleted",
-			"failedToDeleteRole": "Failed to delete role"
+			"failedToDeleteRole": "Failed to delete role",
+			"creating": "Creating..."
 		},
 		"slugNamespace": "Slug Namespace (Optional)",
 		"noneUseAccountOnly": "None (Use only my account)"
@@ -266,6 +276,16 @@
 		"less": "Less",
 		"more": "more",
 		"noImage": "No image"
+	},
+	"MyPages": {
+		"myPages": "My pages",
+		"sharedPages": "Shared pages",
+		"preview": "Preview",
+		"owner": "Owner: {owner}",
+		"edit": "Edit",
+		"noPagesFound": "No pages found",
+		"failedToFetch": "Failed to fetch",
+		"error": "Error: {message}"
 	},
 	"Home": {
 		"tagline": "A wiki for wikis",
