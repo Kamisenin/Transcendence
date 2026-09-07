@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from 'react';
+import { useTranslations } from 'next-intl';
 import { updateTagInfo, deleteTag } from '@/actions/tags';
 import type { TagCapabilities } from '%/lib/tag_permissions';
 import { type Tag } from './TagManagement';
@@ -19,6 +20,7 @@ function slugify(text: string): string {
 }
 
 export default function TagSettingsPanel({ tag, capabilities }: Props) {
+    const t = useTranslations('Tags');
     const [isPending, startTransition] = useTransition();
     const [error, setError] = useState<string | null>(null);
 
@@ -51,10 +53,10 @@ export default function TagSettingsPanel({ tag, capabilities }: Props) {
 
     function getDeleteButtonText() {
         if (isPending && deleteStatus) return deleteStatus;
-        if (deleteStep === 0) return 'Delete Tag';
-        if (deleteStep === 1) return 'Confirmer la suppression';
-        if (deleteStep === 2) return 'Dernière confirmation';
-        return 'Delete Tag';
+        if (deleteStep === 0) return t('deleteTagBtn');
+        if (deleteStep === 1) return t('confirmDeletion');
+        if (deleteStep === 2) return t('lastConfirmation');
+        return t('deleteTagBtn');
     }
 
     function handleDelete() {
@@ -67,11 +69,11 @@ export default function TagSettingsPanel({ tag, capabilities }: Props) {
 
         startTransition(async () => {
             try {
-                setDeleteStatus('Suppression en cours...');
+                setDeleteStatus(t('deletingInProgress'));
                 await deleteTag(tag.id);
-                setDeleteStatus('Tag supprimé, redirection...');
+                setDeleteStatus(t('tagDeletedRedirecting'));
             } catch (e: any) {
-                setError(e.message ?? 'Erreur lors de la suppression');
+                setError(e.message ?? t('deleteError'));
                 setDeleteStep(0);
                 setDeleteStatus(null);
             }
@@ -79,7 +81,7 @@ export default function TagSettingsPanel({ tag, capabilities }: Props) {
     }
 
     if (!capabilities.canEditInfo && !capabilities.canDeleteTag) {
-        return <p className="text-sm text-gray-400">You do not have the current access right to this page.</p>;
+        return <p className="text-sm text-gray-400">{t('noAccessToPage')}</p>;
     }
 
     return (
@@ -93,7 +95,7 @@ export default function TagSettingsPanel({ tag, capabilities }: Props) {
             {capabilities.canEditInfo && (
                 <div className="space-y-3 mb-6">
                     <div>
-                        <label className="block text-sm font-medium mb-1">Name</label>
+                        <label className="block text-sm font-medium mb-1">{t('name')}</label>
                         <input
                             type="text"
                             value={name}
@@ -102,7 +104,7 @@ export default function TagSettingsPanel({ tag, capabilities }: Props) {
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium mb-1">Description</label>
+                        <label className="block text-sm font-medium mb-1">{t('description')}</label>
                         <textarea
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
@@ -111,7 +113,7 @@ export default function TagSettingsPanel({ tag, capabilities }: Props) {
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium mb-1">Color</label>
+                        <label className="block text-sm font-medium mb-1">{t('color')}</label>
                         <input
                             type="color"
                             value={color}
@@ -120,21 +122,20 @@ export default function TagSettingsPanel({ tag, capabilities }: Props) {
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium mb-1">Namespace</label>
+                        <label className="block text-sm font-medium mb-1">{t('namespace')}</label>
                         <div className="flex items-center gap-1 text-sm text-gray-400">
                             <span>/wiki/</span>
                             <input
                                 type="text"
                                 value={namespace}
                                 onChange={(e) => setNamespace(slugify(e.target.value))}
-                                placeholder="mon-tag"
+                                placeholder={t('namespacePlaceholderShort')}
                                 className="flex-1 border rounded px-2 py-1 text-sm text-gray-900"
                             />
                             <span>/page-title</span>
                         </div>
                         <p className="text-xs text-gray-400 mt-1">
-                            Allows pages that use this tag to use its namespace instead of the user's namespace
-                            leave empty to remove
+                            {t('namespaceHint')}
                         </p>
                     </div>
                     <button
@@ -142,14 +143,14 @@ export default function TagSettingsPanel({ tag, capabilities }: Props) {
                         disabled={isPending || !name.trim()}
                         className="text-sm bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-4 py-1.5 rounded-lg"
                     >
-                        Save
+                        {t('save')}
                     </button>
                 </div>
             )}
 
             {capabilities.canDeleteTag && (
                 <div className="border-t pt-4">
-                    <p className="text-sm text-gray-500 mb-2">Dangerous Zone</p>
+                    <p className="text-sm text-gray-500 mb-2">{t('dangerousZone')}</p>
                     <button
                         onClick={handleDelete}
                         disabled={isPending}
@@ -160,7 +161,7 @@ export default function TagSettingsPanel({ tag, capabilities }: Props) {
 
                     {deleteStep > 0 && !isPending && (
                         <p className="text-xs text-red-500 mt-2">
-                            This action is irreversible.
+                            {t('deleteIrreversible')}
                         </p>
                     )}
                 </div>

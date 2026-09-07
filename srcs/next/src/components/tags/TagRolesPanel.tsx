@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from 'react';
+import { useTranslations } from 'next-intl';
 import { createTagRole, updateTagRole, deleteTagRole } from '@/actions/tags';
 import type { TagCapabilities } from '%/lib/tag_permissions';
 
@@ -28,17 +29,6 @@ type Props = {
 
 type PermissionKey = { [K in keyof RoleForm]: RoleForm[K] extends boolean ? K : never; } [keyof RoleForm];
 
-const PERMISSION_FIELDS: { key: PermissionKey; label: string }[] = [
-    { key: 'canManageMembers', label: 'Gérer les membres' },
-    { key: 'canManageRoles', label: 'Gérer les rôles' },
-    { key: 'canEditInfo', label: 'Éditer les infos du tag' },
-    { key: 'canDeleteTag', label: 'Supprimer le tag' },
-    { key: 'canAddPage', label: 'Ajouter une page' },
-    { key: 'canRevokePage', label: 'Révoquer une page' },
-    { key: 'canManagePageGrants', label: 'Gérer les accès de page' },
-    { key: 'canReviewRequests', label: 'Traiter les demandes' },
-];
-
 const emptyForm = (hierarchyLevel: number) => ({
     roleName: '',
     hierarchyLevel,
@@ -58,6 +48,19 @@ export default function TagRolesPanel({ tagId, roles, capabilities }: Props) {
     const [editingId, setEditingId] = useState<number | 'new' | null>(null);
     const nextLevel = roles.length > 0 ? Math.max(...roles.map(r => r.hierarchyLevel)) + 1 : 1;
     const [form, setForm] = useState(emptyForm(nextLevel));
+    const t = useTranslations('Tags.roles');
+    const tCommon = useTranslations('Common');
+
+    const permissionFields: { key: PermissionKey; label: string }[] = [
+        { key: 'canManageMembers', label: t('manageMembers') },
+        { key: 'canManageRoles', label: t('manageRoles') },
+        { key: 'canEditInfo', label: t('editTagInfo') },
+        { key: 'canDeleteTag', label: t('deleteTag') },
+        { key: 'canAddPage', label: t('addPage') },
+        { key: 'canRevokePage', label: t('revokePage') },
+        { key: 'canManagePageGrants', label: t('managePageAccess') },
+        { key: 'canReviewRequests', label: t('handleRequests') },
+    ];
 
     function canManage(role: Role) {
         return capabilities.canManageRoles && (capabilities.isOwner || capabilities.rank > role.hierarchyLevel);
@@ -90,7 +93,7 @@ export default function TagRolesPanel({ tagId, roles, capabilities }: Props) {
     }
 
     function handleDelete(roleId : number) {
-        if (!confirm("Supprimer ce rôle ? Les membres l'ayant perdront leur accès lié.")) return; //TODO language
+        if (!confirm(t('deleteRoleConfirm'))) return;
         setError(null);
         startTransition(async () => {
             try {
@@ -115,15 +118,15 @@ export default function TagRolesPanel({ tagId, roles, capabilities }: Props) {
                         <div className="flex items-center justify-between">
                             <div>
                                 <span className="font-medium text-sm">{role.roleName}</span>
-                                <span className="ml-2 text-xs text-gray-400">rang {role.hierarchyLevel}</span>
+                                <span className="ml-2 text-xs text-gray-400">{t('hierarchyLevelPlaceholder')} {role.hierarchyLevel}</span>
                             </div>
                             {canManage(role) && (
                                 <div className="flex gap-2">
                                     <button onClick={() => startEdit(role)} className="text-xs text-blue-600 hover:underline">
-                                        Modifier
+                                        {t('editTagInfo')}
                                     </button>
                                     <button onClick={() => handleDelete(role.id)} className="text-xs text-red-500 hover:underline">
-                                        Supprimer
+                                        {t('deleteTag')}
                                     </button>
                                 </div>
                             )}
@@ -137,7 +140,7 @@ export default function TagRolesPanel({ tagId, roles, capabilities }: Props) {
                     onClick={startCreate}
                     className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg"
                 >
-                    + Nouveau rôle
+                    {t('newRole')}
                 </button>
             )}
 
@@ -146,24 +149,24 @@ export default function TagRolesPanel({ tagId, roles, capabilities }: Props) {
                     <div className="grid grid-cols-2 gap-3 mb-3">
                         <input
                             type="text"
-                            placeholder="Nom du rôle"
+                            placeholder={t('roleNamePlaceholder')}
                             value={form.roleName}
                             onChange={(e) => setForm({ ...form, roleName: e.target.value })}
                             className="border rounded px-2 py-1 text-sm"
                         />
                         <input
                             type="number"
-                            placeholder="Rang"
+                            placeholder={t('hierarchyLevelPlaceholder')}
                             value={form.hierarchyLevel}
                             disabled={!capabilities.isOwner}
                             onChange={(e) => setForm({ ...form, hierarchyLevel: Number(e.target.value) })}
                             className="border rounded px-2 py-1 text-sm disabled:bg-gray-100"
-                            title={!capabilities.isOwner ? "Rang limité à ton propre niveau ou en dessous" : ""}
+                            title={!capabilities.isOwner ? t('hierarchyHint') : ''}
                         />
                     </div>
 
                     <div className="grid grid-cols-2 gap-2 mb-4">
-                        {PERMISSION_FIELDS.map(f => (
+                        {permissionFields.map(f => (
                             <label key={f.key} className="flex items-center gap-2 text-sm">
                                 <input
                                     type="checkbox"
@@ -181,13 +184,13 @@ export default function TagRolesPanel({ tagId, roles, capabilities }: Props) {
                             disabled={isPending || !form.roleName.trim()}
                             className="text-sm bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-3 py-1.5 rounded-lg"
                         >
-                            Enregistrer
+                            {tCommon('save')}
                         </button>
                         <button
                             onClick={() => setEditingId(null)}
                             className="text-sm px-3 py-1.5 rounded-lg hover:bg-gray-100"
                         >
-                            Annuler
+                            {tCommon('cancel')}
                         </button>
                     </div>
                 </div>
