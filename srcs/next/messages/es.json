@@ -273,7 +273,17 @@
 	"Footer": {
 		"privacyPolicy": "Política de privacidad",
 		"and": "y",
-		"termsOfService": "Términos de servicio"
+		"termsOfService": "Términos de servicio",
+		"recommendations": "Recomendaciones",
+		"favorites": "Favoritos",
+		"loading": "Cargando...",
+		"noFavorites": "Aún no hay favoritos.",
+		"noRecommendations": "No hay recomendaciones disponibles.",
+		"addToFavorites": "Añadir a favoritos",
+		"removeFromFavorites": "Quitar de favoritos",
+		"dislike": "No me gusta",
+		"removeDislike": "Quitar no me gusta",
+		"home": "Inicio"
 	},
 	"Notifications": {
 		"ariaLabel": "Notificaciones",

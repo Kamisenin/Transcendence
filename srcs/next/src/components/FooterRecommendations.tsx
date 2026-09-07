@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import ForumCard, { PageData } from "@/components/ForumCard";
 
@@ -17,6 +18,7 @@ export default function Footer({
   currentPageId,
   hasTags,
 }: FooterProps) {
+  const t = useTranslations("Footer");
   const [mode, setMode] = useState<Mode>("recommendations");
   const [pages, setPages] = useState<PageData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -221,8 +223,8 @@ export default function Footer({
               } ${reaction === "dislike" ? "reaction-hidden" : ""}`}
               title={
                 reaction === "favorite"
-                  ? "Remove from favorites"
-                  : "Add to favorites"
+                  ? t("removeFromFavorites")
+                  : t("addToFavorites")
               }
             >
               <span
@@ -241,7 +243,7 @@ export default function Footer({
               className={`dislike-button w-11 h-11 shrink-0 rounded-full bg-card border border-border shadow-md flex items-center justify-center text-muted-foreground hover:text-foreground ${
                 reaction === "dislike" ? "active" : ""
               } ${reaction === "favorite" ? "reaction-hidden" : ""}`}
-              title={reaction === "dislike" ? "Remove dislike" : "Dislike"}
+              title={reaction === "dislike" ? t("removeDislike") : t("dislike")}
             >
               <span
                 className={`dislike-icon ${
@@ -266,7 +268,7 @@ export default function Footer({
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                Recommendations
+                {t("recommendations")}
               </button>
 
               <button
@@ -278,7 +280,7 @@ export default function Footer({
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                Favorites
+                {t("favorites")}
               </button>
             </div>
           </div>
@@ -288,10 +290,10 @@ export default function Footer({
               <div className="h-full flex items-center justify-center">
                 <p className="text-xs text-muted-foreground italic text-center">
                   {loading 
-                    ? "Loading..." 
+                    ? t("loading") 
                     : mode === "favorites" 
-                      ? "No favorites yet." 
-                      : "No recommendations available."}
+                      ? t("noFavorites") 
+                      : t("noRecommendations")}
                 </p>
               </div>
             ) : (
@@ -327,7 +329,7 @@ export default function Footer({
           <p>© 2026 42chan - Transcendence Project</p>
           <div className="flex gap-4">
             <Link href="/" className="hover:underline text-foreground">
-              Home
+              {t("home")}
             </Link>
           </div>
         </div>
