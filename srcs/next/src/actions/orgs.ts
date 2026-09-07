@@ -25,7 +25,7 @@ export type MemberUserOption = {
   imgLink: string | null;
 };
 
-export async function getUserOrgs(user : User | null): Promise<Organization[]> {
+export async function getUserOrgs(user : User | null = null): Promise<Organization[]> {
   if (!user)
     user = await requireUser();
 
