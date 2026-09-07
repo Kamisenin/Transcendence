@@ -57,7 +57,7 @@ export default function SearchBar()
 				<ul className="absolute top-full w-full mt-2 bg-popover border border-border rounded-lg z-10 overflow-hidden">
 					{results.length === 0 ? (
 						<li className="px-4 py-3 text-sm text-muted-foreground">
-							Aucun résultat trouvé
+							{t("noResults")}
 						</li>
 					) : (
 						results.map((item) => (
@@ -70,7 +70,7 @@ export default function SearchBar()
 										<span className="font-medium truncate">{item.title}</span>
 										{item.owner && (
 											<span className="text-xs text-muted-foreground shrink-0">
-												par {item.owner}
+												{t("byOwner", { owner: item.owner })}
 											</span>
 										)}
 									</div>

@@ -24,7 +24,8 @@
 		"members": "Miembros",
 		"roles": "Roles",
 		"pages": "Páginas",
-		"tags": "Etiquetas"
+		"tags": "Etiquetas",
+		"byOwner": "por {owner}"
 	},
 	"Auth": {
 		"login": {
@@ -263,7 +264,8 @@
 		"previewMode": "Modo de vista previa",
 		"edit": "Editar",
 		"less": "Menos",
-		"more": "más"
+		"more": "más",
+		"noImage": "Sin imagen"
 	},
 	"Home": {
 		"tagline": "Un wiki para wikis",
@@ -272,7 +274,17 @@
 	"Footer": {
 		"privacyPolicy": "Política de privacidad",
 		"and": "y",
-		"termsOfService": "Términos de servicio"
+		"termsOfService": "Términos de servicio",
+		"recommendations": "Recomendaciones",
+		"favorites": "Favoritos",
+		"loading": "Cargando...",
+		"noFavorites": "Aún no hay favoritos.",
+		"noRecommendations": "No hay recomendaciones disponibles.",
+		"addToFavorites": "Añadir a favoritos",
+		"removeFromFavorites": "Quitar de favoritos",
+		"dislike": "No me gusta",
+		"removeDislike": "Quitar no me gusta",
+		"home": "Inicio"
 	},
 	"Notifications": {
 		"ariaLabel": "Notificaciones",

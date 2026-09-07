@@ -24,7 +24,9 @@
 		"members": "Membres",
 		"roles": "Rôles",
 		"pages": "Pages",
-		"tags": "Tags"
+		"tags": "Tags",
+		"byOwner": "par {owner}",
+		"noImage": "Pas d'image"
 	},
 	"Auth": {
 		"login": {
@@ -272,7 +274,17 @@
 	"Footer": {
 		"privacyPolicy": "Politique de confidentialité",
 		"and": "et",
-		"termsOfService": "Conditions d'utilisation"
+		"termsOfService": "Conditions d'utilisation",
+		"recommendations": "Recommandations",
+		"favorites": "Favoris",
+		"loading": "Chargement...",
+		"noFavorites": "Aucun favori pour le moment.",
+		"noRecommendations": "Aucune recommandation disponible.",
+		"addToFavorites": "Ajouter aux favoris",
+		"removeFromFavorites": "Retirer des favoris",
+		"dislike": "Ne pas aimer",
+		"removeDislike": "Retirer le dislike",
+		"home": "Accueil"
 	},
 	"Notifications": {
 		"ariaLabel": "Notifications",

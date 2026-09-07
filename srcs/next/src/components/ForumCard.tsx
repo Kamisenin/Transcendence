@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 
 export interface TagData {
@@ -38,7 +39,7 @@ function formatTagColor(color?: string | number | null): string | undefined {
 
 export default function ForumCard({ page, userId, className = "" }: ForumCardProps) {
   const [imgError, setImgError] = useState(false);
-
+  const t = useTranslations("Common");
   const formatImgSrc = (src: string) => {
     if (src.startsWith("http://") || src.startsWith("https://") || src.startsWith("/")) {
       return src;
@@ -87,7 +88,7 @@ export default function ForumCard({ page, userId, className = "" }: ForumCardPro
             />
           ) : (
             <div className="h-28 w-full bg-muted rounded flex items-center justify-center text-muted-foreground text-xs">
-              Pas d'image
+              {t("noImage")}
             </div>
           )}
         </div>
