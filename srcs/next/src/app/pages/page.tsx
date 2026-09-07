@@ -9,7 +9,7 @@ type PageItem = {
     pageId: number;
     title?: string;
     preview?: string | null;
-    ownerAccount?: string;
+    ownerAccount: string;
     canonicalSlug?: { namespace: string; slug: string } | null;
 };
 

@@ -1,13 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { deleteUpload } from "@/actions/uploads";
+import { deleteUpload, SerializedUpload } from "@/actions/uploads";
+import { Upload } from "@prisma/client";
 
-function UploadsList({ uploads }: { uploads: Upload[] }) {
+function UploadsList({ uploads }: { uploads: SerializedUpload[] }) {
 	const [localUploads, setLocalUploads] = useState(uploads);
 	const [deletingId, setDeletingId] = useState<number | null>(null);
 
-	function formatFileSize(bytes: number) {
+	function formatFileSize(bytesInput: string) {
+		const bytes = Number(bytesInput)
 		const seuilMo = 1024 * 1024; // 1 Mo
 
 		if (bytes < seuilMo) {

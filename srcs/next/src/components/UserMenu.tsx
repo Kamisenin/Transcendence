@@ -7,7 +7,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 type UserMenuProps = {
-    user: { username: string  } | null; 
+    user: { username: string, imgLink: string  } | null; 
 };
 
 export default function UserMenu({ user }: UserMenuProps) {

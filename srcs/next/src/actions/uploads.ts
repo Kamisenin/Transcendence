@@ -2,10 +2,15 @@
 
 import { prisma } from '%/lib/prisma/prisma';
 import { requireUser } from "@/actions/tags";
+import { Upload } from '@prisma/client';
 import { unlink } from "fs/promises";
 import { join } from "path";
 
-export async function getMyUploads() {
+export type SerializedUpload = Omit<Upload, "fileSize"> & {
+    fileSize: string;
+};
+
+export async function getMyUploads() : Promise<SerializedUpload[]> {
 	const user = await requireUser();
 
 	const uploads = await prisma.upload.findMany({
@@ -29,7 +34,7 @@ export async function deleteUpload(uploadId: number) {
 	if (file.ownerToken !== user.user_id)
 		throw new Error("Forbidden");
 
-	const filePath = join(uploadDir, file.url.replace("/api", ""));
+	const filePath = join(/*turbopackIgnore: true*/uploadDir, file.url.replace("/api", ""));
 	console.log(filePath);
 	try {
 		await unlink(filePath);

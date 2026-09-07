@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useTransition, useRef } from 'react';
 import { addTagMember } from '@/actions/tags';
+import { useTranslations } from 'next-intl';
 
 type SearchUser = {
     user_id: string;
@@ -31,6 +32,7 @@ export default function AddMember({ tagId, assignableRoles, existingMemberTokens
     const [isPending, startTransition] = useTransition();
     const [error, setError] = useState<string | null>(null);
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const t = useTranslations("members")
 
     useEffect(() => {
         if (debounceRef.current) clearTimeout(debounceRef.current);
