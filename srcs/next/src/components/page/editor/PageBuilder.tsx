@@ -4,18 +4,18 @@ import { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import type { BaseEditor, Descendant } from 'slate';
 import type { ReactEditor } from 'slate-react';
 import type { ToolbarRef } from "@/components/page/editor/Toolbar";
-import ReactGridLayout, { type Layout } from 'react-grid-layout';
+import ReactGridLayout, { type LayoutItem } from 'react-grid-layout';
 import dynamic from 'next/dynamic';
 import WikiEditor from "@/components/page/editor/WikiEditor";
+import { type EditorInstance } from "./WikiEditor"
 import Infobox, { type InfoboxData } from "@/components/page/Infobox";
 import { savePage } from "@/actions/pages";
+import { useTranslations } from "next-intl";
 
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 
 const Toolbar = dynamic(() => import('@/components/page/editor/Toolbar'), { ssr: false });
-
-type EditorInstance = BaseEditor & ReactEditor;
 
 export type BlockType = 'editor' | 'infobox';
 
@@ -36,7 +36,7 @@ type Props = {
     initialTitle?: string;
     initialBlocks: SavedBlock[];
     visibility: boolean;
-    canonicalNamespace?: string;
+    canonicalNamespace: string | null;
 };
 
 const emptyValue = (): Descendant[] => [
@@ -52,7 +52,10 @@ const DEFAULT_INFOBOX: InfoboxData = {
 };
 
 export default function PageBuilder({ accountId, pageId, initialTitle, initialBlocks, visibility, canonicalNamespace}: Props) {
+    const t = useTranslations("Page");
+    const tCommon = useTranslations("Common");
     const [saving, setSaving] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const [activeId, setActiveId] = useState<string | null>(null);
     const [activeEditor, setActiveEditor] = useState<EditorInstance | null>(null);
     const toolbarRef = useRef<ToolbarRef>(null);
@@ -94,7 +97,7 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
         ];
     });
 
-    const [layout, setLayout] = useState<Layout[]>(() =>
+    const [layout, setLayout] = useState<readonly LayoutItem[]>(() =>
         blocks.map(b => ({ i: b.id, x: b.x, y: b.y, w: b.w, h: b.h }))
     );
 
@@ -161,34 +164,55 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
         setBlocks(prev => prev.map(b => (b.id === id ? { ...b, infoboxData } : b)));
     }, []);
 
-    async function handleSave() {
-        setSaving(true);
-        try {
-            const mainInfobox = blocks.find(b => b.type === 'infobox');
-            const pageTitle = mainInfobox?.infoboxData?.title || initialTitle || "untitled";
-            const visibility = mainInfobox?.infoboxData?.public || false;
-            const namespace = mainInfobox?.infoboxData?.canonicalNamespace;
 
-            const content = {
-                blocks: blocks.map(block => {
-                    const layoutItem = layout.find(l => l.i === block.id)!;
-                    return {
-                        id: block.id,
-                        type: block.type || 'editor',
-                        x: layoutItem.x,
-                        y: layoutItem.y,
-                        w: layoutItem.w,
-                        h: layoutItem.h,
-                        value: block.value,
-                        infoboxData: block.infoboxData
-                    };
-                }),
+    async function handleSave() {
+    setSaving(true);
+
+    try {
+        const mainInfobox = blocks.find(b => b.type === 'infobox');
+
+        const infoboxData = mainInfobox?.infoboxData || DEFAULT_INFOBOX;
+
+        const pageTitle =
+        infoboxData.title || initialTitle || t("untitled");
+
+        const visibility =
+        infoboxData.public || false;
+
+        const namespace =
+        infoboxData.canonicalNamespace;
+
+        const content = {
+        blocks: blocks.map(block => {
+            const layoutItem = layout.find(l => l.i === block.id)!;
+
+            return {
+            id: block.id,
+            type: block.type || 'editor',
+            x: layoutItem.x,
+            y: layoutItem.y,
+            w: layoutItem.w,
+            h: layoutItem.h,
+            value: block.value,
+            infoboxData: block.infoboxData
             };
-            await savePage(pageId, pageTitle, content as any, mainInfobox?.infoboxData, visibility, namespace);
-        } finally {
-            setSaving(false);
-        }
+        }),
+        };
+
+        await savePage(
+        pageId,
+        pageTitle,
+        content as any,
+        infoboxData,
+        visibility,
+        namespace
+        );
+
+    } finally {
+        setSaving(false);
     }
+    }
+
 
     return (
         <div className="min-h-screen bg-gray-50/50 p-8 pt-20">
@@ -207,23 +231,18 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
                     className="layout"
                     layout={layout}
                     onLayoutChange={(newLayout) => setLayout(newLayout)}
-                    cols={12}
-                    rowHeight={40}
-                    margin={[16, 16]}
                     width={width}
-                    draggableHandle=".drag-handle"
-                    draggableCancel="input, textarea, [contenteditable], button"
                 >
                     {blocks.map(block => (
                         <div key={block.id} className="relative group/grid-item">
                             {block.type === 'infobox' ? (
                                 <Infobox
-                                    accountId={{accountId}}
+                                    accountId={accountId}
                                     id={block.id}
                                     pageId={pageId}
                                     data={block.infoboxData || DEFAULT_INFOBOX}
                                     onChange={(newData) => handleInfoboxChange(block.id, newData)}
-                                    namespace={canonicalNamespace}
+                                    canonicalNamespace={canonicalNamespace}
                                 />
                             ) : (
                                 <WikiEditor

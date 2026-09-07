@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react';
 import { createTagRole, updateTagRole, deleteTagRole } from '@/actions/tags';
 import type { TagCapabilities } from '%/lib/tag_permissions';
+
 type Role = {
     id: number;
     roleName: string;
@@ -17,13 +18,17 @@ type Role = {
     canReviewRequests: boolean;
 };
 
+type RoleForm = Omit<Role, 'id'>;
+
 type Props = {
     tagId: number;
     roles: Role[];
     capabilities: TagCapabilities;
 };
 
-const PERMISSION_FIELDS: { key: keyof Role; label: string }[] = [
+type PermissionKey = { [K in keyof RoleForm]: RoleForm[K] extends boolean ? K : never; } [keyof RoleForm];
+
+const PERMISSION_FIELDS: { key: PermissionKey; label: string }[] = [
     { key: 'canManageMembers', label: 'Gérer les membres' },
     { key: 'canManageRoles', label: 'Gérer les rôles' },
     { key: 'canEditInfo', label: 'Éditer les infos du tag' },
@@ -84,8 +89,8 @@ export default function TagRolesPanel({ tagId, roles, capabilities }: Props) {
         });
     }
 
-    function handleDelete(roleId: number) {
-        if (!confirm("Supprimer ce rôle ? Les membres l'ayant perdront leur accès lié.")) return;
+    function handleDelete(roleId : number) {
+        if (!confirm("Supprimer ce rôle ? Les membres l'ayant perdront leur accès lié.")) return; //TODO language
         setError(null);
         startTransition(async () => {
             try {
@@ -162,7 +167,7 @@ export default function TagRolesPanel({ tagId, roles, capabilities }: Props) {
                             <label key={f.key} className="flex items-center gap-2 text-sm">
                                 <input
                                     type="checkbox"
-                                    checked={form[f.key] as boolean}
+                                    checked={form[f.key]}
                                     onChange={(e) => setForm({ ...form, [f.key]: e.target.checked })}
                                 />
                                 {f.label}

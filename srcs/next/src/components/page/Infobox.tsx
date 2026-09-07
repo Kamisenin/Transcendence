@@ -5,6 +5,7 @@ import { GripVertical, Trash2, Eye, Image as ImageIcon } from "lucide-react";
 
 import VisibilityToggler from "@/components/page/VisibilityToggler";
 import CreateTagModal from "@/components/tags/CreateTagModal";
+import { useTranslations } from "next-intl";
 import { Tag } from "../tags/tagType";
 import InfoboxPreview from "./InfoboxPreview";
 import TitleInput from "./TitleInput";
@@ -23,7 +24,7 @@ export type InfoboxData = {
 };
 
 type Props = {
-    accountId: string
+    accountId: string | undefined
     id: string;
     pageId: number;
     data: InfoboxData;
@@ -35,10 +36,11 @@ type Props = {
 };
 
 export default function Infobox({ accountId, id, pageId, data, onChange, onDelete, isReadOnly = false, canonicalNamespace }: Props) {
+    const t = useTranslations("Page");
     const [isPreview, setIsPreview] = useState(isReadOnly);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
-    const updateField = (key: keyof InfoboxData, value: any) => onChange({ ...data, [key]: value });
+    const updateField = (key: keyof InfoboxData, value: any) => onChange?.({ ...data, [key]: value });
 
     if (isReadOnly || isPreview) {
         return (
@@ -84,6 +86,7 @@ export default function Infobox({ accountId, id, pageId, data, onChange, onDelet
                 <DescriptionInput value={data.description} onChange={(val) => updateField("description", val)} />
 
                 <TagManager
+                    accountId={accountId!}
                     pageId={pageId}
                     data={data}
                     onChange={onChange}
@@ -94,7 +97,7 @@ export default function Infobox({ accountId, id, pageId, data, onChange, onDelet
             <CreateTagModal
                 isOpen={isCreateModalOpen}
                 onClose={() => setIsCreateModalOpen(false)}
-                onTagCreated={(newTag) => onChange({ ...data, tags: [...(data.tags || []), newTag] })}
+                onTagCreated={(newTag) => onChange?.({ ...data, tags: [...(data.tags || []), newTag] })}
             />
 
             <VisibilityToggler

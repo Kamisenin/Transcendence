@@ -2,8 +2,11 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 export default function VerifyPage() {
+    const t = useTranslations("Auth.verify");
+    const tCommon = useTranslations("Common");
     const [code, setCode] = useState("");
     const [message, setMessage] = useState("");
     const [loading, setLoading] = useState(false);
@@ -13,7 +16,6 @@ export default function VerifyPage() {
         event.preventDefault();
         setLoading(true);
         setMessage("");
-
         const res = await fetch("/api/auth/verify", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -21,10 +23,10 @@ export default function VerifyPage() {
         });
         const data = await res.json();
         if (res.ok) {
-            setMessage("Email verified!");
+            setMessage(t("emailVerified"));
             router.push("/");
         } else {
-            setMessage(data.error || "something went wrong");
+            setMessage(data.error || tCommon("somethingWentWrong"));
         }
         setLoading(false);
     }
@@ -33,12 +35,13 @@ export default function VerifyPage() {
         setMessage("");
         const res = await fetch("/api/auth/resend_code", { method : "POST" });
         const data = await res.json();
-        setMessage(res.ok ? "Code resent" : (data.error || "Something went wrong"));
+        setMessage(res.ok ? t("codeResent") : (data.error || tCommon("somethingWentWrong")));
     }
+
     return (
         <div className="flex flex-col items-center justify-center min-h-screen">
-            <h1 className="text-2xl font-bold mb-4">Verify your email</h1>
-            <p className="text-sm text-gray-600 mb-4">We sent a code to your email.</p>
+            <h1 className="text-2xl font-bold mb-4">{t("title")}</h1>
+            <p className="text-sm text-gray-600 mb-4">{t("subtitle")}</p>
             <form onSubmit={handleSubmit} className="flex flex-col gap-3 w-80">
                 <input
                     type="text"
@@ -52,11 +55,11 @@ export default function VerifyPage() {
                     type="submit"
                     disabled={loading}
                     className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
-                        {loading ? "Verifying..." : "Verify"}
+                        {loading ? t("verifying") : t("verify")}
                     </button>
             </form>
             <button onClick={handleResend} className="text-sm text-blue-500 underline mt-4">
-                Resend code
+                {t("resendCode")}
             </button>
             {message && <p className="text-sm  mt-4">{message}</p>}
         </div>

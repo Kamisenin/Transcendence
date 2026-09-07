@@ -9,7 +9,6 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     let username = '';
 
-    console.log(body)
     if (!body.password || !body.email || !body.accountId) {
         return NextResponse.json({error: "Field Required"}, {status: 400});
     }
@@ -18,7 +17,6 @@ export async function POST(req: NextRequest) {
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(body.password, salt);
-    console.log("Password ready to be registered : ", hashedPassword);
 
     if (body.username) username = body.username;
 

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/app/lib/session";
-import { compare, genSalt, hash} from "bcrypt";
+import { compare, genSalt, hash} from 'bcrypt';
 import { prisma } from "%/lib/prisma/prisma";
 
 export async function POST(req: NextRequest) {

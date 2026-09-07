@@ -2,6 +2,8 @@
 
 import { useState, useTransition } from 'react';
 import { assignTagRole, removeTagMember } from '@/actions/tags';
+import AddMember from './AddMember';
+
 import type { TagCapabilities } from '%/lib/tag_permissions';
 
 type Role = {
@@ -10,11 +12,11 @@ type Role = {
     hierarchyLevel: number;
 };
 
-type Member = {
+export type Member = {
     tagId: number;
     userToken: string;
     roleId: number;
-    user: { token: string; username: string; imgLink: string };
+    user: { user_id: string; username: string; imgLink: string };
     role: Role;
 };
 

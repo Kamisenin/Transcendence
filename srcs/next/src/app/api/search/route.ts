@@ -12,37 +12,55 @@ export async function GET(req: NextRequest) {
 	return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const userId = user.user_id
-  const queryWords = query.split(" ").filter((w: string) => w.length > 2).join(" ")
+  const queryWords = query.split(" ").filter((w: string) => w.length > 0).join(" ")
 
   if (!queryWords)
 	return NextResponse.json({ error: "Query too short" }, { status: 400 })
-
-  const pages = await prisma.$queryRaw`
+const pages = await prisma.$queryRaw`
 	SELECT DISTINCT p.page_id, p.title,
-	  array_agg(t.name) as tags
+	 ps.namespace, ps.slug,
+	 u.username as owner_username,
+	 array_agg(t.name) FILTER (WHERE t.name IS NOT NULL) as tags
 	FROM pages p
-	JOIN tag_pages tp ON tp.page_id = p.page_id
-	JOIN tags t ON t.id = tp.tag_id
+	LEFT JOIN tag_pages tp ON tp.page_id = p.page_id
+	LEFT JOIN tags t ON t.id = tp.tag_id
+	JOIN page_slugs ps ON ps.page_id = p.page_id
+		AND ps.is_canonical = true
+	JOIN users u ON u.user_id = p.owner_id
 	WHERE (
-	  EXISTS (SELECT 1 FROM page_permissions pp WHERE pp.page_id = p.page_id AND pp.user_token = ${userId})
-	  OR EXISTS (SELECT 1 FROM tag_members tm WHERE tm.tag_id = tp.tag_id AND tm.user_token = ${userId})
+		p.public = true
+		OR p.owner_id = ${userId}
+		OR EXISTS (
+			SELECT 1
+			FROM page_permissions pp
+			WHERE pp.page_id = p.page_id
+			AND pp.user_token = ${userId}
+		)
+		OR EXISTS (
+			SELECT 1
+			FROM tag_members tm
+			WHERE tm.tag_id = tp.tag_id
+			AND tm.user_token = ${userId}
+		)
 	)
-	AND similarity(t.name, ${queryWords}) > 0.15
-	GROUP BY p.page_id, p.title
+	AND (similarity(t.name, ${queryWords}) > 0.15 OR similarity(p.title, ${queryWords}) > 0.15)
+	GROUP BY p.page_id, p.title, ps.namespace, ps.slug, u.username
   `
 
   const items = (pages as any[]).map(page => ({
 	id: page.page_id,
 	title: page.title,
-	tags: page.tags
-  }))
-
+	tags: page.tags ?? [],
+	namespace: page.namespace,
+	slug: page.slug,
+	owner: page.owner_username
+}))
   let response
   try {
 	response = await fetch(`${process.env.SEARCH_ENGINE_URL || "http://search-engine:8000"}/search`, {
-	  method: "POST",
-	  headers: { "Content-Type": "application/json" },
-	  body: JSON.stringify({ query, items })
+	 method: "POST",
+	 headers: { "Content-Type": "application/json" },
+	 body: JSON.stringify({ query, items })
 	})
   } catch (err) {
 	return NextResponse.json({ error: "Search service unavailable" }, { status: 503 })
@@ -51,5 +69,7 @@ export async function GET(req: NextRequest) {
   if (!response.ok)
 	return NextResponse.json({ error: "Search service error" }, { status: 502 })
 
-  return NextResponse.json(await response.json())
+  const searchResult = await response.json()
+
+  return NextResponse.json(searchResult);
 }

@@ -6,4 +6,7 @@ export DATABASE_URL="postgres://website_db_admin:${PSSWD}@127.0.0.1:5432/WEBSITE
 export SEARCH_ENGINE_URL="http://localhost:8000"
 export FTCHAN_MODE="dev"
 
+export GMAIL_USER=$(cat secrets/gmail_user.txt)
+export GMAIL_APP_PASSWORD=$(cat secrets/gmail_app_pwd.txt)
+
 npm run dev --prefix srcs/next/

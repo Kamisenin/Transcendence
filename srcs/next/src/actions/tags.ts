@@ -217,7 +217,7 @@ export async function checkTagNamespaceAvailability(namespace: string): Promise<
     const cleanNamespace = namespace.trim();
     if (!cleanNamespace) return { available: true };
 
-    const existingUser = await prisma.user.findFirst({
+    const existingUser = await prisma.user.findUnique({
         where: { accountId: cleanNamespace }
     });
 
@@ -225,7 +225,7 @@ export async function checkTagNamespaceAvailability(namespace: string): Promise<
         return { available: false, message: "This namespace is already used." };
     }
 
-    const existingTag = await prisma.tag.findFirst({
+    const existingTag = await prisma.tag.findUnique({
         where: { namespace: cleanNamespace }
     });
 
@@ -236,18 +236,18 @@ export async function checkTagNamespaceAvailability(namespace: string): Promise<
     return { available: true };
 }
 
-export async function checkTagNameAvailability(name: string, namespace?: string) {
+export async function checkTagNameAvailability(name: string) {
     const trimmed = name.trim();
     if (!trimmed) return { available: null as boolean | null };
 
-    const taken = await tagNameExists(trimmed, namespace ?? null);
+    const taken = await tagNameExists(trimmed);
     return { available: !taken, message: taken ? "This name is already taken" : undefined };
 }
 
 async function tagNameExists(name: string): Promise<boolean> {
     return (await prisma.tag.findUnique({
         where: { name }
-    }))
+    }) ? true : false)
 }
 
 export async function createTagAction(data: { name: string; namespace?: string; colorHex?: string }) {
@@ -255,10 +255,7 @@ export async function createTagAction(data: { name: string; namespace?: string; 
     const name = data.name.trim();
     if (!name) throw new Error("Tag name is required.");
 
-    const existingName = await prisma.tag.findUnique({
-        where: { name }
-    });
-    if (existingName) {
+    if (await tagNameExists(name)) {
         throw new Error("This tag name is taken.");
     }
 
@@ -336,17 +333,16 @@ export async function addTagMember(tagId: number, targetUserToken: string, roleI
     revalidatePath(`/tags/${tagId}`);
 }
 
-export async function deleteTag(
-    prisma: PrismaClient,
-    tagId: number,
-    userId: string
-): Promise<void> {
+export async function deleteTag(tagId: number): Promise<void> {
+
+    const user = await requireUser();
+    const userToken = user.user_id;
     const tag = await prisma.tag.findUnique({
         where: { id: tagId },
         include: {
-            permissions: { where: { userToken: userId } },
+            permissions: { where: { userToken } },
             members: {
-                where: { userToken: userId },
+                where: { userToken },
                 include: { role: true },
             },
         },
@@ -355,12 +351,12 @@ export async function deleteTag(
     if (!tag)
         redirect("/");
 
-    const isOwner = tag.ownerToken === userId;
+    const isOwner = tag.ownerToken === userToken;
     const hasDirectPermission = tag.permissions.some((p) => p.canDeleteTag);
     const hasRolePermission = tag.members.some((m) => m.role.canDeleteTag);
 
     if (!isOwner && !hasDirectPermission && !hasRolePermission)
-        throw new PermissionError("Forbidden");
+        throw new TagPermissionError("Forbidden");
 
     await prisma.tag.delete({ where: { id: tagId } });
     redirect("/");

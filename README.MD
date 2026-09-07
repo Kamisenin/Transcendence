@@ -35,10 +35,10 @@ to a specific role inside the tag, which will allow the people with this role an
 
 Now there is a last situation you can be in. Maybe the person with th **Longsword** tag has a lot of tags, Like the **Sword** tag,
 the **saber** tag, the *One Handed sword* tag and would want to centralize all the permissions of those tags inside one role. <br/>
-Introducing ===**Organizations**=== <br/>
+Introducing **Organizations** <br/>
 Organizations allows you to add tags to them and associate roles inside the organization to role inside the managed Tags ! 
 
-[^1]: Federschwert are a type of Longsword that was made in germany during the 16^th^ century with no cutting edge to use it for sports
+[^1]: Federschwert are a type of Longsword that was made in germany during the 16th century with no cutting edge to use it for sports
 
 ---
 # Instructions
@@ -100,7 +100,26 @@ if they are not strong enough someone could break through the password and have 
 ```bash
 db_root_pwd.txt # is the password of the root user of the database
 db_website_pwd.txt # is the password of the WEBSITE database admin
+gmail_app_pwd.txt # Your gmail application password for sending automated mail
+gmail_user # The associated google account
 ```
+
+### Gmail Configuration
+
+Inside the `/next` folder, create a `.env` file:
+
+```env
+GMAIL_USER="your-gmail-address@gmail.com"
+GMAIL_APP_PASSWORD="xxxx xxxx xxxx xxxx"
+```
+
+To get a **Gmail App Password**:
+
+1. Go to your Google Account → **Security**.
+2. Enable **2-Step Verification** if it is not already enabled.
+3. Search for **App passwords**.
+4. Create a new app password for the project, for example `Transcendence`.
+5. Copy the generated password into `GMAIL_APP_PASSWORD`.
 
 ---
 

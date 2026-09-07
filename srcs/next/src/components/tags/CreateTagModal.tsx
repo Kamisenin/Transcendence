@@ -42,7 +42,7 @@ export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props)
         }
         setNameStatus({ checking: true, available: null });
         const timer = setTimeout(async () => {
-            const res = await checkTagNameAvailability(name, namespace.trim() || undefined);
+            const res = await checkTagNameAvailability(name);
             setNameStatus({ checking: false, available: res.available, message: res.message });
         }, 400);
         return () => clearTimeout(timer);

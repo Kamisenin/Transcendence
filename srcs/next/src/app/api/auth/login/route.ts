@@ -5,12 +5,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { compare } from 'bcrypt';
 import { cookies } from "next/headers";
 import { prisma } from "%/lib/prisma/prisma"
+import { DELETED_USER_EMAIL } from "%/lib/delete_user"
 
 export async function POST(req: NextRequest) {
     const body = await req.json();
 
     if (!body.id || !body.password)
         return NextResponse.json({error: "Field Required"}, {status: 400});
+
+    if (body.id === DELETED_USER_EMAIL || body.id === "DELETED_USER")
+        return NextResponse.json({error: "Invalid credentials"}, {status: 401});
 
     const user = await getUser(body.id);
     if (!user)

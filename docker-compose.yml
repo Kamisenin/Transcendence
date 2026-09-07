@@ -32,22 +32,24 @@ services:
       - ADDRESS=${ADDRESS}
     extra_hosts:
       - "host.parent:host-gateway"
+    networks :
+      - 42chan
 
-  yjs:
-    container_name: yjs
-    build: srcs/yjs
-    restart: unless-stopped
   next:
     container_name: next
     build: srcs/next/
     restart: unless-stopped
     secrets:
       - db_website_pwd
+      - gmail_app_pwd
+      - gmail_user
     depends_on:
       - postgres
     profiles: ["prod"]
     volumes:
       next_uploads:/app/data/uploads
+    networks:
+      - 42chan
 
   search-engine:
     container_name: search
@@ -58,11 +60,28 @@ services:
     ports: 
       - 8000:8000
 
+  recommendation:
+    container_name: recommendation
+    build: srcs/apiRecommendation/
+    restart: unless-stopped
+    secrets:
+      - db_website_pwd
+    depends_on:
+      - postgres
+    ports:
+      - "8001:8001"
+    networks:
+      - 42chan
+
 secrets:
   db_root_pwd:
     file: secrets/db_root_pwd.txt
   db_website_pwd:
     file : secrets/db_website_pwd.txt
+  gmail_app_pwd:
+    file : secrets/gmail_app_pwd.txt
+  gmail_user:
+    file : secrets/gmail_user.txt
 
 volumes:
   pgdata:

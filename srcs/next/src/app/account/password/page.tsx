@@ -2,8 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 export default function ChangePasswordPage() {
+    const t = useTranslations("Auth.changePassword");
+    const tCommon = useTranslations("Common");
     const [step, setStep] = useState(1);
     const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
@@ -26,7 +29,7 @@ export default function ChangePasswordPage() {
         if (res.ok) {
             setStep(2);
         } else {
-            setMessage(data.error || "Something went wrong")
+            setMessage(data.error || tCommon("somethingWentWrong"))
         }
         setLoading(false);
     }
@@ -36,7 +39,7 @@ export default function ChangePasswordPage() {
         setMessage("");
 
         if (newPassword !== confirmPassword) {
-            setMessage("Passwords do not match");
+            setMessage(t("passwordsDoNotMatch"));
             return ;
         }
         setLoading(true);
@@ -50,21 +53,21 @@ export default function ChangePasswordPage() {
         if (res.ok) {
             router.push("/account");
         } else {
-            setMessage(data.error || "Something went wrong")
+            setMessage(data.error || tCommon("somethingWentWrong"))
         }
         setLoading(false);
     }
     return (
         <div className="flex flex-col items-center justify-center min-h-screen">
-            <h1 className="text-2xl font-bold mb-4">Change password</h1>
+            <h1 className="text-2xl font-bold mb-4">{t("title")}</h1>
             {step === 1 && (
                 <form onSubmit={handleStep1} className="flex flex-col gap-3 w-80">
-                    <p className="text-sm text-gray-600">Enter your current password</p>
+                    <p className="text-sm text-gray-600">{t("enterCurrent")}</p>
                     <input
                         type="password"
                         value={currentPassword}
                         onChange={(e) => setCurrentPassword(e.target.value)}
-                        placeholder="Current password"
+                        placeholder={t("currentPlaceholder")}
                         className="border p-2 rounded text-black" 
                         required
                     />
@@ -72,19 +75,19 @@ export default function ChangePasswordPage() {
                         type="submit"
                         disabled={loading}
                         className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
-                        {loading ? "Checking..." : "Next"}
+                        {loading ? t("checking") : t("next")}
                     </button>
                 </form>
             )}
 
             {step === 2 && (
                 <form onSubmit={handleStep2} className="flex flex-col  gap-3 w-80">
-                    <p className="text-sm text-gray-600">Please put your new password</p>
+                    <p className="text-sm text-gray-600">{t("enterNew")}</p>
                     <input
                         type="password"
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
-                        placeholder="New password"
+                        placeholder={t("newPlaceholder")}
                         className="border p-2 rounded text-black"
                         required
                     />
@@ -92,7 +95,7 @@ export default function ChangePasswordPage() {
                         type="password"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        placeholder="confirm new password"
+                        placeholder={t("confirmPlaceholder")}
                         className="border p-2 rounded text-black"
                         required
                     />
@@ -100,7 +103,7 @@ export default function ChangePasswordPage() {
                         type="submit"
                         disabled={loading}
                         className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
-                        {loading ? "Saving..." : "Change password"}
+                        {loading ? tCommon("saving") : t("submit")}
                     </button>
                 </form>
             )}

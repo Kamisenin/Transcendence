@@ -24,6 +24,10 @@ enum SlugType {
   TAG
 }
 
+enum NotificationType {
+  PAGE_EDITED
+}
+
 
 // ════════════════════════════════════════════
 // USERS
@@ -31,7 +35,7 @@ enum SlugType {
 
 model User {
   user_id   String   @id @default(uuid())
-  accountId String?  @map("account_id") @unique
+  accountId String   @map("account_id") @unique
   username  String
   firstName String?  @map("first_name")
   lastName  String?  @map("last_name")
@@ -56,11 +60,18 @@ model User {
   tagPermissions  TagPermission[]
   pagePermissions PagePermission[]
   orgMemberships  OrganizationMember[]
+  pageReactions PageReaction[]
 
   tagPageRequestsMade     TagPageRequest[] @relation("RequestedBy")
   tagPageRequestsReviewed TagPageRequest[] @relation("ReviewedBy")
 
   uploads  Upload[]  @relation("FileOwner")
+
+  editedPages         Page[]         @relation("PageLastEditor")
+  notifications       Notification[] @relation("NotificationRecipient")
+  notificationsCaused Notification[] @relation("NotificationActor")
+
+  userInterests UserTagInterest[]
 
   @@map("users")
 }
@@ -102,7 +113,7 @@ model Tag {
   name        String   @unique
   description String?
   createdAt   DateTime @default(now()) @map("created_at")
-  namespace   String?
+  namespace   String?  @unique
   color       Int?
 
   owner       User            @relation("TagOwner", fields: [ownerToken], references: [user_id])
@@ -117,6 +128,9 @@ model Tag {
 
   orgTagAccess     OrgTagAccess[]
   orgTagCapability OrgTagCapability[]
+
+  userInterests UserTagInterest[]
+  statistic     TagStatistic?
 
   @@map("tags")
 }
@@ -193,9 +207,11 @@ model Page {
   ownerId      String   @map("owner_id")
   createdAt    DateTime @default(now()) @map("created_at")
   lastModified DateTime @updatedAt @map("last_modified")
+  lastEditedById String? @map("last_edited_by_id")
   public       Boolean  @default(false)
 
-  owner User @relation("PageOwner", fields: [ownerId], references: [user_id])
+  owner      User  @relation("PageOwner", fields: [ownerId], references: [user_id])
+  lastEditor User? @relation("PageLastEditor", fields: [lastEditedById], references: [user_id], onDelete: SetNull)
 
   permissions PagePermission[]
   tagPages    TagPage[]
@@ -207,7 +223,11 @@ model Page {
   orgPageAccess     OrgPageAccess[]
   orgPageCapability OrgPageCapability[]
 
+  pageReactions PageReaction[]
+
   slugs             PageSlug[]
+
+  notifications Notification[]
 
   @@map("pages")
 }
@@ -255,6 +275,23 @@ model TagPage {
 
   @@id([tagId, pageId])
   @@map("tag_pages")
+}
+
+model Notification {
+  id          Int              @id @default(autoincrement())
+  recipientId String           @map("recipient_id")
+  actorId     String?          @map("actor_id")
+  pageId      Int?             @map("page_id")
+  type        NotificationType @default(PAGE_EDITED)
+  read        Boolean          @default(false)
+  createdAt   DateTime         @default(now()) @map("created_at")
+
+  recipient User  @relation("NotificationRecipient", fields: [recipientId], references: [user_id], onDelete: Cascade)
+  actor     User? @relation("NotificationActor", fields: [actorId], references: [user_id], onDelete: SetNull)
+  page      Page? @relation(fields: [pageId], references: [pageId], onDelete: Cascade)
+
+  @@index([recipientId, read])
+  @@map("notifications")
 }
 
 model TagPageRequest {
@@ -428,4 +465,52 @@ model OrgTagCapability {
 
   @@id([orgId, tagId, roleId])
   @@map("org_tag_capability")
+}
+
+
+// ════════════════════════════════════════════
+// RECOMMENDATIONS / INTERESTS
+// ════════════════════════════════════════════
+
+model UserTagInterest {
+  userId String @map("user_id")
+  tagId  Int    @map("tag_id")
+  weight Float  @default(0)
+
+  user User @relation(fields: [userId], references: [user_id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([userId, tagId])
+  @@index([userId])
+  @@map("user_tag_interests")
+}
+
+model TagStatistic {
+  tagId             Int   @id @map("tag_id")
+  documentFrequency Int   @default(0) @map("document_frequency")
+  idf               Float @default(1)
+
+  tag Tag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@map("tag_statistics")
+}
+
+
+enum PageReactionType {
+  FAVORITE
+  DISLIKE
+}
+
+model PageReaction {
+  userId    String           @map("user_id")
+  pageId    Int              @map("page_id")
+  type      PageReactionType
+  createdAt DateTime         @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [user_id], onDelete: Cascade)
+  page Page @relation(fields: [pageId], references: [pageId], onDelete: Cascade)
+
+  @@id([userId, pageId])
+  @@index([userId, type])
+  @@map("page_reactions")
 }
