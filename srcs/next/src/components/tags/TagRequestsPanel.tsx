@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { reviewTagPageRequest } from '@/actions/tags';
 
 type PendingRequest = {
@@ -20,6 +21,7 @@ export default function TagRequestsPanel({ requests }: Props) {
     const [isPending, startTransition] = useTransition();
     const [error, setError] = useState<string | null>(null);
     const [handledIds, setHandledIds] = useState<number[]>([]);
+    const t = useTranslations('Tags.requests');
 
     function handleReview(requestId: number, accept: boolean) {
         setError(null);
@@ -44,7 +46,7 @@ export default function TagRequestsPanel({ requests }: Props) {
             )}
 
             {visible.length === 0 ? (
-                <p className="text-sm text-gray-400">Aucune demande en attente.</p>
+                <p className="text-sm text-gray-400">{t('noPendingRequests')}</p>
             ) : (
                 <div className="divide-y border rounded-lg overflow-hidden">
                     {visible.map(req => (
@@ -52,8 +54,7 @@ export default function TagRequestsPanel({ requests }: Props) {
                             <div>
                                 <p className="text-sm">
                                     <span className="font-medium">{req.requester.username}</span>
-                                    {' '}demande à ajouter la page{' '}
-                                    <span className="font-medium">{req.page.title || 'Sans titre'}</span>
+                                    {' '}{t('requestText', { username: req.requester.username, title: req.page.title || t('untitled') })}
                                 </p>
                                 <p className="text-xs text-gray-400">
                                     {new Date(req.createdAt).toLocaleDateString()}
@@ -65,14 +66,14 @@ export default function TagRequestsPanel({ requests }: Props) {
                                     disabled={isPending}
                                     className="text-xs bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded"
                                 >
-                                    Accepter
+                                    {t('accept')}
                                 </button>
                                 <button
                                     onClick={() => handleReview(req.id, false)}
                                     disabled={isPending}
                                     className="text-xs bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded"
                                 >
-                                    Refuser
+                                    {t('reject')}
                                 </button>
                             </div>
                         </div>

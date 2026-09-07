@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import type { Organization } from '@prisma/client';
 
     type OrgWithAccess = Organization & {
@@ -10,13 +11,16 @@ import type { Organization } from '@prisma/client';
 };
 
 export default function OrgDetails({ org }: { org: OrgWithAccess }) {
+    const t = useTranslations('Orgs');
+    const createdDate = org.createdAt ? new Date(org.createdAt).toLocaleDateString() : '—';
+
     return (
             <div className="max-w-6xl mx-auto">
                     <div className="bg-white border border-gray-200 rounded-md shadow-sm p-6">
                         <header className="flex items-start justify-between gap-4">
                             <div>
                                 <h1 className="text-2xl font-semibold text-gray-900">{org.name}</h1>
-                                <p className="text-sm text-gray-500 mt-1">Created {org.createdAt?.toString() || '—'}</p>
+                                <p className="text-sm text-gray-500 mt-1">{t('created', { date: createdDate })}</p>
                             </div>
 
                             <div className="flex items-center gap-2">
@@ -24,7 +28,7 @@ export default function OrgDetails({ org }: { org: OrgWithAccess }) {
                                     href={`/orgs/${encodeURIComponent(org.name)}/manage`}
                                     className="inline-flex items-center px-3 py-1.5 rounded-md text-sm font-medium bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
                                 >
-                                    Manage organization
+                                    {t('manageOrganization')}
                                 </Link>
                             </div>
                         </header>
@@ -32,7 +36,7 @@ export default function OrgDetails({ org }: { org: OrgWithAccess }) {
             <section className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div className="col-span-1 md:col-span-2 space-y-6">
                             <div>
-                                <h2 className="font-medium text-gray-900 mb-2">Roles</h2>
+                                <h2 className="font-medium text-gray-900 mb-2">{t('roles')}</h2>
                                 <div className="rounded-md border border-gray-100 bg-gray-50 p-3">
                                     <ul className="space-y-2">
                                         {org.roles && org.roles.length > 0 ? (
@@ -42,14 +46,14 @@ export default function OrgDetails({ org }: { org: OrgWithAccess }) {
                                                         </li>
                                                 ))
                                         ) : (
-                                            <div className="text-sm text-gray-500">No role found</div>
+                                            <div className="text-sm text-gray-500">{t('noRoleFound')}</div>
                                         )}
                                     </ul>
                                 </div>
                             </div>
 
                             <div>
-                                <h2 className="font-medium text-gray-900 mb-2">Pages</h2>
+                                <h2 className="font-medium text-gray-900 mb-2">{t('pages')}</h2>
                                 {org.orgPageAccess && org.orgPageAccess.length > 0 ? (
                                     <ul className="space-y-2">
                                             {org.orgPageAccess.map((a: any) => {
@@ -64,11 +68,11 @@ export default function OrgDetails({ org }: { org: OrgWithAccess }) {
                                                         >
                                                             <div>
                                                                     <div className="font-medium text-gray-900">{page.title || `Page #${page.pageId}`}</div>
-                                                                    <div className="text-sm text-gray-500">Permissions: {a.permissions || '—'}</div>
+                                                                    <div className="text-sm text-gray-500">{t('permissionsLabel', { defaultValue: 'Permissions' })}: {a.permissions || '—'}</div>
                                                                 </div>
                                                             <div className="flex gap-2">
                                                                     <Link href={pageLink} className="text-sm text-blue-600 hover:underline">
-                                                                        View
+                                                                        {t('view')}
                                                                     </Link>
                                                                 </div>
                                                         </li>
@@ -76,14 +80,14 @@ export default function OrgDetails({ org }: { org: OrgWithAccess }) {
                                             })}
                                         </ul>
                                 ) : (
-                                    <div className="text-sm text-gray-500">No page found</div>
+                                    <div className="text-sm text-gray-500">{t('noPageFound')}</div>
                                 )}
                             </div>
                         </div>
 
                         <aside className="col-span-1 space-y-6">
                             <div>
-                                <h3 className="font-medium text-gray-900 mb-2">Tags</h3>
+                                <h3 className="font-medium text-gray-900 mb-2">{t('tags')}</h3>
                                 {org.orgTagAccess && org.orgTagAccess.length > 0 ? (
                                     <div className="flex flex-wrap gap-2">
                                             {org.orgTagAccess.map((a: any) => {
@@ -100,12 +104,12 @@ export default function OrgDetails({ org }: { org: OrgWithAccess }) {
                                             })}
                                         </div>
                                 ) : (
-                                    <div className="text-sm text-gray-500">No tag found</div>
+                                    <div className="text-sm text-gray-500">{t('noTagFound')}</div>
                                 )}
                             </div>
 
                             <div>
-                                <h3 className="font-medium text-gray-900 mb-2">Members</h3>
+                                <h3 className="font-medium text-gray-900 mb-2">{t('members')}</h3>
                                 {org.members && org.members.length > 0 ? (
                                     <ul className="space-y-2">
                                             {org.members.map((m: any) => {
@@ -117,14 +121,14 @@ export default function OrgDetails({ org }: { org: OrgWithAccess }) {
                                                                     <Link href={`/users/${profileId}`} className="text-sm font-medium text-blue-600 hover:underline">
                                                                         {user?.username || profileId}
                                                                     </Link>
-                                                                    <div className="text-xs text-gray-500">{m.role?.roleName || 'Member'}</div>
+                                                                    <div className="text-xs text-gray-500">{m.role?.roleName || t('member')}</div>
                                                                 </div>
                                                             </li>
                                                     );
                                             })}
                                         </ul>
                                 ) : (
-                                    <div className="text-sm text-gray-500">No member found</div>
+                                    <div className="text-sm text-gray-500">{t('noMemberFound')}</div>
                                 )}
                             </div>
                         </aside>
