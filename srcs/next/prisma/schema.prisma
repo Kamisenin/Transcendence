@@ -82,12 +82,14 @@ model Session {
 // ════════════════════════════════════════════
 
 model Upload {
-  id          Int     @id @default(autoincrement())
-  ownerToken  String  @map("owner_token")
-  path        String
-  fileSize    BigInt  @map("file_size")
+  id			Int			@id @default(autoincrement())
+  ownerToken	String		@map("owner_token")
+  url			String		@map("url")
+  fileName		String
+  fileSize		BigInt		@map("file_size")
+  createdAt		DateTime	@default(now())
 
-  owner       User    @relation("FileOwner", fields: [ownerToken], references: [user_id])
+  owner			User		@relation("FileOwner", fields: [ownerToken], references: [user_id])
 }
 
 // ════════════════════════════════════════════

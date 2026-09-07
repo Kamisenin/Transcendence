@@ -300,16 +300,123 @@ export default function ImageElement({ attributes, children, element }: any) {
                             onChange={(e) => updateElement({ alt: e.target.value })}
                             className="text-xs p-2 bg-white border rounded-lg outline-none focus:border-blue-500"
                         />
-
-                        <div className="border border-dashed border-gray-200 bg-white rounded-lg p-3 text-center opacity-60 cursor-not-allowed">
-                            <p className="text-[11px] text-gray-400 flex items-center justify-center gap-1">
-                                <Upload size={12} /> Glisser un fichier ou parcourir (Bientôt disponible)
-                            </p>
-                        </div>
+						<UploadButton
+							onUploadSuccess={(path) => {
+							updateElement( { url: path });
+//							setIsEditing(true);
+			//				setTempUrl(path);
+						}}/>
                     </div>
                 )}
             </div>
             {children}
         </div>
     );
+}
+
+export function UploadButton({ onUploadSuccess }: { onUploadSuccess: (path: string) => void }) {
+
+	const [isDragging, setIsDragging] = useState(false)
+	const [isUploading, setIsUploading] = useState(false)
+	
+	function handleUpload(event: React.ChangeEvent<HTMLInputElement>) {
+		const file = event.target.files?.[0]
+
+		if (!file) return
+
+		uploadFile(file)
+	}
+
+	function handleDragOver(event: React.DragEvent<HTMLDivElement>) {
+		event.preventDefault()
+		event.stopPropagation()
+
+		setIsDragging(true)
+	}
+
+	function handleDragLeave(event: React.DragEvent<HTMLDivElement>) {
+		event.preventDefault()
+		event.stopPropagation()
+
+		setIsDragging(false)
+	}
+
+	function handleDrop(event: React.DragEvent<HTMLDivElement>) {
+		event.preventDefault()
+		event.stopPropagation()
+
+		setIsDragging(false)
+
+		const file = event.dataTransfer.files?.[0]
+
+		if (!file) return
+
+		uploadFile(file)
+	}
+
+	async function uploadFile(file: File) {
+		if (!file.type.startsWith("image/")) {
+			alert("Veuillez sélectionner une image.")
+			return
+		}
+
+		if (file.size > 10 * 1024 * 1024) {
+			alert("L'image ne doit pas dépasser 10 Mo.")
+			return
+		}
+		try {
+			setIsUploading(true)
+			const formData = new FormData()
+			formData.append("file", file)
+
+			const response = await fetch("/api/upload", {
+				method: "POST",
+				body: formData,
+			})
+			if (!response.ok) {
+				throw new Error("Erreur lors de l'upload")
+			}
+
+			const data = await response.json()
+
+			onUploadSuccess(data.path);
+		} catch (error) {
+			console.error(error)
+			alert("Impossible d'envoyer l'image.")
+		} finally {
+			setIsUploading(false)
+		}
+	}
+
+	return (
+		<div
+			onDragOver={handleDragOver}
+			onDragLeave={handleDragLeave}
+			onDrop={handleDrop}
+		
+			className={`
+				border border-dashed rounded-lg p-3 text-center
+				transition-colors duration-200
+				${
+					isDragging
+						? "border-blue-500 bg-blue-50"
+						: "border-gray-200 bg-white"
+				}
+			`}
+		>
+			<label>
+				<span className="text-[11px] text-gray-500">
+					Glissez une image ici ou cliquez pour parcourir
+				</span>
+				<br />
+				<span className="mt-1 text-[10px] text-gray-400">
+					PNG, JPG, WEBP · 10 Mo max
+				</span>
+
+				<p className="text-[11px] text-gray-400 flex items-center justify-center gap-1">
+					<input type="file" accept="image/*" className="hidden" onChange={handleUpload}/> 
+				</p>
+			</label>
+		</div>
+	)
 }

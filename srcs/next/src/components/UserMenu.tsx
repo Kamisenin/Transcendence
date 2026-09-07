@@ -68,6 +68,9 @@ export default function UserMenu({ user }: UserMenuProps) {
                     <Link href="/orgs/" className="block px-4 py-2 hover:bg-gray-100">
                         My organizations
                     </Link>
+                    <Link href="/tags" className="block px-4 py-2 hover:bg-gray-100">
+                        tags
+                    </Link>
                     <button
                         onClick={handleCreatePage}
                         disabled={creating}
@@ -77,6 +80,9 @@ export default function UserMenu({ user }: UserMenuProps) {
                     <Link href="/settings" className="block px-4 py-2 hover:bg-gray-100">
                         Settings
                     </Link>
+					<Link href="/uploads-manager" className="block px-4 py-2 hover:bg-gray-100">
+						Upload Manager
+					</Link >
                     <button onClick={handleLogout} className="w-full text-left px-4 py-2 hover:bg-gray-100">
                         Log out
                     </button>

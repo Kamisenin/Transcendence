@@ -46,6 +46,8 @@ services:
     depends_on:
       - postgres
     profiles: ["prod"]
+    volumes:
+      next_uploads:/app/data/uploads
 
   search-engine:
     container_name: search
@@ -69,3 +71,9 @@ volumes:
       o: bind
       type: none
       device: ./data/db
+  next_uploads:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ${NEXT_UPLOADS_PATH}
