@@ -121,9 +121,7 @@ export default function Footer({
         } else {
           setReaction(null);
         }
-      } catch (error) {
-        // Ignorer silencieusement si le service de reco est éteint pour éviter de polluer les logs
-      }
+      } catch (error) {}
     }
 
     fetchReaction();
