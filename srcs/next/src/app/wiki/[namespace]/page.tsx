@@ -28,17 +28,13 @@ export default async function UserWikiPage({ params }: Params) {
   }));
 
   return (
-    <div className="min-h-screen container mx-auto p-6">
+    <div className="min-h-screen container mx-auto p-6 pt-20">
       
-      {/* ==========================================
-          CONTENEUR 1 : Liste avec défilement vertical
-         ========================================== */}
       <section className="bg-card text-card-foreground border border-border rounded-lg p-4 shadow-md">
         <h2 className="text-xl font-bold mb-4">
           Pages créées par {username} ({formattedPages.length})
         </h2>
 
-        {/* Zone à défilement vertical (overflow-y-auto) */}
         <div className="max-h-[600px] overflow-y-auto pr-2 space-y-4 scrollbar-thin">
           {formattedPages.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
