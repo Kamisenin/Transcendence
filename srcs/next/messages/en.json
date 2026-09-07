@@ -157,6 +157,7 @@
 		"deleteOrgWarning": "This will permanently remove {name} and cannot be undone.",
 		"deleting": "Deleting…",
 		"created": "Created {date}",
+		"newOrganization": "Nouvelle organisation",
 		"manageOrganization": "Manage organization",
 		"noRoleFound": "No role found",
 		"noPageFound": "No page found",
