@@ -3,8 +3,8 @@
 import { Organization, Page, User, Friendship, FriendshipStatus } from "@prisma/client";
 import { prisma } from "@/app/lib/prisma/prisma";
 
-export async function getRelation(senderId : string, receiverId : string) : Promise<Friendship> {
-    const relation = await prisma.friendship.findUnique({
+export async function getRelation(senderId : string, receiverId : string) : Promise<Friendship | null> {
+    const relation = await prisma.friendship.findFirst({
     where: {
       OR: [
         { senderId, receiverId },
@@ -22,8 +22,7 @@ export async function isBlocked(senderId : string, receiverId : string) : Promis
     return (relation.status === FriendshipStatus.BLOCKED && relation.receiverId === senderId);
 }
 
-
-export async function getFriends(userId : string) : Promise<Friendship> {
+export async function getFriends(userId : string) : Promise<Friendship[]> {
     const friends = await prisma.friendship.findMany({
     where: {
         status: FriendshipStatus.ACCEPTED,
@@ -47,7 +46,7 @@ export async function addFriends(senderId : string, receiverId : string)
     }
 
     await prisma.friendship.create({
-        where: {
+        data: {
             senderId,
             receiverId
         }
@@ -66,7 +65,7 @@ export async function acceptFriend(shipId : string) {
     if (relation.status === FriendshipStatus.BLOCKED)
         return ;
 
-    await prisma.frienship.update({
+    await prisma.friendship.update({
         where: { id:shipId },
         data: { status : FriendshipStatus.ACCEPTED }
     })
@@ -84,7 +83,7 @@ export async function refuseFriend(shipId : string) {
     if (relation.status === FriendshipStatus.BLOCKED)
         return ;
 
-    await prisma.frienship.delete({
+    await prisma.friendship.delete({
         where: { id:shipId }
     })
 }
@@ -92,7 +91,7 @@ export async function refuseFriend(shipId : string) {
 export async function blockFriend(shipId : string) {
 
     await prisma.friendship.update({
-        where: { id:shipId }
+        where: { id:shipId },
         data: { status: FriendshipStatus.BLOCKED}
     })
 }
