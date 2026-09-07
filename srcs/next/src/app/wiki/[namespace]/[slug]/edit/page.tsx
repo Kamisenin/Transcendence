@@ -42,6 +42,7 @@ export default async function WikiEditPage({ params }: Params) {
             initialBlocks={content?.blocks ?? []}
             visibility={page.public}
             canonicalNamespace={canoNamespace ? canoNamespace.namespace : null}
+            isOwner={page.ownerId === user.user_id}
         />
     );
 }

@@ -11,6 +11,7 @@ import InfoboxPreview from "./InfoboxPreview";
 import TitleInput from "./TitleInput";
 import DescriptionInput from "./DescriptionInput";
 import TagManager from "../tags/TagManager";
+import { addPagePermission } from '@/actions/pages';
 
 export type { Tag };
 
@@ -33,12 +34,20 @@ type Props = {
     isReadOnly?: boolean;
     availableTagsPool?: Tag[];
     canonicalNamespace?: string | null;
+    isOwner?: boolean;
 };
 
-export default function Infobox({ accountId, id, pageId, data, onChange, onDelete, isReadOnly = false, canonicalNamespace }: Props) {
+export default function Infobox({ accountId, id, pageId, data, onChange, onDelete, isReadOnly = false, canonicalNamespace, isOwner = false }: Props) {
     const t = useTranslations("Page");
+    const tCommon = useTranslations("Common");
+    const tTags = useTranslations("Tags");
     const [isPreview, setIsPreview] = useState(isReadOnly);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [isPermModalOpen, setIsPermModalOpen] = useState(false);
+    const [permUser, setPermUser] = useState("");
+    const [permLevel, setPermLevel] = useState<'READ' | 'WRITE' | 'ADMIN'>('READ');
+    const [permError, setPermError] = useState<string | null>(null);
+    const [permLoading, setPermLoading] = useState(false);
 
     const updateField = (key: keyof InfoboxData, value: any) => onChange?.({ ...data, [key]: value });
 
@@ -52,18 +61,48 @@ export default function Infobox({ accountId, id, pageId, data, onChange, onDelet
         );
     }
 
+    async function handleAddPermission() {
+        setPermError(null);
+        setPermLoading(true);
+        try {
+            const res = await addPagePermission(pageId, permUser, permLevel as any);
+            if ((res as any)?.success) {
+                alert(tCommon('saved'));
+                setIsPermModalOpen(false);
+                setPermUser('');
+            } else {
+                setPermError((res as any)?.error || 'Error');
+            }
+        } catch (e: any) {
+            setPermError(e.message || 'Error');
+        } finally {
+            setPermLoading(false);
+        }
+    }
+
     return (
         <div className="group relative h-full w-full bg-white rounded-xl border border-blue-200 ring-1 ring-blue-50 p-4 shadow-sm flex flex-col overflow-hidden">
             {/* En-tête */}
             <div className="pl-7 flex items-center justify-between border-b pb-2 mb-3 shrink-0">
-                <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Page Options</span>
-                <button
-                    type="button"
-                    onClick={() => setIsPreview(true)}
-                    className="flex items-center gap-1 text-xs bg-blue-50 text-blue-600 hover:bg-blue-100 font-medium px-2 py-1 rounded-md transition cursor-pointer"
-                >
-                    <Eye size={13} /> Preview
-                </button>
+                <span className="text-xs font-bold uppercase tracking-wider text-gray-400">{t('options')}</span>
+                <div className="flex items-center gap-2">
+                    {isOwner && (
+                        <button
+                            type="button"
+                            onClick={() => setIsPermModalOpen(true)}
+                            className="flex items-center gap-1 text-xs bg-blue-50 text-blue-600 hover:bg-blue-100 font-medium px-2 py-1 rounded-md transition cursor-pointer"
+                        >
+                            {tTags('roles.managePageAccess')}
+                        </button>
+                    )}
+                    <button
+                        type="button"
+                        onClick={() => setIsPreview(true)}
+                        className="flex items-center gap-1 text-xs bg-blue-50 text-blue-600 hover:bg-blue-100 font-medium px-2 py-1 rounded-md transition cursor-pointer"
+                    >
+                        <Eye size={13} /> {t('editor.preview')}
+                    </button>
+                </div>
             </div>
 
             {/* Formulaire défilant si redimensionné petit en hauteur */}
@@ -72,7 +111,7 @@ export default function Infobox({ accountId, id, pageId, data, onChange, onDelet
 
                 <div>
                     <label className="block text-xs font-medium text-gray-600 mb-1 flex items-center gap-1">
-                        <ImageIcon size={12} /> URL de l'image
+                        <ImageIcon size={12} /> {t('imageUrlLabel')}
                     </label>
                     <input
                         type="text"
@@ -104,6 +143,39 @@ export default function Infobox({ accountId, id, pageId, data, onChange, onDelet
                 isPublic={data.public ?? true}
                 onChange={(newPublicState) => updateField("public", newPublicState)}
             />
+
+            {isPermModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                    <div className="bg-white p-4 rounded-lg w-96">
+                        <h3 className="font-semibold mb-2">{tTags('confirmDeletion') /* reuse a generic label */}</h3>
+                        <p className="text-sm text-gray-600 mb-3">{tTags('managePageAccess')}</p>
+
+                        <div className="mb-3">
+                            <input
+                                placeholder="User token"
+                                value={permUser}
+                                onChange={(e) => setPermUser(e.target.value)}
+                                className="w-full border rounded px-2 py-1 text-sm"
+                            />
+                        </div>
+
+                        <div className="mb-3">
+                            <select value={permLevel} onChange={(e) => setPermLevel(e.target.value as any)} className="w-full border rounded px-2 py-1 text-sm">
+                                <option value="READ">READ</option>
+                                <option value="WRITE">WRITE</option>
+                                <option value="ADMIN">ADMIN</option>
+                            </select>
+                        </div>
+
+                        {permError && <div className="text-sm text-red-600 mb-2">{permError}</div>}
+
+                        <div className="flex gap-2 justify-end">
+                            <button onClick={() => setIsPermModalOpen(false)} className="px-3 py-1 rounded bg-gray-100">{tCommon('cancel')}</button>
+                            <button onClick={handleAddPermission} disabled={permLoading || !permUser.trim()} className="px-3 py-1 rounded bg-blue-600 text-white">{permLoading ? tCommon('saving') : tCommon('save')}</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

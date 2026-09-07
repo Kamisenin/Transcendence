@@ -4,6 +4,7 @@ import { prisma } from '%/lib/prisma/prisma';
 import { getSessionUser, getSessionCookie } from '%/lib/session';
 import { requireUser } from '@/actions/tags'
 import { redirect } from "next/navigation";
+import { randomUUID } from "crypto";
 import { PermissionLevel } from "@prisma/client"
 import { init_slug, syncUserSlugs, slugify, removeTagSlug, setTagSlug } from "%/lib/page/slug";
 import { User, Page } from '@prisma/client';
@@ -144,7 +145,11 @@ export async function savePage(
 ) {
     const user = await requireUser();
 
-    const titleSlug = title.trim() ? slugify(title) : null;
+    if (!title.trim()) {
+        title = `page-${randomUUID()}`;
+    }
+
+    const titleSlug = slugify(title);
 
     if (!titleSlug) {
         return {
@@ -262,6 +267,121 @@ export async function createPage() {
 
     await init_slug(user.accountId, page.pageId);
     redirect(`/wiki/${user.accountId}/${page.pageId}/edit`);
+}
+
+export async function deletePage(pageId: number) {
+    const user = await requireUser();
+
+    const page = await prisma.page.findUnique({
+        where: { pageId },
+        select: { ownerId: true }
+    });
+
+    if (!page) {
+        return { success: false, error: "Page not found." };
+    }
+
+    if (page.ownerId !== user.user_id) {
+        return { success: false, error: "Only the owner can delete this page." };
+    }
+
+    await prisma.page.delete({ where: { pageId } });
+
+    return { success: true };
+}
+
+export async function addPagePermission(pageId: number, userToken: string, level: PermissionLevel) {
+    const user = await requireUser();
+
+    const page = await prisma.page.findUnique({
+        where: { pageId },
+        select: { ownerId: true }
+    });
+
+    if (!page) {
+        return { success: false, error: "Page not found." };
+    }
+
+    if (page.ownerId !== user.user_id) {
+        return { success: false, error: "Only the owner can manage permissions." };
+    }
+
+    if (userToken === user.user_id) {
+        return { success: false, error: "You already own this page." };
+    }
+
+    await prisma.pagePermission.upsert({
+        where: {
+            pageId_userToken: {
+                pageId,
+                userToken
+            }
+        },
+        update: { permissions: level },
+        create: {
+            pageId,
+            userToken,
+            permissions: level
+        }
+    });
+
+    return { success: true };
+}
+
+export async function removePagePermission(pageId: number, userToken: string) {
+    const user = await requireUser();
+
+    const page = await prisma.page.findUnique({
+        where: { pageId },
+        select: { ownerId: true }
+    });
+
+    if (!page) {
+        return { success: false, error: "Page not found." };
+    }
+
+    if (page.ownerId !== user.user_id) {
+        return { success: false, error: "Only the owner can manage permissions." };
+    }
+
+    await prisma.pagePermission.delete({
+        where: {
+            pageId_userToken: {
+                pageId,
+                userToken
+            }
+        }
+    }).catch(() => null);
+
+    return { success: true };
+}
+
+export async function getPagePermissions(pageId: number) {
+    const user = await requireUser();
+
+    const page = await prisma.page.findUnique({
+        where: { pageId },
+        select: { ownerId: true }
+    });
+
+    if (!page || page.ownerId !== user.user_id) {
+        return [];
+    }
+
+    const permissions = await prisma.pagePermission.findMany({
+        where: { pageId },
+        include: {
+            user: { select: { user_id: true, username: true, accountId: true, imgLink: true } }
+        }
+    });
+
+    return permissions.map(p => ({
+        userToken: p.userToken,
+        username: p.user.username,
+        accountId: p.user.accountId,
+        imgLink: p.user.imgLink,
+        level: p.permissions
+    }));
 }
 
 export async function checkTitleAvailability(pageId: number, title: string): Promise<{ available: boolean; slug: string }> {
@@ -384,8 +504,6 @@ async function getUserToken() : Promise<string>
 export async function canEditPage(pageId: number, userToken: string = ""): Promise<boolean> {
     if (userToken.length === 0)
         userToken = await getUserToken();
-    console.log(pageId);
-    console.log(userToken);
     return await hasPageAccess(userToken, pageId, ['WRITE', 'ADMIN']);
 }
 
