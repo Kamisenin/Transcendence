@@ -25,7 +25,8 @@
 		"roles": "Rôles",
 		"pages": "Pages",
 		"tags": "Tags",
-		"byOwner": "par {owner}"
+		"byOwner": "par {owner}",
+		"noImage": "Pas d'image"
 	},
 	"Auth": {
 		"login": {

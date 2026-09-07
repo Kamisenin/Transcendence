@@ -264,7 +264,8 @@
 		"previewMode": "Modo de vista previa",
 		"edit": "Editar",
 		"less": "Menos",
-		"more": "más"
+		"more": "más",
+		"noImage": "Sin imagen"
 	},
 	"Home": {
 		"tagline": "Un wiki para wikis",
