@@ -24,7 +24,8 @@
 		"members": "Miembros",
 		"roles": "Roles",
 		"pages": "Páginas",
-		"tags": "Etiquetas"
+		"tags": "Etiquetas",
+		"byOwner": "por {owner}"
 	},
 	"Auth": {
 		"login": {

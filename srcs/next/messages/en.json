@@ -24,7 +24,8 @@
 		"members": "Members",
 		"roles": "Roles",
 		"pages": "Pages",
-		"tags": "Tags"
+		"tags": "Tags",
+		"byOwner": "by {owner}"
 	},
 	"Auth": {
 		"login": {
