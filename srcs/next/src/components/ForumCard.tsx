@@ -49,10 +49,6 @@ export default function ForumCard({ page, userId, className = "" }: ForumCardPro
   const hasValidImg = page.img && !imgError;
 
   const handleClick = () => {
-      console.log("ForumCard click", {
-    userId,
-    pageId: page.pageId,
-  });
 
   if (!userId) return;
 
