@@ -24,7 +24,7 @@ export default function SearchBar()
 
 	useEffect(() => 
 	{
-		if (query.length < 3)
+		if (query.length < 1)
 		{
 			setResults([]);
 			setSearched(false);
@@ -42,7 +42,7 @@ export default function SearchBar()
 		return () => clearTimeout(timer);
 	}, [query]);
 
-	const showDropdown = query.length >= 3 && (searched || results.length > 0);
+	const showDropdown = query.length >= 1 && (searched || results.length > 0);
 
 	return (
 		<div className="relative">

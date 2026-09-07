@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
 	return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const userId = user.user_id
-  const queryWords = query.split(" ").filter((w: string) => w.length > 2).join(" ")
+  const queryWords = query.split(" ").filter((w: string) => w.length > 0).join(" ")
 
   if (!queryWords)
 	return NextResponse.json({ error: "Query too short" }, { status: 400 })
