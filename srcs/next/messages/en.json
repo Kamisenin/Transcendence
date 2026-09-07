@@ -41,7 +41,7 @@
 			"title": "Create an account",
 			"emailPlaceholder": "Email",
 			"accountNamePlaceholder": "Account name",
-			"userNamePlaceholder" : "Username (optional)",
+			"userNamePlaceholder": "Username (optional)",
 			"passwordPlaceholder": "Password",
 			"submit": "Sign up"
 		},
@@ -104,7 +104,6 @@
 		"username": "Username",
 		"email": "Email",
 		"2fa disable": "Email updated. 2FA has been disabled."
-
 	},
 	"Session": {
 		"loading": "Loading sessions...",
@@ -114,7 +113,7 @@
 		"Since": "Since",
 		"Revoke": "Revoke"
 	},
-		"Terms": {
+	"Terms": {
 		"title": "Terms of Service",
 		"intro": "By using this forum, you agree to follow these Terms of Service.",
 		"respectTitle": "Respect other users",
@@ -128,7 +127,7 @@
 		"changesTitle": "Changes",
 		"changesText": "These terms may be updated when necessary. Continued use of the forum means that you accept the updated terms."
 	},
-		"Privacy": {
+	"Privacy": {
 		"title": "Privacy Policy",
 		"intro": "Your privacy is important to us. This Privacy Policy explains how information is handled when you use our forum.",
 		"informationTitle": "Information we collect",
@@ -156,7 +155,15 @@
 		"remove": "Remove",
 		"addSelected": "Add selected ({count})",
 		"deleteOrgWarning": "This will permanently remove {name} and cannot be undone.",
-		"deleting": "Deleting…"
+		"deleting": "Deleting…",
+		"created": "Created {date}",
+		"manageOrganization": "Manage organization",
+		"noRoleFound": "No role found",
+		"noPageFound": "No page found",
+		"noTagFound": "No tag found",
+		"noMemberFound": "No member found",
+		"member": "Member",
+		"createdLabel": "Created"
 	},
 	"Tags": {
 		"myTags": "My Tags",
@@ -175,7 +182,15 @@
 			"namespacePlaceholder": "Ex: my-namespace",
 			"colorLabel": "Color",
 			"namespaceUnavailable": "The given namespace is unavailable.",
-			"namespaceAvailable": "Namespace available"
+			"namespaceAvailable": "Namespace available",
+			"required": "Tag name is required.",
+			"nameUnavailable": "This tag name is not available.",
+			"namespaceInvalid": "The given namespace is not valid.",
+			"checkingAvailability": "Checking availability...",
+			"checking": "Checking...",
+			"nameAvailable": "Name available",
+			"validNamespace": "Valid namespace",
+			"invalidNamespace": "Invalid namespace"
 		},
 		"members": {
 			"noMemberYet": "No member yet.",
@@ -196,7 +211,11 @@
 			"ownerRoleCannotBeChanged": "Owner role cannot be changed"
 		},
 		"requests": {
-			"noPendingRequests": "No pending requests."
+			"noPendingRequests": "No pending requests.",
+			"requestText": "{username} requests to add the page {title}",
+			"accept": "Accept",
+			"reject": "Reject",
+			"untitled": "Untitled"
 		},
 		"roles": {
 			"noRoleFound": "No role found",
@@ -208,7 +227,14 @@
 			"failedToCreateRole": "Failed to create role",
 			"roleDeleted": "Role deleted",
 			"failedToDeleteRole": "Failed to delete role",
-			"creating": "Creating..."
+			"creating": "Creating...",
+			"newRole": "+ New role",
+			"roleNameLabel": "Role name",
+			"hierarchyLevelLabel": "Rank",
+			"hierarchyHint": "Rank limited to your own level or below",
+			"save": "Save",
+			"cancel": "Cancel",
+			"deleteRoleConfirm": "Delete this role? Members with it will lose their linked access."
 		},
 		"slugNamespace": "Slug Namespace (Optional)",
 		"noneUseAccountOnly": "None (Use only my account)"
@@ -324,5 +350,18 @@
 		"title": "recently edited",
 		"editedBy": "edited by {name} · {time}",
 		"untitled": "Untitled"
+	},
+	"LocaleSwitcher": {
+		"ariaLabel": "Change language"
+	},
+	"DeleteAccount": {
+		"exportData": "Export my data",
+		"deleteAccount": "Delete my account",
+		"irreversible": "This action is irreversible.",
+		"password": "Password",
+		"deleting": "Deleting...",
+		"confirmDeletion": "Confirm deletion",
+		"cancel": "Cancel",
+		"error": "Something went wrong"
 	}
 }
