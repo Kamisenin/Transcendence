@@ -1,0 +1,98 @@
+"use server";
+
+import { Organization, Page, User, Friendship, FriendshipStatus } from "@prisma/client";
+import { prisma } from "@/app/lib/prisma/prisma";
+
+export async function getRelation(senderId : string, receiverId : string) : Promise<Friendship> {
+    const relation = await prisma.friendship.findUnique({
+    where: {
+      OR: [
+        { senderId, receiverId },
+        { senderId: receiverId, receiverId: senderId },
+      ],
+    },
+  });
+  return (relation);
+}
+
+export async function isBlocked(senderId : string, receiverId : string) : Promise<boolean> {
+    const relation = await getRelation(senderId, receiverId);
+    if (!relation)
+        return false;
+    return (relation.status === FriendshipStatus.BLOCKED && relation.receiverId === senderId);
+}
+
+
+export async function getFriends(userId : string) : Promise<Friendship> {
+    const friends = await prisma.friendship.findMany({
+    where: {
+        status: FriendshipStatus.ACCEPTED,
+        OR: [
+        { senderId: userId },
+        { receiverId: userId }
+        ]
+    },
+    include: {
+        sender: true,
+        receiver: true,
+    }
+    });
+    return (friends);
+}
+
+export async function addFriends(senderId : string, receiverId : string)
+{
+    if (senderId === receiverId) {
+        throw new Error("Cannot add yourself");
+    }
+
+    await prisma.friendship.create({
+        where: {
+            senderId,
+            receiverId
+        }
+    })
+}
+
+export async function acceptFriend(shipId : string) {
+
+    const relation = await prisma.friendship.findUnique( {
+        where : { id:shipId }
+    });
+
+    if (!relation)
+        throw new Error("Logic error, cannot go there");
+
+    if (relation.status === FriendshipStatus.BLOCKED)
+        return ;
+
+    await prisma.frienship.update({
+        where: { id:shipId },
+        data: { status : FriendshipStatus.ACCEPTED }
+    })
+}
+
+export async function refuseFriend(shipId : string) {
+
+    const relation = await prisma.friendship.findUnique( {
+        where : { id:shipId }
+    });
+
+    if (!relation)
+        throw new Error("Logic error, cannot go there");
+
+    if (relation.status === FriendshipStatus.BLOCKED)
+        return ;
+
+    await prisma.frienship.delete({
+        where: { id:shipId }
+    })
+}
+
+export async function blockFriend(shipId : string) {
+
+    await prisma.friendship.update({
+        where: { id:shipId }
+        data: { status: FriendshipStatus.BLOCKED}
+    })
+}

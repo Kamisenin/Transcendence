@@ -10,6 +10,18 @@ import { User, Page } from '@prisma/client';
 import { type InfoboxData } from "@/components/page/Infobox"
 import { notifyPageEdit } from "%/lib/notifications";
 
+
+type SimplifiedPage = {
+    pageId: any;
+    title: string;
+    preview: string | null;
+    ownerAccount: string;
+    canonicalSlug: {
+        namespace: string;
+        slug: string;
+    } | null;
+}
+
 function findPreviewImageFromContent(content: any): string | null {
     try {
         if (!content) return null;
@@ -62,14 +74,19 @@ export async function getOwnedPages() {
     });
 }
 
-export async function getAccessiblePages() {
-    const user = await requireUser();
-
-    const userId = user.user_id;
+export async function getAccessiblePages(user_id : string | null) {
+    let user;
+    if (!user_id)
+    {
+        user = await requireUser();
+        user_id = user.user_id; 
+    }
+    else
+        user = await prisma.user.findUnique({ where : { user_id }});
 
     const directPages = await prisma.page.findMany({
         where: {
-            permissions: { some: { userToken: userId } },
+            permissions: { some: { userToken: user_id } },
         },
         include: {
             slugs: true,
@@ -79,7 +96,7 @@ export async function getAccessiblePages() {
     });
 
     const tagMemberships = await prisma.tagMember.findMany({
-        where: { userToken: userId },
+        where: { userToken: user_id },
         select: { tagId: true },
     });
     const tagPagePages = tagMemberships.length
@@ -91,7 +108,7 @@ export async function getAccessiblePages() {
         : [];
 
     const memberships = await prisma.organizationMember.findMany({
-        where: { userToken: userId },
+        where: { userToken: user_id },
         include: { role: true },
     });
     const orgIds = memberships.map(m => m.organizationId);
@@ -132,6 +149,16 @@ export async function getAccessiblePages() {
         };
     });
     return results;
+}
+
+export async function filterPages(user_id : string, pages : SimplifiedPage[] )
+{
+    const permissions = await Promise.all(
+        pages.map(page => canViewPage(page.pageId, user_id))
+    );
+
+    const result = pages.filter((_, index) => permissions[index]);
+    return result;
 }
 
 export async function savePage(
