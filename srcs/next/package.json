@@ -63,10 +63,10 @@
     "typescript": "^7"
   },
   "allowScripts": {
-    "@prisma/engines@7.9.0": true,
     "bcrypt@6.0.0": true,
-    "prisma@7.9.0": true,
     "sharp@0.34.5": true,
-    "unrs-resolver@1.12.2": true
+    "unrs-resolver@1.12.2": true,
+    "prisma@7.10.0": true,
+    "@prisma/engines@7.10.0": true
   }
 }
