@@ -39,7 +39,7 @@ model User {
   username  String
   firstName String?  @map("first_name")
   lastName  String?  @map("last_name")
-  imgLink   String   @default("") @map("img_link")
+  imgLink   String   @default("/defaultUserProfilePicture.svg") @map("img_link")
   email     String   @unique
   password  String
   createdAt DateTime @default(now()) @map("created_at")
