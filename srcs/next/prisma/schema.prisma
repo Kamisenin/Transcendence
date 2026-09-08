@@ -22,7 +22,6 @@ enum RequestStatus {
 enum FriendshipStatus {
   PENDING
   ACCEPTED
-  BLOCKED
 }
 
 enum SlugType {

@@ -1,10 +1,9 @@
 import { getUser } from "%/lib/prisma/prisma-utils";
-import { getOwnedPages } from "@/actions/pages";
 import { getUserOrgs } from "@/actions/orgs";
 import { getCurrentUser } from "%/lib/session";
 import { notFound } from "next/navigation";
 import PagesList from "@/components/user/PagesList";
-import FriendList from "@/components/friends/FriendList";
+import FriendList from "@/components/user/friends/FriendList";
 
 type Params = {
   params: Promise<{
@@ -35,8 +34,6 @@ export default async function UserWikiPage({ params }: Params) {
     </div>
 	);
 }
-
-
 
 async function ListTags() {
 	return (

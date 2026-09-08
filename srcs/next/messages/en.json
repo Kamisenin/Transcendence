@@ -430,5 +430,14 @@
 		"confirmDeletion": "Confirm deletion",
 		"cancel": "Cancel",
 		"error": "Something went wrong"
+	},
+	"Friend" : {
+		"sending" : "Sending...",
+		"addFriend" : "Add friend",
+		"sent" : "Request sent",
+		"noPageFound" : "No page found",
+		"pages" : "Pages {user} ({number})"
+
+
 	}
 }

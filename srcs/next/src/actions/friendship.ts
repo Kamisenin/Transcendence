@@ -15,14 +15,7 @@ export async function getRelation(senderId : string, receiverId : string) : Prom
   return (relation);
 }
 
-export async function isBlocked(senderId : string, receiverId : string) : Promise<boolean> {
-    const relation = await getRelation(senderId, receiverId);
-    if (!relation)
-        return false;
-    return (relation.status === FriendshipStatus.BLOCKED && relation.receiverId === senderId);
-}
-
-export async function getFriends(userId : string) : Promise<Friendship[]> {
+export async function getFriends(userId : string) {
     const friends = await prisma.friendship.findMany({
     where: {
         status: FriendshipStatus.ACCEPTED,
@@ -62,9 +55,6 @@ export async function acceptFriend(shipId : string) {
     if (!relation)
         throw new Error("Logic error, cannot go there");
 
-    if (relation.status === FriendshipStatus.BLOCKED)
-        return ;
-
     await prisma.friendship.update({
         where: { id:shipId },
         data: { status : FriendshipStatus.ACCEPTED }
@@ -80,18 +70,7 @@ export async function refuseFriend(shipId : string) {
     if (!relation)
         throw new Error("Logic error, cannot go there");
 
-    if (relation.status === FriendshipStatus.BLOCKED)
-        return ;
-
     await prisma.friendship.delete({
         where: { id:shipId }
-    })
-}
-
-export async function blockFriend(shipId : string) {
-
-    await prisma.friendship.update({
-        where: { id:shipId },
-        data: { status: FriendshipStatus.BLOCKED}
     })
 }

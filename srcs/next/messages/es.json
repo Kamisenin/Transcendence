@@ -430,5 +430,12 @@
 		"confirmDeletion": "Confirmar eliminación",
 		"cancel": "Cancelar",
 		"error": "Algo salió mal"
-	}
+	},
+	"Friend": {
+		"sending": "Enviando...",
+		"addFriend": "Añadir amigo",
+		"sent": "Solicitud enviada",
+		"noPageFound": "No se encontró ninguna página",
+		"pages": "Páginas de {user} ({number})"
+  	}
 }
