@@ -1,10 +1,10 @@
-import ForumCard, { PageData } from "@/components/ForumCard";
-import { filterPages, getEditablePages } from "@/actions/pages";
 import { getUser } from "%/lib/prisma/prisma-utils";
 import { getOwnedPages } from "@/actions/pages";
 import { getUserOrgs } from "@/actions/orgs";
 import { getCurrentUser } from "%/lib/session";
 import { notFound } from "next/navigation";
+import PagesList from "@/components/user/PagesList";
+import FriendList from "@/components/friends/FriendList";
 
 type Params = {
   params: Promise<{
@@ -35,44 +35,21 @@ async function ListPages({ params }: Params) {
 
 	const currentUser = await getCurrentUser();
 
-	const ownedPages = await getEditablePages(namespace);
-
-	const formattedPages: PageData[] = ownedPages.map((p) => ({
-		pageId: p.pageId,
-		title: p.title,
-		description: null,
-		img: p.img || null,
-		slug: p.slug || "",
-		namespace: p.namespace || "",
-		tags: [],
-	}));
-
 	return (
-		<section className="bg-card text-card-foreground border border-border rounded-lg p-4 shadow-md h-[600px] flex flex-col">
-			<h2 className="text-xl font-bold mb-4">
-				Pages créées par {target.username} ({formattedPages.length})
-			</h2>
+    <div>
+      <FriendList target_id={target.user_id}/>
+      <div className="grid grid-cols-3 gap-6 w-full mx-auto p-6 pt-22 items-start">
+        <PagesList target={target} currentUserId={currentUser?.user_id}/>
 
-			<div className="flex-1 overflow-y-auto pr-2 space-y-4 scrollbar-thin">
-				{formattedPages.length > 0 ? (
-					<div className="grid grid-cols-1 gap-4">
-						{formattedPages.map((page) => (
-							<ForumCard
-								key={page.pageId}
-								page={page}
-								userId={currentUser?.user_id}
-							/>
-						))}
-					</div>
-				) : (
-					<p className="text-sm text-muted-foreground py-8 text-center">
-						Aucune page trouvée pour cet utilisateur.
-					</p>
-				)}
-			</div>
-		</section>
+        <ListTags />
+
+        <ListOrgs />
+      </div>
+    </div>
 	);
 }
+
+
 
 async function ListTags() {
 	return (
