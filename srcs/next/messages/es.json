@@ -20,6 +20,8 @@
 		"color": "Color",
 		"namespace": "Espacio de nombres",
 		"visibility": "Visibilidad",
+		"public": "Público",
+		"private": "Privado",
 		"owner": "Propietario",
 		"members": "Miembros",
 		"roles": "Roles",
@@ -27,6 +29,7 @@
 		"tags": "Etiquetas",
 		"byOwner": "por {owner}",
 		"noImage": "Sin imagen",
+		"noImagesYet": "Aún no hay imágenes.",
 		"languageSwitcher": "Cambiar idioma"
 	},
 	"Auth": {
@@ -204,6 +207,17 @@
 		"nameAlreadyTaken": "Este nombre ya está ocupado",
 		"validNamespace": "Espacio de nombres válido",
 		"invalidNamespace": "Espacio de nombres no válido",
+		"deleteTagBtn": "Eliminar etiqueta",
+		"noAccessToPage": "No tienes acceso a esta página",
+		"name": "Nombre",
+		"description": "Descripción",
+		"color": "Color",
+		"namespace": "Espacio de nombres",
+		"namespacePlaceholderShort": "ej. espada",
+		"namespaceHint": "Se usa para agrupar etiquetas relacionadas",
+		"save": "Guardar",
+		"dangerousZone": "Zona peligrosa",
+		"deleteIrreversible": "Esta acción es irreversible",
 		"createModal": {
 			"title": "Crear una nueva etiqueta",
 			"nameLabel": "Nombre de la etiqueta *",
@@ -240,7 +254,9 @@
 			"memberRoleUpdated": "Rol del miembro actualizado",
 			"failedToChangeMemberRole": "Error al cambiar el rol del miembro",
 			"ownerRoleCannotBeChanged": "El rol del propietario no se puede cambiar",
-			"alreadyMember": "Ya es miembro"
+			"alreadyMember": "Ya es miembro",
+			"remove": "Eliminar",
+			"you": "tú"
 		},
 		"requests": {
 			"noPendingRequests": "No hay solicitudes pendientes.",

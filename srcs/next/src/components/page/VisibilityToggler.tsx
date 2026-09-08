@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useTranslations } from "next-intl";
 
 type Props = {
     isPublic: boolean;
@@ -8,14 +9,15 @@ type Props = {
 };
 
 export default function VisibilityToggler({ isPublic, onChange }: Props) {
+    const t = useTranslations("Common");
     return (
         <div className="pt-2 border-t border-gray-100 flex items-center justify-between">
             <label className="text-xs font-medium text-gray-600 flex items-center gap-1.5 cursor-pointer select-none">
-                <span>Visibility</span>
+                <span>{t('visibility')}</span>
                 <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
                     isPublic ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-100 text-gray-500'
                 }`}>
-                    {isPublic ? 'Public' : 'Private'}
+                    {isPublic ? t('public') : t('private')}
                 </span>
             </label>
 

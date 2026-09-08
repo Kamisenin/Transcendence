@@ -20,6 +20,8 @@
 		"color": "Couleur",
 		"namespace": "Namespace",
 		"visibility": "Visibilité",
+		"public": "Public",
+		"private": "Privé",
 		"owner": "Propriétaire",
 		"members": "Membres",
 		"roles": "Rôles",
@@ -27,6 +29,7 @@
 		"tags": "Tags",
 		"byOwner": "par {owner}",
 		"noImage": "Pas d'image",
+		"noImagesYet": "Aucune image pour le moment.",
 		"languageSwitcher": "Changer de langue"
 	},
 	"Auth": {
@@ -204,6 +207,17 @@
 		"nameAlreadyTaken": "Ce nom est déjà pris",
 		"validNamespace": "Namespace valide",
 		"invalidNamespace": "Namespace invalide",
+		"deleteTagBtn": "Supprimer le tag",
+		"noAccessToPage": "Vous n'avez pas accès à cette page",
+		"name": "Nom",
+		"description": "Description",
+		"color": "Couleur",
+		"namespace": "Namespace",
+		"namespacePlaceholderShort": "ex. épée",
+		"namespaceHint": "Utilisé pour regrouper les tags liés entre eux",
+		"save": "Enregistrer",
+		"dangerousZone": "Zone dangereuse",
+		"deleteIrreversible": "Cette action est irréversible",
 		"createModal": {
 			"title": "Créer un nouveau Tag",
 			"nameLabel": "Nom du Tag *",
@@ -278,23 +292,6 @@
 			"save": "Enregistrer",
 			"cancel": "Annuler"
 		},
-		"settings": {
-			"name": "Nom",
-			"description": "Description",
-			"color": "Couleur",
-			"namespace": "Namespace",
-			"namespacePlaceholder": "mon-tag",
-			"namespaceHelp": "Permet aux pages utilisant ce tag d'utiliser son namespace plutôt que celui de l'utilisateur. Laissez vide pour supprimer.",
-			"save": "Enregistrer",
-			"dangerousZone": "Zone dangereuse",
-			"deleteTag": "Supprimer le tag",
-			"confirmDeletion": "Confirmer la suppression",
-			"lastConfirmation": "Dernière confirmation",
-			"deleting": "Suppression en cours...",
-			"deletedRedirecting": "Tag supprimé, redirection...",
-			"irreversible": "Cette action est irréversible.",
-			"noAccess": "Vous n'avez pas les droits d'accès actuels à cette page."
-		},
 		"slugNamespace": "Namespace du Slug (Optionnel)",
 		"noneUseAccountOnly": "Aucun (Utiliser uniquement mon compte)"
 	},
@@ -359,7 +356,8 @@
 		"previewMode": "Mode Prévisualisation",
 		"edit": "Éditer",
 		"less": "Moins",
-		"more": "plus"
+		"more": "plus",
+		"noImage": "Pas d'image"
 	},
 	"MyPages": {
 		"myPages": "Mes pages",

@@ -3,10 +3,12 @@
 import { useState } from "react";
 import { deleteUpload, SerializedUpload } from "@/actions/uploads";
 import { Upload } from "@prisma/client";
+import { useTranslations } from "next-intl";
 
 function UploadsList({ uploads }: { uploads: SerializedUpload[] }) {
 	const [localUploads, setLocalUploads] = useState(uploads);
 	const [deletingId, setDeletingId] = useState<number | null>(null);
+	const t = useTranslations("Common");
 
 	function formatFileSize(bytesInput: string) {
 		const bytes = Number(bytesInput)
@@ -33,7 +35,7 @@ function UploadsList({ uploads }: { uploads: SerializedUpload[] }) {
 	if (localUploads.length === 0) {
 		return (
 			<div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white/50 py-16 text-center">
-				<p className="text-slate-500">Aucune image pour le moment.</p>
+				<p className="text-slate-500">{t('noImagesYet')}</p>
 			</div>
 		);
 	}
@@ -66,7 +68,7 @@ function UploadsList({ uploads }: { uploads: SerializedUpload[] }) {
 						onClick={() => handleDelete(upload.id)}
 						disabled={deletingId === upload.id}
 						className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-slate-500 opacity-0 shadow-sm backdrop-blur transition hover:bg-red-50 hover:text-red-600 group-hover:opacity-100 disabled:opacity-100"
-						aria-label="Supprimer"
+						aria-label={t('delete')}
 					>
 						{deletingId === upload.id ? (
 							<svg
