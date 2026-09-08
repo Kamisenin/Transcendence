@@ -1,7 +1,7 @@
 import ForumCard, { PageData } from "@/components/ForumCard";
 import { filterPages, getAccessiblePages, getEditablePages} from "@/actions/pages";
 import { getCurrentUser } from "%/lib/session";
-import { getUser } from "@/app/lib/prisma/prisma-utils";
+import { getUser } from "%/lib/prisma/prisma-utils";
 import { notFound } from "next/navigation";
 import FriendList from "@/components/friends/FriendList";
 
@@ -26,13 +26,12 @@ export default async function UserWikiPage({ params }: Params) {
   const filteredPages = await filterPages(currentUser?.user_id, ownedPages)
 
   return (
-    <div className="min-h-screen container mx-auto p-6 pt-20">
-      
+    <div className="grid grid-cols-3 gap-6 w-full mx-auto p-6 pt-22 items-start">
       <section className="bg-card text-card-foreground border border-border rounded-lg p-4 shadow-md">
         <h2 className="text-xl font-bold mb-4">
           Pages créées par {target.username} ({filteredPages.length})
-        </h2> 
-        <FriendList target_id={target.user_id}/>
+        </h2>
+
 
         <div className="max-h-[600px] overflow-y-auto pr-2 space-y-4 scrollbar-thin">
           {filteredPages.length > 0 ? (
@@ -52,7 +51,12 @@ export default async function UserWikiPage({ params }: Params) {
           )}
         </div>
       </section>
-
+      <section className="bg-card text-card-foreground border border-border rounded-lg p-4 shadow-md">
+          <div/>
+      </section>
+       <section className="bg-card text-card-foreground border border-border rounded-lg p-4 shadow-md">
+          <div/>
+      </section>
     </div>
   );
 }
