@@ -21,6 +21,7 @@ export default function AccountForm({ user }: Props) {
     const t = useTranslations("Account");
     const tCommon = useTranslations("Common");
     const [loading, setLoading] = useState(false);
+    const [verifyLoading, setVerifyLoading] = useState(false);
     const [account_id, setAccountId] = useState(user.accountId);
     const [username, setUsername] = useState(user.username);
     const [firstName, setFirstName] = useState(user.firstName || "");
@@ -54,7 +55,7 @@ export default function AccountForm({ user }: Props) {
     }
 
     async function handleVerifyClick() {
-        setLoading(true);
+        setVerifyLoading(true);
         await fetch("/api/auth/resend_code", { method: "POST" });
         router.push("/verify");
     }
@@ -102,7 +103,9 @@ export default function AccountForm({ user }: Props) {
                 ) : (
                     <>
                         <span className="text-red-500 font-semibold">{t("emailNotVerified")} </span>
-                        <button onClick={handleVerifyClick} className="text-blue-500 underline">
+                        <button onClick={handleVerifyClick}
+                            disabled={verifyLoading}
+                            className="text-blue-500 underline">
                             {t("verifyMyEmail")}
                         </button>
                     </>
