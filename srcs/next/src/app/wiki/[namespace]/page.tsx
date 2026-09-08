@@ -1,9 +1,10 @@
 import ForumCard, { PageData } from "@/components/ForumCard";
-import { filterPages, getAccessiblePages, getEditablePages} from "@/actions/pages";
-import { getCurrentUser } from "%/lib/session";
+import { filterPages, getEditablePages } from "@/actions/pages";
 import { getUser } from "%/lib/prisma/prisma-utils";
+import { getOwnedPages } from "@/actions/pages";
+import { getUserOrgs } from "@/actions/orgs";
+import { getCurrentUser } from "%/lib/session";
 import { notFound } from "next/navigation";
-import FriendList from "@/components/friends/FriendList";
 
 type Params = {
   params: Promise<{
@@ -11,52 +12,98 @@ type Params = {
   }>;
 };
 
-export default async function UserWikiPage({ params }: Params) {
-  const { namespace } = await params;
+export default function UserWikiPage({ params }: Params) {
+	return (
+		<div className="grid grid-cols-3 gap-6 w-full mx-auto p-6 pt-22 items-start">
+			<ListPages params={params}/>
 
-  const target = await getUser(namespace);
+			<ListTags />
 
-  if (!target)
-    notFound();
+			<ListOrgs />
+		</div>
+	);
+}
 
-  const currentUser = await getCurrentUser();
+async function ListPages({ params }: Params) {
+	const { namespace } = await params;
 
-  const ownedPages = await getEditablePages(namespace);
+	const target = await getUser(namespace);
 
-  const filteredPages = await filterPages(currentUser?.user_id, ownedPages)
+	if (!target)
+		notFound();
 
-  return (
-    <div className="grid grid-cols-3 gap-6 w-full mx-auto p-6 pt-22 items-start">
-      <section className="bg-card text-card-foreground border border-border rounded-lg p-4 shadow-md">
-        <h2 className="text-xl font-bold mb-4">
-          Pages créées par {target.username} ({filteredPages.length})
-        </h2>
+	const currentUser = await getCurrentUser();
 
+	const ownedPages = await getEditablePages(namespace);
 
-        <div className="max-h-[600px] overflow-y-auto pr-2 space-y-4 scrollbar-thin">
-          {filteredPages.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filteredPages.map((page) => (
-                <ForumCard
-                  key={page.pageId}
-                  page={page}
-                  userId={currentUser?.user_id}
-                />
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm text-muted-foreground py-8 text-center">
-              Aucune page trouvée pour cet utilisateur.
-            </p>
-          )}
-        </div>
-      </section>
-      <section className="bg-card text-card-foreground border border-border rounded-lg p-4 shadow-md">
-          <div/>
-      </section>
-       <section className="bg-card text-card-foreground border border-border rounded-lg p-4 shadow-md">
-          <div/>
-      </section>
-    </div>
-  );
+	const formattedPages: PageData[] = ownedPages.map((p) => ({
+		pageId: p.pageId,
+		title: p.title,
+		description: null,
+		img: p.img || null,
+		slug: p.slug || "",
+		namespace: p.namespace || "",
+		tags: [],
+	}));
+
+	return (
+		<section className="bg-card text-card-foreground border border-border rounded-lg p-4 shadow-md h-[600px] flex flex-col">
+			<h2 className="text-xl font-bold mb-4">
+				Pages créées par {target.username} ({formattedPages.length})
+			</h2>
+
+			<div className="flex-1 overflow-y-auto pr-2 space-y-4 scrollbar-thin">
+				{formattedPages.length > 0 ? (
+					<div className="grid grid-cols-1 gap-4">
+						{formattedPages.map((page) => (
+							<ForumCard
+								key={page.pageId}
+								page={page}
+								userId={currentUser?.user_id}
+							/>
+						))}
+					</div>
+				) : (
+					<p className="text-sm text-muted-foreground py-8 text-center">
+						Aucune page trouvée pour cet utilisateur.
+					</p>
+				)}
+			</div>
+		</section>
+	);
+}
+
+async function ListTags() {
+	return (
+			<section className="bg-card text-card-foreground border border-border rounded-lg p-4 shadow-md h-[600px] flex flex-col">
+				<h2 className="text-xl font-bold mb-4">Tags</h2>
+				<div className="flex-1 overflow-y-auto pr-2 scrollbar-thin">
+					{/* contenu des tags */}
+				</div>
+			</section>
+	);
+}
+
+async function ListOrgs() {
+	const orgs = await getUserOrgs();
+
+	return (
+		<section className="bg-card text-card-foreground border border-border rounded-lg p-4 shadow-md h-[600px] flex flex-col">
+			<h2 className="text-xl font-bold mb-4">
+				Organisations ({orgs?.length ?? 0})
+			</h2>
+
+			<div className="flex-1 overflow-y-auto pr-2 space-y-4 scrollbar-thin">
+				{orgs && orgs.length > 0 ? (
+					<div className="grid grid-cols-1 gap-4">
+						{/* affichage de tes orgs ici */}
+					</div>
+				) : (
+					<p className="text-sm text-muted-foreground py-8 text-center">
+						Aucune organisation trouvée.
+					</p>
+				)}
+			</div>
+		</section>
+	);
 }
