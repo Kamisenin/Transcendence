@@ -123,7 +123,8 @@
 		"deletingInProgress": "Suppression...",
 		"confirmDeletionAction": "confirmer la suppression",
 		"cancel": "Annuler",
-		"somethingWentWrongGeneric": "Une erreur est survenue"
+		"somethingWentWrongGeneric": "Une erreur est survenue",
+		"manageAccount": "Gérer votre compte"
 	},
 	"Session": {
 		"loading": "Chargement des sessions...",
@@ -132,7 +133,8 @@
 		"2fa disable": "E-mail mis à jour. La 2FA a été désactivée.",
 		"Since": "Depuis",
 		"Revoke": "Révoquer",
-		"somethingWentWrong": "Une erreur est survenue"
+		"somethingWentWrong": "Une erreur est survenue",
+		"localhost": "Hôte local"
 	},
 	"Terms": {
 		"title": "Conditions d'utilisation",

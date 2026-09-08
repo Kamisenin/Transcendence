@@ -123,7 +123,8 @@
 		"deletingInProgress": "Deleting...",
 		"confirmDeletionAction": "confirm deletion",
 		"cancel": "Cancel",
-		"somethingWentWrongGeneric": "Something went wrong"
+		"somethingWentWrongGeneric": "Something went wrong",
+		"manageAccount": "Manage your account"
 	},
 	"Session": {
 		"loading": "Loading sessions...",
@@ -132,7 +133,8 @@
 		"2fa disable": "Email updated. 2FA has been disabled.",
 		"Since": "Since",
 		"Revoke": "Revoke",
-		"somethingWentWrong": "Something went wrong"
+		"somethingWentWrong": "Something went wrong",
+		"localhost": "localhost"
 	},
 	"Terms": {
 		"title": "Terms of Service",

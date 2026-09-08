@@ -123,7 +123,8 @@
 		"deletingInProgress": "Eliminando...",
 		"confirmDeletionAction": "confirmar eliminación",
 		"cancel": "Cancelar",
-		"somethingWentWrongGeneric": "Algo salió mal"
+		"somethingWentWrongGeneric": "Algo salió mal",
+		"manageAccount": "Gestionar tu cuenta"
 	},
 	"Session": {
 		"loading": "Cargando sesiones...",
@@ -132,7 +133,8 @@
 		"2fa disable": "Correo electrónico actualizado. La 2FA ha sido desactivada.",
 		"Since": "Desde",
 		"Revoke": "Revocar",
-		"somethingWentWrong": "Algo salió mal"
+		"somethingWentWrong": "Algo salió mal",
+		"localhost": "El host local"
 	},
 	"Terms": {
 		"title": "Términos de servicio",

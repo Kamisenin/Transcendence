@@ -24,7 +24,7 @@ export default async function AccountPage() {
 							{t("title")}
 						</h1>
 						<p className="text-sm text-gray-500">
-							Manage your account
+							{t("manageAccount")}
 						</p>
 					</div>
 				</div>
