@@ -1,5 +1,7 @@
 import { getRelation } from "@/actions/friendship";
 import AddFriendButton from "./AddFriendButton";
+import RemoveFriendButton from "./RemoveFriendButton";
+import HandleFriendRequestButtons from "./HandleFriendRequestButtons";
 import { FriendshipStatus } from "@prisma/client";
 import { getTranslations } from "next-intl/server";
 
@@ -16,6 +18,10 @@ export default async function FriendButtons({ target_id, user_id } : Props)
     if (!relation)
         return (<AddFriendButton sender_id={user_id} receiver_id={target_id}/>)
     if (relation.status === FriendshipStatus.PENDING ) {
+        if (relation.senderId === target_id && relation.receiverId === user_id) {
+            return <HandleFriendRequestButtons friendship_id={relation.id} />;
+        }
+
         return (
             <button
                 disabled
@@ -25,6 +31,6 @@ export default async function FriendButtons({ target_id, user_id } : Props)
             </button>
         );
     }
-
-    return null;
+    
+    return <RemoveFriendButton friendship_id={relation.id} />;
 }

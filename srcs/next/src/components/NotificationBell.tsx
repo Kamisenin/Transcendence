@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 
 type Notification = {
@@ -9,7 +10,7 @@ type Notification = {
     type: string;
     read: boolean;
     createdAt: string;
-    actor: { username: string; imgLink: string } | null;
+    actor: { username: string; imgLink: string; accountId: string } | null;
     page: {
         pageId: number;
         title: string;
@@ -19,6 +20,7 @@ type Notification = {
 
 export default function NotificationBell() {
     const t = useTranslations("Notifications");
+    const router = useRouter();
     const [open, setOpen] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
     const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -123,6 +125,17 @@ export default function NotificationBell() {
         return `/pages/${n.page.pageId}`;
     }
 
+    function friendHref(n: Notification): string | null {
+        return n.actor ? `/wiki/${encodeURIComponent(n.actor.accountId)}` : null;
+    }
+
+    function handleFriendNotificationClick(n: Notification) {
+        const href = friendHref(n);
+        if (!href) return;
+        handleNotificationClick(n.id);
+        router.push(href);
+    }
+
     function timeAgo(dateString: string): string {
         const seconds = Math.floor((Date.now() - new Date(dateString).getTime()) / 1000);
         if (seconds < 60) return t("justNow");
@@ -175,27 +188,45 @@ export default function NotificationBell() {
                         n.type === "FRIEND_REQUEST" ? (
                             <div
                                 key={n.id}
-                                className={`px-4 py-3 border-b last:border-b-0 ${!n.read ? "bg-blue-50" : ""}`}
+                                onClick={() => handleFriendNotificationClick(n)}
+                                onKeyDown={(event) => {
+                                    if (event.key === "Enter" || event.key === " ") {
+                                        event.preventDefault();
+                                        handleFriendNotificationClick(n);
+                                    }
+                                }}
+                                role={n.actor ? "link" : undefined}
+                                tabIndex={n.actor ? 0 : undefined}
+                                className={`px-4 py-3 border-b last:border-b-0 ${n.actor ? "cursor-pointer hover:bg-gray-50" : ""} ${!n.read ? "bg-blue-50" : ""}`}
                             >
                                 <p className="text-sm">
                                     {t("friendRequest", { actor: n.actor?.username ?? t("someone") })}
                                 </p>
                                 <div className="flex items-center gap-2 mt-2">
                                     <button
-                                        onClick={() => handleAcceptFriend(n.id)}
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            handleAcceptFriend(n.id);
+                                        }}
                                         className="text-xs px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
                                     >
                                         {t("accept")}
                                     </button>
                                     <button
-                                        onClick={() => handleRefuseFriend(n.id)}
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            handleRefuseFriend(n.id);
+                                        }}
                                         className="text-xs px-2 py-1 rounded bg-gray-200 hover:bg-gray-300 cursor-pointer"
                                     >
                                         {t("refuse")}
                                     </button>
                                     {!n.read && (
                                         <button
-                                            onClick={() => handleNotificationClick(n.id)}
+                                            onClick={(event) => {
+                                                event.stopPropagation();
+                                                handleNotificationClick(n.id);
+                                            }}
                                             className="text-xs px-2 py-1 rounded text-gray-500 hover:underline cursor-pointer ml-auto"
                                         >
                                             {t("ignore")}

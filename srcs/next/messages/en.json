@@ -405,7 +405,11 @@
 		"markAllRead": "Mark all as read",
 		"loading": "Loading...",
 		"empty": "No notifications yet",
+		"accept": "Accept",
+		"refuse": "Decline",
+		"ignore": "Ignore",
 		"someone": "Someone",
+		"friendRequest": "{actor} sent you a friend request",
 		"untitled": "a page",
 		"pageEdited": "{actor} edited \"{title}\"",
 		"justNow": "just now",
@@ -435,6 +439,8 @@
 		"sending" : "Sending...",
 		"addFriend" : "Add friend",
 		"sent" : "Request sent",
+		"removing" : "Removing...",
+		"removeFriend" : "Remove friend",
 		"noPageFound" : "No page found",
 		"pages" : "Pages of {user} ({number})"
 
