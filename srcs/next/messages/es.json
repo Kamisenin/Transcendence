@@ -37,7 +37,9 @@
 		"uploadImageFailed": "No se pudo enviar la imagen.",
 		"dragOrBrowse": "Arrastra una imagen aquí o haz clic para buscar",
 		"acceptedFormats": "PNG, JPG, WEBP · 10 MB máx.",
-		"languageSwitcher": "Cambiar idioma"
+		"languageSwitcher": "Cambiar idioma",
+		"online" : "En línea",
+		"offline" : "Fuera de línea"
 	},
 	"Auth": {
 		"login": {
@@ -197,9 +199,13 @@
 		"noMemberFound": "No se encontró ningún miembro",
 		"member": "Miembro",
 		"createdLabel": "Creado"
+		,"organizationsOf": "Organizaciones de {user} ({count})"
+		,"permissionsLabel": "Permisos"
+		,"membersCount": "{count, plural, =0 {Ningún miembro} one {# miembro} other {# miembros}}"
 	},
 	"Tags": {
 		"myTags": "Mis etiquetas",
+		"tagsOf": "Etiquetas de {user} ({count})",
 		"newTag": "Nueva etiqueta",
 		"noTagFound": "No se encontró ninguna etiqueta",
 		"youDontHaveAccess": "No tienes acceso",
@@ -450,7 +456,11 @@
 		"markAllRead": "Marcar todo como leído",
 		"loading": "Cargando...",
 		"empty": "No hay notificaciones",
+		"accept": "Aceptar",
+		"refuse": "Rechazar",
+		"ignore": "Ignorar",
 		"someone": "Alguien",
+		"friendRequest": "{actor} te envió una solicitud de amistad",
 		"untitled": "una página",
 		"pageEdited": "{actor} editó \"{title}\"",
 		"justNow": "justo ahora",
@@ -475,5 +485,14 @@
 		"confirmDeletion": "Confirmar eliminación",
 		"cancel": "Cancelar",
 		"error": "Algo salió mal"
-	}
+	},
+	"Friend": {
+		"sending": "Enviando...",
+		"addFriend": "Añadir amigo",
+		"sent": "Solicitud enviada",
+		"removing": "Eliminando...",
+		"removeFriend": "Eliminar amigo",
+		"noPageFound": "No se encontró ninguna página",
+		"pages": "Páginas de {user} ({number})"
+  	}
 }

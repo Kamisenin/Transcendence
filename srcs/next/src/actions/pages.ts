@@ -6,9 +6,11 @@ import { requireUser } from '@/actions/tags'
 import { redirect } from "next/navigation";
 import { PermissionLevel } from "@prisma/client"
 import { init_slug, syncUserSlugs, slugify, removeTagSlug, setTagSlug } from "%/lib/page/slug";
-import { User, Page } from '@prisma/client';
+import { Page } from '@prisma/client';
 import { type InfoboxData } from "@/components/page/Infobox"
 import { notifyPageEdit } from "%/lib/notifications";
+import { getUserById } from '@/app/lib/prisma/prisma-utils';
+import { PageData } from '@/components/ForumCard';
 import { PagePermissionError } from "%/lib/errors";
 import { revalidatePath } from "next/cache";
 import { getTagCapabilities, getUserTags } from '%/lib/tag_permissions';
@@ -66,14 +68,123 @@ export async function getOwnedPages() {
     });
 }
 
-export async function getAccessiblePages() {
-    const user = await requireUser();
+const EDIT_LEVELS: PermissionLevel[] = [PermissionLevel.WRITE, PermissionLevel.ADMIN];
 
-    const userId = user.user_id;
+const pageInclude = {
+    slugs: true,
+    tagPages: { include: { tag: true } },
+} as const;
+
+export async function getEditablePages(user_id : string) {
+    
+    const user = await getUserById(user_id);
+    if (!user)
+        throw new Error("can't find user");
+
+    const ownedPages = await prisma.page.findMany({
+        where: { ownerId: user.user_id },
+        include : pageInclude,
+        take: 200,
+    });
 
     const directPages = await prisma.page.findMany({
         where: {
-            permissions: { some: { userToken: userId } },
+            permissions: {
+                some: {
+                    userToken: user_id,
+                    permissions: { in: EDIT_LEVELS },
+                },
+            },
+        },
+        include : pageInclude,
+        take: 200,
+    });
+
+    const tagMemberships = await prisma.tagMember.findMany({
+        where: { userToken: user_id },
+        include: { role: true },
+    });
+
+    let tagEditablePages: any[] = [];
+    if (tagMemberships.length) {
+        const tagPageAccess = await prisma.tagPageAccess.findMany({
+            where: {
+                tagId: { in: tagMemberships.map(m => m.tagId) },
+                permissions: { in: EDIT_LEVELS },
+            },
+            include: { page: { include : pageInclude }, minRole: true },
+            take: 500,
+        });
+
+        tagEditablePages = tagPageAccess
+            .filter(access => {
+                const membership = tagMemberships.find(m => m.tagId === access.tagId);
+                if (!membership || !membership.role || !access.minRole) return false;
+                return membership.role.hierarchyLevel <= access.minRole.hierarchyLevel;
+            })
+            .map(access => access.page)
+            .filter(Boolean);
+    }
+
+    const orgMemberships = await prisma.organizationMember.findMany({
+        where: { userToken: user_id },
+        include: { role: true },
+    });
+
+    let orgEditablePages: any[] = [];
+    if (orgMemberships.length) {
+        const orgPageAccess = await prisma.orgPageAccess.findMany({
+            where: {
+                orgId: { in: orgMemberships.map(m => m.organizationId) },
+                permissions: { in: EDIT_LEVELS },
+            },
+            include: { page: { include : pageInclude }, minRole: true },
+            take: 500,
+        });
+
+        orgEditablePages = orgPageAccess
+            .filter(access => {
+                const membership = orgMemberships.find(m => m.organizationId === access.orgId);
+                if (!membership || !membership.role || !access.minRole) return false;
+                return membership.role.hierarchyLevel <= access.minRole.hierarchyLevel;
+            })
+            .map(access => access.page)
+            .filter(Boolean);
+    }
+
+    const pagesMap = new Map<number, typeof ownedPages[number]>();
+    for (const p of ownedPages) pagesMap.set(p.pageId, p);
+    for (const p of directPages) pagesMap.set(p.pageId, p);
+    for (const p of tagEditablePages) pagesMap.set(p.pageId, p);
+    for (const p of orgEditablePages) pagesMap.set(p.pageId, p);
+
+    return Array.from(pagesMap.values());
+}
+
+function mapPageToPageData(p: any): PageData {
+    const canonical = (p.slugs || []).find((s: any) => s.isCanonical);
+
+    return {
+        pageId: p.pageId,
+        title: p.title,
+        description: p.description,
+        img: p.img,
+        slug: canonical?.slug ?? "",
+        namespace: canonical?.namespace ?? "",
+        tags: (p.tagPages || []).map((tp: any) => ({
+            id: tp.tag.id,
+            name: tp.tag.name,
+        })),
+    };
+}
+
+export async function getAccessiblePages() {
+    const user = await requireUser();
+
+    const user_id = user.accountId;
+    const directPages = await prisma.page.findMany({
+        where: {
+            permissions: { some: { userToken: user_id } },
         },
         include: {
             slugs: true,
@@ -83,7 +194,7 @@ export async function getAccessiblePages() {
     });
 
     const tagMemberships = await prisma.tagMember.findMany({
-        where: { userToken: userId },
+        where: { userToken: user_id },
         select: { tagId: true },
     });
     const tagPagePages = tagMemberships.length
@@ -95,7 +206,7 @@ export async function getAccessiblePages() {
         : [];
 
     const memberships = await prisma.organizationMember.findMany({
-        where: { userToken: userId },
+        where: { userToken: user_id },
         include: { role: true },
     });
     const orgIds = memberships.map(m => m.organizationId);
@@ -136,6 +247,25 @@ export async function getAccessiblePages() {
         };
     });
     return results;
+}
+
+export async function filterPages(user_id : string | undefined, pages : Page[] )
+{
+    
+    const publicPages = pages.filter(page => page.public);
+    if (!user_id)
+        return (publicPages.map(mapPageToPageData));
+    
+    const privatePages = pages.filter(page => !page.public);
+
+    const permissions = await Promise.all(
+        privatePages.map(page => canViewPage(page.pageId, user_id))
+    );
+
+    const accessiblePrivatePages = privatePages.filter((_, index) => permissions[index]);
+
+    const result = [...publicPages, ...accessiblePrivatePages];
+    return result.map(mapPageToPageData);
 }
 
 export async function savePage(
@@ -388,8 +518,6 @@ async function getUserToken() : Promise<string>
 export async function canEditPage(pageId: number, userToken: string = ""): Promise<boolean> {
     if (userToken.length === 0)
         userToken = await getUserToken();
-    console.log(pageId);
-    console.log(userToken);
     return await hasPageAccess(userToken, pageId, ['WRITE', 'ADMIN']);
 }
 

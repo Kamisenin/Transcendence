@@ -37,7 +37,9 @@
 		"uploadImageFailed": "Unable to upload the image.",
 		"dragOrBrowse": "Drag an image here or click to browse",
 		"acceptedFormats": "PNG, JPG, WEBP · 10 MB max",
-		"languageSwitcher": "Change language"
+		"languageSwitcher": "Change language",
+		"online" : "Online",
+		"offline" : "Offline"
 	},
 	"Auth": {
 		"login": {
@@ -197,9 +199,13 @@
 		"noMemberFound": "No member found",
 		"member": "Member",
 		"createdLabel": "Created"
+		,"organizationsOf": "Organizations of {user} ({count})"
+		,"permissionsLabel": "Permissions"
+		,"membersCount": "{count, plural, =0 {No members} one {# member} other {# members}}"
 	},
 	"Tags": {
 		"myTags": "My Tags",
+		"tagsOf": "Tags of {user} ({count})",
 		"newTag": "New tag",
 		"noTagFound": "No tag found",
 		"youDontHaveAccess": "You don't have access",
@@ -450,7 +456,11 @@
 		"markAllRead": "Mark all as read",
 		"loading": "Loading...",
 		"empty": "No notifications yet",
+		"accept": "Accept",
+		"refuse": "Decline",
+		"ignore": "Ignore",
 		"someone": "Someone",
+		"friendRequest": "{actor} sent you a friend request",
 		"untitled": "a page",
 		"pageEdited": "{actor} edited \"{title}\"",
 		"justNow": "just now",
@@ -475,5 +485,16 @@
 		"confirmDeletion": "Confirm deletion",
 		"cancel": "Cancel",
 		"error": "Something went wrong"
+	},
+	"Friend" : {
+		"sending" : "Sending...",
+		"addFriend" : "Add friend",
+		"sent" : "Request sent",
+		"removing" : "Removing...",
+		"removeFriend" : "Remove friend",
+		"noPageFound" : "No page found",
+		"pages" : "Pages of {user} ({number})"
+
+
 	}
 }

@@ -15,12 +15,12 @@ export default async function AccountPage() {
         redirect("/login");
     }
     return (
-        <main className="pt-20 flex justify-center">
-            <div className="w-96 bg-white p-6 rounded shadow">
-				<div className="flex items-center gap-4 pb-5 mb-6 border-b border-gray-200">
-					<UploadProfilePicture initialImgLink={user.imgLink} />
+				<main className="flex justify-center bg-[#f0e0d6] px-4 pb-12 pt-20">
+						<div className="w-full max-w-md border border-[#d9bfb7] border-t-4 border-t-[#800000] bg-[#fffaf7] p-6 shadow-[0_2px_10px_rgba(128,0,0,0.08)]">
+				<div className="mb-6 flex items-center gap-4 border-b border-[#ead7d0] pb-5">
+					<UploadProfilePicture accountId={user.accountId} initialImgLink={user.imgLink} />
 					<div>
-						<h1 className="text-2xl font-bold text-gray-900">
+						<h1 className="text-2xl font-bold text-[#800000]">
 							{t("title")}
 						</h1>
 						<p className="text-sm text-gray-500">

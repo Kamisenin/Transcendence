@@ -24,7 +24,7 @@ export default function LocaleSwitcher() {
 		<select
 			defaultValue={locale}
 			onChange={handleChange}
-			className="border border-black rounded px-2 py-1 text-sm bg-white cursor-pointer"
+			className="cursor-pointer border border-[#a98275] bg-[#fffaf7] px-2 py-1 text-sm text-[#3f2924]"
 			aria-label={t("ariaLabel")}
 		>
 			{routing.locales.map((loc) => (

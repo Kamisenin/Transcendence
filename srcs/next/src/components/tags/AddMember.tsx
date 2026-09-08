@@ -3,6 +3,7 @@
 import { useState, useEffect, useTransition, useRef } from 'react';
 import { addTagMember } from '@/actions/tags';
 import { useTranslations } from 'next-intl';
+import UserAvatar from '@/components/UserAvatar';
 
 type SearchUser = {
     user_id: string;
@@ -119,11 +120,7 @@ export default function AddMember({ tagId, assignableRoles, existingMemberTokens
                         return (
                             <div key={u.user_id} className="flex items-center justify-between p-2">
                                 <div className="flex items-center gap-2">
-                                    <img
-                                        src={u.imgLink || '/default-avatar.png'}
-                                        alt=""
-                                        className="w-6 h-6 rounded-full bg-gray-200"
-                                    />
+                                    <UserAvatar accountId={u.accountId} imgLink={u.imgLink} alt={u.username || u.accountId} size={24} className="h-6 w-6" />
                                     <div>
                                         <p className="text-sm font-medium leading-tight">{u.username}</p>
                                         <p className="text-xs text-gray-400 leading-tight">@{u.accountId}</p>

@@ -24,7 +24,7 @@ export default async function TagManagementPage({ params }: Params) {
         prisma.tagRole.findMany({ where: { tagId: tag.id }, orderBy: { hierarchyLevel: 'desc' } }),
         prisma.tagMember.findMany({
             where: { tagId: tag.id },
-            include: { user: { select: { user_id: true, username: true, imgLink: true } }, role: true },
+            include: { user: { select: { user_id: true, accountId: true, username: true, imgLink: true } }, role: true },
         }),
         capabilities.canReviewRequests
             ? prisma.tagPageRequest.findMany({

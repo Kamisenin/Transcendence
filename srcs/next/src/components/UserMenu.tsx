@@ -4,10 +4,10 @@ import { useState, useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { createPage } from "@/actions/pages";
 import Link from "next/link";
-import Image from "next/image";
+import UserAvatar from "@/components/UserAvatar";
 
 type UserMenuProps = {
-    user: { username: string, imgLink: string  } | null; 
+    user: { accountId: string, username: string, imgLink: string | null  } | null; 
 };
 
 export default function UserMenu({ user }: UserMenuProps) {
@@ -62,14 +62,7 @@ export default function UserMenu({ user }: UserMenuProps) {
 				onClick={() => setOpen(!open)}
 				className="w-10 h-10 rounded-full bg-white border-2 border-black shadow-md hover:shadow-lg cursor-pointer transition flex items-center justify-center overflow-hidden"
 			>
-				<Image
-					src={user.imgLink || "/defaultUserProfilePicture.svg"}
-					alt="Logo"
-					width={44}
-					height={44}
-					className="w-full h-full object-cover"
-					style={{ filter: "drop-shadow(0 0 2px black)" }}
-				/>
+                <UserAvatar accountId={user.accountId} imgLink={user.imgLink} alt={user.username || user.accountId} size={44} className="h-full w-full" />
 			</button>
             {open && (
                 <div className="absolute right-0 mt-2 w-48 bg-white text-back rounded shadow-lg border">

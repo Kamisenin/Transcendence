@@ -25,8 +25,9 @@ export type MemberUserOption = {
   imgLink: string | null;
 };
 
-export async function getUserOrgs(): Promise<Organization[]> {
-  const user = await requireUser();
+export async function getUserOrgs(user : User | null = null): Promise<Organization[]> {
+  if (!user)
+    user = await requireUser();
 
   const owned = await prisma.organization.findMany({
     where: { ownerToken: user.user_id },

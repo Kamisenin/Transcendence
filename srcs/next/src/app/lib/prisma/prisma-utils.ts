@@ -8,6 +8,11 @@ export async function getUser(id : string)
     return user;
 }
 
+export async function getUserById(user_id : string)
+{
+    return (await prisma.user.findUnique({ where : { user_id } }));
+}
+
 export async function isEmailUsed(email: string): Promise<boolean>
 {
     if (!email)

@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+import UserAvatar from "@/components/UserAvatar";
 
 type Member = {
     userToken: string;
-    user: { user_id: string; username: string; imgLink: string | null };
+    user: { user_id: string; accountId: string; username: string; imgLink: string | null };
     role: { roleName: string };
 };
 
@@ -110,10 +111,7 @@ export default async function TagOverview({ tag, members, pages, isOwnerOrManage
                                 <ul className="divide-y divide-[#d8dee4]">
                                     {members.map((member) => (
                                         <li key={member.userToken} className="flex items-center gap-2.5 px-3 py-2.5">
-                                            <img
-                                                src={member.user.imgLink || "/default-avatar.png"}
-                                                alt=""
-                                                className="w-7 h-7 rounded-full bg-gray-200 shrink-0"/>
+                                            <UserAvatar accountId={member.user.accountId} imgLink={member.user.imgLink} alt={member.user.username} size={28} className="h-7 w-7" />
                                             <div className="min-w-0">
                                                 <p className="text-sm font-medium text-[#24292f] truncate">
                                                     {member.user.username}

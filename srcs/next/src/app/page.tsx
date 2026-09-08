@@ -6,13 +6,13 @@ export default function Home() {
   const t = useTranslations("Home");
 
   return (
-    <div className="flex flex-col min-h-dvh items-center justify-start bg-zinc-50 font-sans dark:bg-black">
-        <main className="flex flex-1 w-full flex-col items-center justify-center px-16 bg-white dark:bg-black sm:items-start">
+    <div className="flex min-h-dvh flex-col items-center justify-start bg-[#f0e0d6] font-sans">
+      <main className="flex w-full flex-1 flex-col items-center justify-center bg-[#f0e0d6] px-6 sm:items-start sm:px-16">
           <div className="flex flex-col items-start gap-2 text-left w-full">
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            <p className="text-sm text-[#8a6b63]">
               {t("tagline")}
             </p>
-            <h1 className="text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
+            <h1 className="text-3xl font-semibold leading-10 tracking-tight text-[#800000]">
               {t("title")}
             </h1>
           </div>

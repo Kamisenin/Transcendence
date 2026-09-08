@@ -37,7 +37,9 @@
 		"uploadImageFailed": "Impossible d'envoyer l'image.",
 		"dragOrBrowse": "Glissez une image ici ou cliquez pour parcourir",
 		"acceptedFormats": "PNG, JPG, WEBP · 10 Mo max",
-		"languageSwitcher": "Changer de langue"
+		"languageSwitcher": "Changer de langue",
+		"online" : "En ligne",
+		"offline" : "Hors ligne"
 	},
 	"Auth": {
 		"login": {
@@ -197,9 +199,13 @@
 		"noMemberFound": "Aucun membre trouvé",
 		"member": "Membre",
 		"createdLabel": "Créé le"
+		,"organizationsOf": "Organisations de {user} ({count})"
+		,"permissionsLabel": "Permissions"
+		,"membersCount": "{count, plural, =0 {Aucun membre} one {# membre} other {# membres}}"
 	},
 	"Tags": {
 		"myTags": "Mes tags",
+		"tagsOf": "Tags de {user} ({count})",
 		"newTag": "Nouveau tag",
 		"noTagFound": "Aucun tag trouvé",
 		"youDontHaveAccess": "Vous n'avez pas accès",
@@ -450,7 +456,11 @@
 		"markAllRead": "Tout marquer comme lu",
 		"loading": "Chargement...",
 		"empty": "Aucune notification",
+		"accept": "Accepter",
+		"refuse": "Refuser",
+		"ignore": "Ignorer",
 		"someone": "Quelqu'un",
+		"friendRequest": "{actor} vous a envoyé une demande d'ami",
 		"untitled": "une page",
 		"pageEdited": "{actor} a modifié \"{title}\"",
 		"justNow": "à l'instant",
@@ -475,5 +485,14 @@
 		"confirmDeletion": "Confirmer la suppression",
 		"cancel": "Annuler",
 		"error": "Une erreur est survenue"
-	}
+	},
+	"Friend": {
+		"sending": "Envoi en cours...",
+		"addFriend": "Ajouter en ami",
+		"sent": "Demande envoyée",
+		"removing": "Suppression...",
+		"removeFriend": "Retirer l'ami",
+		"noPageFound": "Aucune page trouvée",
+		"pages": "Pages de {user} ({number})"
+  	}
 }

@@ -11,11 +11,11 @@ export default async function MyTagsPage() {
     const tCommon = await getTranslations('Common');
 
     return (
-        <div className="min-h-screen bg-[#f6f8fa] pt-16">
+        <div className="min-h-screen bg-[#f0e0d6] pt-16">
             <div className="mx-auto max-w-4xl px-6 py-10">
-                <div className="mb-6 border-b border-[#d0d7de] pb-4">
-                    <h1 className="text-[32px] leading-tight font-semibold text-[#24292f]">{t("myTags")}</h1>
-                    <p className="mt-1 text-sm text-[#57606a]">
+                <div className="mb-6 border-b-2 border-[#800000] pb-4">
+                    <h1 className="text-[32px] leading-tight font-semibold text-[#800000]">{t("myTags")}</h1>
+                    <p className="mt-1 text-sm text-[#8a6b63]">
                         {t("manageAndBrowse")}
                     </p>
                 </div>
@@ -25,17 +25,17 @@ export default async function MyTagsPage() {
                 </div>
 
                 {tags.length === 0 ? (
-                    <div className="rounded-md border border-[#d0d7de] bg-white p-6 text-sm text-[#57606a]">
+                    <div className="border border-[#d9bfb7] bg-[#fffaf7] p-6 text-sm text-[#8a6b63]">
                         {t("youDontHaveAccessToAnyTag")}
                     </div>
                 ) : (
-                    <div className="overflow-hidden rounded-md border border-[#d0d7de] bg-white">
-                        <ul className="divide-y divide-[#d8dee4]">
+                    <div className="overflow-hidden border border-[#d9bfb7] bg-[#fffaf7]">
+                        <ul className="divide-y divide-[#ead7d0]">
                             {tags.map(tag => (
                                 <li key={tag.name}>
                                     <Link
                                         href={`/tags/${tag.name}`}
-                                        className="flex items-center justify-between px-4 py-3 hover:bg-[#f6f8fa] transition-colors"
+                                        className="flex items-center justify-between px-4 py-3 transition-colors hover:bg-[#f7e9e2]"
                                     >
                                         <div className="flex items-center gap-3 min-w-0">
                                             <span
@@ -46,13 +46,13 @@ export default async function MyTagsPage() {
                                                         : '#8c959f',
                                                 }}
                                             />
-                                            <span className="truncate font-medium text-[#0969da] hover:underline">
+                                            <span className="truncate font-medium text-[#800000] hover:underline">
                                                 {tag.name}
                                             </span>
                                         </div>
 
                                         {tag.ownerToken === user.user_id && (
-                                            <span className="rounded-full border border-[#d0d7de] bg-[#f6f8fa] px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-[#57606a]">
+                                            <span className="border border-[#d9bfb7] bg-[#f7e9e2] px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-[#8a6b63]">
                                                 {tCommon("owner")}
                                             </span>
                                         )}
