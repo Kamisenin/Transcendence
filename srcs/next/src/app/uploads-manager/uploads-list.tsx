@@ -45,7 +45,7 @@ function UploadsList({ uploads }: { uploads: SerializedUpload[] }) {
 			{localUploads.map((upload) => (
 				<li
 					key={upload.id}
-					className="group relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md"
+					className="group relative overflow-hodden transition flex flex-col border border-[#d9bfb7] border-t-4 border-t-[#800000] bg-[#fffaf7] p-4 shadow-[0_2px_8px_rgba(128,0,0,0.08)]"
 				>
 					<div className="aspect-square w-full overflow-hidden bg-slate-100">
 						<img
