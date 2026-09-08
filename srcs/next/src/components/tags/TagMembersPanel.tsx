@@ -80,7 +80,7 @@ export default function TagMembersPanel({ tagId, members, roles, capabilities, c
 
             <div className="divide-y border rounded-lg overflow-hidden">
                 {members.length === 0 && (
-                    <p className="p-4 text-sm text-gray-400">Aucun membre pour l'instant.</p>
+                    <p className="p-4 text-sm text-gray-400">{t('noMemberYet')}</p>
                 )}
 
                 {members.map(member => {
@@ -98,7 +98,7 @@ export default function TagMembersPanel({ tagId, members, roles, capabilities, c
                                 />
                                 <span className="text-sm font-medium">{member.user.username}</span>
                                 {member.userToken === currentUserToken && (
-                                    <span className="text-xs text-gray-400">(toi)</span>
+                                    <span className="text-xs text-gray-400">({t('you')})</span>
                                 )}
                             </div>
 
@@ -124,7 +124,7 @@ export default function TagMembersPanel({ tagId, members, roles, capabilities, c
                                             disabled={isPending}
                                             className="text-xs text-red-500 hover:text-red-700 px-2"
                                         >
-                                            Retirer
+                                            {t('remove')}
                                         </button>
                                     </>
                                 ) : (

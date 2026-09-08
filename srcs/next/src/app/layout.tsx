@@ -29,6 +29,7 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode; }>) {
     const user = await getCurrentUser();
+    const menuUser = user ? { username: user.username, imgLink: user.imgLink } : null;
     const locale = await getLocale();
     const messages = await getMessages();
     const t = await getTranslations("Footer");
@@ -42,7 +43,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             <div className="flex items-center gap-4">
                 <LocaleSwitcher />
                 {user && <NotificationBell />}
-                <UserMenu user={user} />
+                <UserMenu user={menuUser} />
             </div>
         </header>
         <main className="min-h-full item-center flex flex-col">{children}</main>

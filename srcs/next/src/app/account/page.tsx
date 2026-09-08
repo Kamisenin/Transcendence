@@ -23,8 +23,8 @@ export default async function AccountPage() {
 						<h1 className="text-2xl font-bold text-[#800000]">
 							{t("title")}
 						</h1>
-						<p className="text-sm text-[#8a6b63]">
-							Manage your account
+						<p className="text-sm text-gray-500">
+							{t("manageYourAccount")}
 						</p>
 					</div>
 				</div>

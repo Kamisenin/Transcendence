@@ -11,6 +11,10 @@ import { type InfoboxData } from "@/components/page/Infobox"
 import { notifyPageEdit } from "%/lib/notifications";
 import { getUserById } from '@/app/lib/prisma/prisma-utils';
 import { PageData } from '@/components/ForumCard';
+import { PagePermissionError } from "%/lib/errors";
+import { revalidatePath } from "next/cache";
+import { getTagCapabilities, getUserTags } from '%/lib/tag_permissions';
+import { userHasOrgPermission, getUserOrgs } from '@/actions/orgs';
 
 function findPreviewImageFromContent(content: any): string | null {
     try {
@@ -562,4 +566,198 @@ export async function getRecentlyEditedPages(limit: number = 6) {
         lastEditorName: p.lastEditor?.username ?? null,
         tag: p.tagPages[0]?.tag ? { name: p.tagPages[0].tag.name, color: p.tagPages[0].tag.color } : null,
     }));
+}
+
+// ───────────── PAGE PERMISSIONS ─────────────
+
+async function hasPageManagePermission(pageId: number, userToken: string): Promise<boolean> {
+    const page = await prisma.page.findUnique({ where: { pageId }, select: { ownerId: true } });
+    if (!page) return false;
+    if (page.ownerId === userToken) return true;
+
+    const permission = await prisma.pagePermission.findUnique({
+        where: { pageId_userToken: { pageId, userToken } },
+    });
+
+    return Boolean(permission?.canManagePermissions || permission?.permissions === 'ADMIN');
+}
+
+export async function searchUsersForPageAdd(query: string) {
+    await requireUser();
+
+    const q = query.trim();
+    if (!q) return [];
+
+    return prisma.user.findMany({
+        where: {
+            OR: [
+                { accountId: { contains: q, mode: "insensitive" } },
+                { username: { contains: q, mode: "insensitive" } },
+            ],
+        },
+        select: {
+            user_id: true,
+            username: true,
+            accountId: true,
+            imgLink: true,
+        },
+        orderBy: { accountId: "asc" },
+        take: 20,
+    });
+}
+
+export async function getPagePermissions(pageId: number) {
+    return prisma.pagePermission.findMany({
+        where: { pageId },
+        include: { user: { select: { user_id: true, username: true, accountId: true, imgLink: true } } },
+    });
+}
+
+export async function addPagePermission(pageId: number, accountId: string, level: PermissionLevel) {
+    const user = await requireUser();
+    const can = await hasPageManagePermission(pageId, user.user_id);
+    if (!can) throw new PagePermissionError("Forbidden");
+
+    const targetUser = await prisma.user.findUnique({ where: { accountId }, select: { user_id: true } });
+    if (!targetUser) throw new Error("User not found. Please select a user from suggestions.");
+
+    const result = await prisma.pagePermission.upsert({
+        where: { pageId_userToken: { pageId, userToken: targetUser.user_id } },
+        update: { permissions: level },
+        create: { pageId, userToken: targetUser.user_id, permissions: level },
+        include: { user: { select: { user_id: true, username: true, accountId: true, imgLink: true } } },
+    });
+
+    revalidatePath(`/wiki/${accountId}/${pageId}/edit`);
+    return result;
+}
+
+export async function removePagePermission(pageId: number, userToken: string) {
+    const user = await requireUser();
+    const can = await hasPageManagePermission(pageId, user.user_id);
+    if (!can) throw new PagePermissionError("Forbidden");
+
+    await prisma.pagePermission.delete({
+        where: { pageId_userToken: { pageId, userToken } },
+    }).catch(() => {});
+
+    revalidatePath(`/pages`);
+}
+
+export async function getGrantableTagsAndOrgs() {
+    const user = await requireUser();
+
+    const [tags, orgs] = await Promise.all([
+        getUserTags(user.user_id),
+        getUserOrgs(),
+    ]);
+
+    const grantableTags = [];
+    for (const tag of tags) {
+        const caps = await getTagCapabilities(tag.id, user.user_id);
+        if (caps.canManagePageGrants) {
+            const roles = await prisma.tagRole.findMany({
+                where: { tagId: tag.id },
+                orderBy: { hierarchyLevel: 'desc' },
+            });
+            grantableTags.push({ id: tag.id, name: tag.name, roles });
+        }
+    }
+
+    const grantableOrgs = [];
+    for (const org of orgs) {
+        const can = await userHasOrgPermission(org.id, 'canManageOrgPageGrants', user);
+        if (can) {
+            const roles = await prisma.organizationRole.findMany({
+                where: { organizationId: org.id },
+                orderBy: { hierarchyLevel: 'desc' },
+            });
+            grantableOrgs.push({ id: org.id, name: org.name, roles });
+        }
+    }
+
+    return { grantableTags, grantableOrgs };
+}
+
+export async function getPageRoleAccess(pageId: number) {
+    const [tagAccess, orgAccess] = await Promise.all([
+        prisma.tagPageAccess.findMany({
+            where: { pageId },
+            include: { tag: { select: { name: true } }, minRole: { select: { roleName: true } } },
+        }),
+        prisma.orgPageAccess.findMany({
+            where: { pageId },
+            include: { organization: { select: { name: true } }, minRole: { select: { roleName: true } } },
+        }),
+    ]);
+    return { tagAccess, orgAccess };
+}
+
+export async function addTagRolePageAccess(pageId: number, tagId: number, minRoleId: number, level: PermissionLevel) {
+    const user = await requireUser();
+    const can = await hasPageManagePermission(pageId, user.user_id);
+    if (!can) throw new PagePermissionError("Forbidden");
+
+    const result = await prisma.tagPageAccess.upsert({
+        where: { pageId_tagId: { pageId, tagId } },
+        update: { minRoleId, permissions: level },
+        create: { pageId, tagId, minRoleId, permissions: level },
+        include: { tag: { select: { name: true } }, minRole: { select: { roleName: true } } },
+    });
+
+    revalidatePath(`/pages`);
+    return result;
+}
+
+export async function removeTagRolePageAccess(pageId: number, tagId: number) {
+    const user = await requireUser();
+    const can = await hasPageManagePermission(pageId, user.user_id);
+    if (!can) throw new PagePermissionError("Forbidden");
+
+    await prisma.tagPageAccess.delete({
+        where: { pageId_tagId: { pageId, tagId } },
+    }).catch(() => {});
+
+    revalidatePath(`/pages`);
+}
+
+export async function addOrgRolePageAccess(pageId: number, orgId: number, minRoleId: number, level: PermissionLevel) {
+    const user = await requireUser();
+    const can = await hasPageManagePermission(pageId, user.user_id);
+    if (!can) throw new PagePermissionError("Forbidden");
+
+    const result = await prisma.orgPageAccess.upsert({
+        where: { orgId_pageId: { orgId, pageId } },
+        update: { minRoleId, permissions: level },
+        create: { pageId, orgId, minRoleId, permissions: level },
+        include: { organization: { select: { name: true } }, minRole: { select: { roleName: true } } },
+    });
+
+    revalidatePath(`/pages`);
+    return result;
+}
+
+export async function removeOrgRolePageAccess(pageId: number, orgId: number) {
+    const user = await requireUser();
+    const can = await hasPageManagePermission(pageId, user.user_id);
+    if (!can) throw new PagePermissionError("Forbidden");
+
+    await prisma.orgPageAccess.delete({
+        where: { orgId_pageId: { orgId, pageId } },
+    }).catch(() => {});
+
+    revalidatePath(`/pages`);
+}
+
+export async function deletePage(pageId: number) {
+    const user = await requireUser();
+
+    const page = await prisma.page.findUnique({ where: { pageId }, select: { ownerId: true } });
+    if (!page) throw new Error("Page not found");
+    if (page.ownerId !== user.user_id) throw new PagePermissionError("Forbidden");
+
+    await prisma.page.delete({ where: { pageId } });
+
+    revalidatePath(`/pages`);
+    return { success: true };
 }

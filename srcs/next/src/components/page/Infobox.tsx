@@ -11,6 +11,7 @@ import InfoboxPreview from "./InfoboxPreview";
 import TitleInput from "./TitleInput";
 import DescriptionInput from "./DescriptionInput";
 import TagManager from "../tags/TagManager";
+import PagePermissions from "./PagePermissions";
 
 export type { Tag };
 
@@ -33,9 +34,12 @@ type Props = {
     isReadOnly?: boolean;
     availableTagsPool?: Tag[];
     canonicalNamespace?: string | null;
+    ownerAccountId?: string;
+    initialPermissions?: any[];
+    isOwner?: boolean;
 };
 
-export default function Infobox({ accountId, id, pageId, data, onChange, onDelete, isReadOnly = false, canonicalNamespace }: Props) {
+export default function Infobox({ accountId, id, pageId, data, onChange, onDelete, isReadOnly = false, canonicalNamespace, ownerAccountId, initialPermissions = [], isOwner = false }: Props) {
     const t = useTranslations("Page");
     const [isPreview, setIsPreview] = useState(isReadOnly);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -93,6 +97,14 @@ export default function Infobox({ accountId, id, pageId, data, onChange, onDelet
                     onOpenModal={() => setIsCreateModalOpen(true)}
                 />
             </div>
+
+                {isOwner && ownerAccountId && (
+                    <PagePermissions
+                        pageId={pageId}
+                        ownerAccountId={ownerAccountId}
+                        initialPermissions={initialPermissions}
+                    />
+                )}
 
             <CreateTagModal
                 isOpen={isCreateModalOpen}
