@@ -405,7 +405,11 @@
 		"markAllRead": "Marcar todo como leído",
 		"loading": "Cargando...",
 		"empty": "No hay notificaciones",
+		"accept": "Aceptar",
+		"refuse": "Rechazar",
+		"ignore": "Ignorar",
 		"someone": "Alguien",
+		"friendRequest": "{actor} te envió una solicitud de amistad",
 		"untitled": "una página",
 		"pageEdited": "{actor} editó \"{title}\"",
 		"justNow": "justo ahora",
@@ -435,6 +439,8 @@
 		"sending": "Enviando...",
 		"addFriend": "Añadir amigo",
 		"sent": "Solicitud enviada",
+		"removing": "Eliminando...",
+		"removeFriend": "Eliminar amigo",
 		"noPageFound": "No se encontró ninguna página",
 		"pages": "Páginas de {user} ({number})"
   	}

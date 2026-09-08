@@ -82,3 +82,12 @@ export async function refuseFriend(shipId : string) {
 
     await prisma.friendship.delete({ where: { id:shipId }})
 }
+
+export async function removeFriend(shipId : string) {
+    const relation = await prisma.friendship.findUnique({ where: { id: shipId } });
+
+    if (!relation)
+        throw new Error("Friendship not found");
+
+    await prisma.friendship.delete({ where: { id: shipId } });
+}
