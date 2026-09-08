@@ -32,7 +32,11 @@ export async function GET(request: Request) {
         type: n.type,
         read: n.read,
         createdAt: n.createdAt,
-        actor: n.actor ? { username: n.actor.username, imgLink: n.actor.imgLink } : null,
+        actor: n.actor ? {
+            username: n.actor.username,
+            imgLink: n.actor.imgLink,
+            accountId: n.actor.accountId,
+        } : null,
         page: n.page
             ? {
                 pageId: n.page.pageId,

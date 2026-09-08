@@ -1,7 +1,9 @@
 "use server";
 
-import { Organization, Page, User, Friendship, FriendshipStatus } from "@prisma/client";
+import { Friendship, FriendshipStatus, NotificationType } from "@prisma/client";
 import { prisma } from "@/app/lib/prisma/prisma";
+import { notifyFriendRequest } from "./notifications";
+import { revalidatePath } from "next/dist/server/web/spec-extension/revalidate";
 
 export async function getRelation(senderId : string, receiverId : string) : Promise<Friendship | null> {
     const relation = await prisma.friendship.findFirst({
@@ -15,14 +17,7 @@ export async function getRelation(senderId : string, receiverId : string) : Prom
   return (relation);
 }
 
-export async function isBlocked(senderId : string, receiverId : string) : Promise<boolean> {
-    const relation = await getRelation(senderId, receiverId);
-    if (!relation)
-        return false;
-    return (relation.status === FriendshipStatus.BLOCKED && relation.receiverId === senderId);
-}
-
-export async function getFriends(userId : string) : Promise<Friendship[]> {
+export async function getFriends(userId : string) {
     const friends = await prisma.friendship.findMany({
     where: {
         status: FriendshipStatus.ACCEPTED,
@@ -45,53 +40,54 @@ export async function addFriends(senderId : string, receiverId : string)
         throw new Error("Cannot add yourself");
     }
 
-    await prisma.friendship.create({
+    const existing = await getRelation(senderId, receiverId);
+    if (existing) {
+        throw new Error("Friendship already exists");
+    }
+
+      const friendship = await prisma.friendship.create({
         data: {
             senderId,
             receiverId
         }
     })
+
+    await notifyFriendRequest(friendship.id, senderId, receiverId);
+    revalidatePath("/wiki/${receiver_id}");
 }
 
 export async function acceptFriend(shipId : string) {
 
-    const relation = await prisma.friendship.findUnique( {
-        where : { id:shipId }
-    });
+    const relation = await prisma.friendship.findUnique( { where : { id:shipId } });
 
     if (!relation)
         throw new Error("Logic error, cannot go there");
-
-    if (relation.status === FriendshipStatus.BLOCKED)
-        return ;
 
     await prisma.friendship.update({
         where: { id:shipId },
         data: { status : FriendshipStatus.ACCEPTED }
     })
+
+    await prisma.notification.deleteMany({
+        where: { friendshipId: shipId, type: NotificationType.FRIEND_REQUEST },
+    });
 }
 
 export async function refuseFriend(shipId : string) {
 
-    const relation = await prisma.friendship.findUnique( {
-        where : { id:shipId }
-    });
+    const relation = await prisma.friendship.findUnique( { where : { id:shipId } });
 
     if (!relation)
         throw new Error("Logic error, cannot go there");
 
-    if (relation.status === FriendshipStatus.BLOCKED)
-        return ;
-
-    await prisma.friendship.delete({
-        where: { id:shipId }
-    })
+    await prisma.friendship.delete({ where: { id:shipId }})
 }
 
-export async function blockFriend(shipId : string) {
+export async function removeFriend(shipId : string) {
+    const relation = await prisma.friendship.findUnique({ where: { id: shipId } });
 
-    await prisma.friendship.update({
-        where: { id:shipId },
-        data: { status: FriendshipStatus.BLOCKED}
-    })
+    if (!relation)
+        throw new Error("Friendship not found");
+
+    await prisma.friendship.delete({ where: { id: shipId } });
 }

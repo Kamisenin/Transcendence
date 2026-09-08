@@ -2,6 +2,7 @@
 import { filterPages, getEditablePages } from "@/actions/pages";
 import { User } from "@prisma/client";
 import ForumCard from "../ForumCard";
+import { getTranslations } from "next-intl/server";
 
 
 type Props = {
@@ -12,12 +13,13 @@ type Props = {
 export default async function PagesList({ target, currentUserId }: Props)
 {
 	console.log(target.user_id);
-	const editablePages = await getEditablePages(target.accountId);
+	const editablePages = await getEditablePages(target.user_id);
 
-	const filteredpages = await filterPages(currentUserId, editablePages);
-
+    const t = await  getTranslations("Friend");
+    const filteredpages = await filterPages(currentUserId, editablePages);
+	
 	return (
-		<section className="bg-card text-card-foreground border border-border rounded-lg p-4 shadow-md h-[600px] flex flex-col">
+		<section className="bg-card text-card-foreground border border-border rounded-lg p-4 shadow-md h-[400px] flex flex-col">
 			<h2 className="text-xl font-bold mb-4">
 			Pages créées par {target.username} ({filteredpages.length})
 			</h2>

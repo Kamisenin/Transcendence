@@ -6,10 +6,10 @@ import { requireUser } from '@/actions/tags'
 import { redirect } from "next/navigation";
 import { PermissionLevel } from "@prisma/client"
 import { init_slug, syncUserSlugs, slugify, removeTagSlug, setTagSlug } from "%/lib/page/slug";
-import { User, Page } from '@prisma/client';
+import { Page } from '@prisma/client';
 import { type InfoboxData } from "@/components/page/Infobox"
 import { notifyPageEdit } from "%/lib/notifications";
-import { getUser } from '@/app/lib/prisma/prisma-utils';
+import { getUserById } from '@/app/lib/prisma/prisma-utils';
 import { PageData } from '@/components/ForumCard';
 
 function findPreviewImageFromContent(content: any): string | null {
@@ -73,7 +73,7 @@ const pageInclude = {
 
 export async function getEditablePages(user_id : string) {
     
-    const user = await getUser(user_id);
+    const user = await getUserById(user_id);
     if (!user)
         throw new Error("can't find user");
 
