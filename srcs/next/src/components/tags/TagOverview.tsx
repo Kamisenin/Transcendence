@@ -41,26 +41,23 @@ export default async function TagOverview({ tag, members, pages, isOwnerOrManage
                     <div className="flex items-center gap-3">
                         <span
                             className="h-4 w-4 shrink-0 rounded-full border border-black/10"
-                            style={{ backgroundColor: colorHex }}
-                        />
+                            style={{ backgroundColor: colorHex }}/>
                         <h1 className="text-[32px] leading-tight font-semibold text-[#24292f]">
                             {tag.name}
                         </h1>
-                        {isOwnerOrManager && (
-                            <Link
-                                href={`/tags/${tag.name}`}
-                                className="ml-auto text-sm text-[#0969da] hover:underline"
-                            >
-                                {t("Manage")}
-                            </Link>
+                        {tag.namespace && (
+                            <span className="rounded-md border border-[#d0d7de] bg-[#f6f8fa] px-2 py-1 text-xs font-mono text-[#57606a]">
+                                {tag.namespace}
+                            </span>
                         )}
+                        <Link
+                            href={`/tags/${tag.name}/manage`}
+                            className="ml-auto text-sm text-[#0969da] hover:underline">
+                            {t("Manage")}
+                        </Link>
                     </div>
                     {tag.description && (
-                        <p className="mt-2 text-sm text-[#57606a]">{tag.description}</p>
-                    )}
-                    {tag.namespace && (
-                        <p className="mt-1 text-xs font-mono text-[#8c959f]">/wiki/{tag.namespace}/...</p>
-                    )}
+                        <p className="mt-2 text-sm text-[#57606a]">{tag.description}</p>)}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -68,7 +65,6 @@ export default async function TagOverview({ tag, members, pages, isOwnerOrManage
                         <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-[#57606a]">
                             {t("pages")} <span className="text-[#8c959f] font-normal">({pages.length})</span>
                         </h2>
-
                         {pages.length === 0 ? (
                             <div className="rounded-md border border-[#d0d7de] bg-white p-6 text-sm text-[#57606a]">
                                 {t("noPageWithTag")}
@@ -80,13 +76,11 @@ export default async function TagOverview({ tag, members, pages, isOwnerOrManage
                                         const href = page.canonicalSlug
                                             ? `/wiki/${page.canonicalSlug.namespace}/${page.canonicalSlug.slug}`
                                             : `/wiki/${page.ownerAccount}/${page.pageId}`;
-
                                         return (
                                             <li key={page.pageId}>
                                                 <Link
                                                     href={href}
-                                                    className="flex items-center justify-between px-4 py-3 hover:bg-[#f6f8fa] transition-colors"
-                                                >
+                                                    className="flex items-center justify-between px-4 py-3 hover:bg-[#f6f8fa] transition-colors">
                                                     <span className="truncate font-medium text-[#0969da] hover:underline">
                                                         {page.title || r("untitled")}
                                                     </span>
@@ -107,7 +101,6 @@ export default async function TagOverview({ tag, members, pages, isOwnerOrManage
                         <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-[#57606a]">
                             {t("member")} <span className="text-[#8c959f] font-normal">({members.length})</span>
                         </h2>
-
                         {members.length === 0 ? (
                             <div className="rounded-md border border-[#d0d7de] bg-white p-4 text-sm text-[#57606a]">
                                 {t("noMemberYet")}
@@ -120,8 +113,7 @@ export default async function TagOverview({ tag, members, pages, isOwnerOrManage
                                             <img
                                                 src={member.user.imgLink || "/default-avatar.png"}
                                                 alt=""
-                                                className="w-7 h-7 rounded-full bg-gray-200 shrink-0"
-                                            />
+                                                className="w-7 h-7 rounded-full bg-gray-200 shrink-0"/>
                                             <div className="min-w-0">
                                                 <p className="text-sm font-medium text-[#24292f] truncate">
                                                     {member.user.username}

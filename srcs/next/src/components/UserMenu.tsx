@@ -86,7 +86,7 @@ export default function UserMenu({ user }: UserMenuProps) {
                         {tOrgs("myOrganizations")}
                     </Link>
                     <Link href="/tags" className="block px-4 py-2 hover:bg-gray-100">
-                        tags
+                        {tOrgs("tags")}
                     </Link>
                     <button
                         onClick={handleCreatePage}
@@ -94,9 +94,6 @@ export default function UserMenu({ user }: UserMenuProps) {
                         className="w-full text-left px-4 py-2 hover:bg-gray-100">
                         {creating ? t("creatingPage") : t("createPage")}
                     </button>
-                    <Link href="/settings" className="block px-4 py-2 hover:bg-gray-100">
-                        {t("settings")}
-                    </Link>
 					<Link href="/uploads-manager" className="block px-4 py-2 hover:bg-gray-100">
 						{t("uploadManager")}
 					</Link >
