@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 
 export interface TagData {
@@ -38,7 +39,7 @@ function formatTagColor(color?: string | number | null): string | undefined {
 
 export default function ForumCard({ page, userId, className = "" }: ForumCardProps) {
   const [imgError, setImgError] = useState(false);
-
+  const t = useTranslations("Common");
   const formatImgSrc = (src: string) => {
     if (src.startsWith("http://") || src.startsWith("https://") || src.startsWith("/")) {
       return src;
@@ -49,7 +50,6 @@ export default function ForumCard({ page, userId, className = "" }: ForumCardPro
   const hasValidImg = page.img && !imgError;
 
   const handleClick = () => {
-
   if (!userId) return;
 
     fetch("http://localhost:8001/recommendation/event", {
@@ -64,28 +64,29 @@ export default function ForumCard({ page, userId, className = "" }: ForumCardPro
   };
 
   return (
-  <Link
-    href={`/wiki/${page.namespace}/${page.slug}`}
-    onClick={handleClick}
-    className={`group relative bg-card text-card-foreground border border-border rounded-lg overflow-hidden hover:border-ring transition-all duration-300 hover:-translate-y-1 shadow-md flex flex-col justify-between p-4 h-56 ${className}`}
-  >
-    <div className="flex-1 flex flex-col min-h-0">
-      
-      <div className="transition-all duration-300 group-hover:h-0 group-hover:opacity-0 group-hover:mb-0 mb-3 h-28 w-full flex-shrink-0 overflow-hidden">
-        {hasValidImg ? (
-          <img
-            src={formatImgSrc(page.img!)}
-            alt={page.title}
-            onError={() => setImgError(true)}
-            loading="eager"
-            className="h-full w-full object-cover rounded"
-          />
-        ) : (
-          <div className="h-28 w-full bg-muted rounded flex items-center justify-center text-muted-foreground text-xs">
-            Pas d'image
-          </div>
-        )}
-      </div>
+    <Link
+      href={`/wiki/${page.namespace}/${page.slug}`}
+      onClick={handleClick}
+      className={`group relative bg-card text-card-foreground border border-border rounded-lg overflow-hidden hover:border-ring transition-all duration-300 hover:-translate-y-1 shadow-md flex flex-col justify-between p-4 h-56 ${className}`}
+    >
+      <div className="flex-1 flex flex-col min-h-0">
+        
+        <div className="transition-all duration-300 group-hover:h-0 group-hover:opacity-0 group-hover:mb-0 mb-3 h-28 w-full flex-shrink-0 overflow-hidden">
+          {hasValidImg ? (
+            <img
+              src={formatImgSrc(page.img!)}
+              alt={page.title}
+              onError={() => setImgError(true)}
+              loading="eager"
+              style={{ width: "auto", height: "100%" }}
+              className="h-28 w-full object-cover rounded"
+            />
+          ) : (
+            <div className="h-28 w-full bg-muted rounded flex items-center justify-center text-muted-foreground text-xs">
+              {t("noImage")}
+            </div>
+          )}
+        </div>
 
       <div className="flex-1 flex flex-col justify-start min-h-0 pb-1">
         <h4 className="font-semibold text-card-foreground text-base leading-snug line-clamp-2 flex-shrink-0">

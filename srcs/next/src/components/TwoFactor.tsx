@@ -43,7 +43,7 @@ export default function TwoFactorToggle({ twoFactorEnabled, emailVerified }: Pro
         setLoading(false);
     }
     return (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 pt-4">
             <label className="flex items-center gap-2">
                 <input
                     type="checkbox"

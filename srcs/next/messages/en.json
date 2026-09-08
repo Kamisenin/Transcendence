@@ -20,12 +20,24 @@
 		"color": "Color",
 		"namespace": "Namespace",
 		"visibility": "Visibility",
+		"public": "Public",
+		"private": "Private",
 		"owner": "Owner",
 		"members": "Members",
 		"roles": "Roles",
 		"pages": "Pages",
 		"tags": "Tags",
-		"byOwner": "by {owner}"
+		"byOwner": "by {owner}",
+		"noImage": "No image",
+		"noImagesYet": "No images yet.",
+		"kb": "KB",
+		"mb": "MB",
+		"selectValidImage": "Please select an image.",
+		"imageTooLarge": "The image must not exceed 10 MB.",
+		"uploadImageFailed": "Unable to upload the image.",
+		"dragOrBrowse": "Drag an image here or click to browse",
+		"acceptedFormats": "PNG, JPG, WEBP · 10 MB max",
+		"languageSwitcher": "Change language"
 	},
 	"Auth": {
 		"login": {
@@ -41,7 +53,7 @@
 			"title": "Create an account",
 			"emailPlaceholder": "Email",
 			"accountNamePlaceholder": "Account name",
-			"userNamePlaceholder" : "Username (optional)",
+			"userNamePlaceholder": "Username (optional)",
 			"passwordPlaceholder": "Password",
 			"submit": "Sign up"
 		},
@@ -103,8 +115,15 @@
 		"changePassword": "Change password",
 		"username": "Username",
 		"email": "Email",
-		"2fa disable": "Email updated. 2FA has been disabled."
-
+		"2fa disable": "Email updated. 2FA has been disabled.",
+		"exportMyData": "Export my data",
+		"deleteMyAccount": "Delete my account",
+		"deleteIrreversibleWarning": "This action is irreversible. Enter your password to confirm.",
+		"passwordPlaceholder": "password",
+		"deletingInProgress": "Deleting...",
+		"confirmDeletionAction": "confirm deletion",
+		"cancel": "Cancel",
+		"somethingWentWrongGeneric": "Something went wrong"
 	},
 	"Session": {
 		"loading": "Loading sessions...",
@@ -112,9 +131,10 @@
 		"device": "this device",
 		"2fa disable": "Email updated. 2FA has been disabled.",
 		"Since": "Since",
-		"Revoke": "Revoke"
+		"Revoke": "Revoke",
+		"somethingWentWrong": "Something went wrong"
 	},
-		"Terms": {
+	"Terms": {
 		"title": "Terms of Service",
 		"intro": "By using this forum, you agree to follow these Terms of Service.",
 		"respectTitle": "Respect other users",
@@ -128,7 +148,7 @@
 		"changesTitle": "Changes",
 		"changesText": "These terms may be updated when necessary. Continued use of the forum means that you accept the updated terms."
 	},
-		"Privacy": {
+	"Privacy": {
 		"title": "Privacy Policy",
 		"intro": "Your privacy is important to us. This Privacy Policy explains how information is handled when you use our forum.",
 		"informationTitle": "Information we collect",
@@ -147,7 +167,30 @@
 		"organizationNotFound": "Organization not found",
 		"manageDescription": "Manage your organizations and access controls",
 		"dangerousZone": "Dangerous Zone",
-		"deleteOrganization": "Delete organization"
+		"deleteOrganization": "Delete organization",
+		"searchMemberPlaceholder": "Search by accountId or username",
+		"roleNamePlaceholder": "Role name",
+		"hierarchyLevelPlaceholder": "Hierarchy level",
+		"permissionDenied": "Permission denied",
+		"deleteFailed": "Delete failed",
+		"remove": "Remove",
+		"addSelected": "Add selected ({count})",
+		"deleteOrgWarning": "This will permanently remove {name} and cannot be undone.",
+		"deleting": "Deleting…",
+		"owner": "Owner",
+		"view": "View",
+		"manage": "Manage",
+		"viewAria": "View {name}",
+		"manageAria": "Manage {name}",
+		"created": "Created {date}",
+		"newOrganization": "New organization",
+		"manageOrganization": "Manage organization",
+		"noRoleFound": "No role found",
+		"noPageFound": "No page found",
+		"noTagFound": "No tag found",
+		"noMemberFound": "No member found",
+		"member": "Member",
+		"createdLabel": "Created"
 	},
 	"Tags": {
 		"myTags": "My Tags",
@@ -157,6 +200,32 @@
 		"noPageFound": "No page found",
 		"noPagesFound": "No pages found",
 		"tagNameRequired": "The tag name is required.",
+		"confirmDeletion": "Confirm deletion",
+		"lastConfirmation": "Last confirmation",
+		"deletingInProgress": "Deleting...",
+		"tagDeletedRedirecting": "Tag deleted, redirecting...",
+		"deleteError": "Error deleting tag",
+		"tagNameRequiredCreate": "Tag name is required.",
+		"tagNameUnavailable": "This tag name is not available.",
+		"namespaceInvalid": "The given namespace is not valid.",
+		"genericError": "Something went wrong.",
+		"namePlaceholderExample": "Ex: Character, Lore, Universe...",
+		"namespacePlaceholderExample": "Ex: my-namespace",
+		"nameAlreadyTaken": "This name is already taken",
+		"validNamespace": "Valid namespace",
+		"invalidNamespace": "Invalid namespace",
+		"deleteTagBtn": "Delete tag",
+		"noAccessToPage": "You do not have access to this page",
+		"name": "Name",
+		"description": "Description",
+		"color": "Color",
+		"namespace": "Namespace",
+		"namespacePlaceholderShort": "e.g. sword",
+		"namespaceHint": "Used to group related tags",
+		"save": "Save",
+		"dangerousZone": "Dangerous Zone",
+		"noRoleAvailable": "No role available to assign (create a role below your rank first).",
+		"deleteIrreversible": "This action is irreversible",
 		"createModal": {
 			"title": "Create a new Tag",
 			"nameLabel": "Tag Name *",
@@ -166,7 +235,15 @@
 			"namespacePlaceholder": "Ex: my-namespace",
 			"colorLabel": "Color",
 			"namespaceUnavailable": "The given namespace is unavailable.",
-			"namespaceAvailable": "Namespace available"
+			"namespaceAvailable": "Namespace available",
+			"required": "Tag name is required.",
+			"nameUnavailable": "This tag name is not available.",
+			"namespaceInvalid": "The given namespace is not valid.",
+			"checkingAvailability": "Checking availability...",
+			"checking": "Checking...",
+			"nameAvailable": "Name available",
+			"validNamespace": "Valid namespace",
+			"invalidNamespace": "Invalid namespace"
 		},
 		"members": {
 			"noMemberYet": "No member yet.",
@@ -184,10 +261,18 @@
 			"pleaseSelectRole": "Please select a role",
 			"memberRoleUpdated": "Member role updated",
 			"failedToChangeMemberRole": "Failed to change member role",
-			"ownerRoleCannotBeChanged": "Owner role cannot be changed"
+			"ownerRoleCannotBeChanged": "Owner role cannot be changed",
+			"alreadyMember": "Already a member",
+			"remove": "Remove",
+			"add": "Add",
+			"you": "you"
 		},
 		"requests": {
-			"noPendingRequests": "No pending requests."
+			"noPendingRequests": "No pending requests.",
+			"requestText": "{username} requests to add the page {title}",
+			"accept": "Accept",
+			"reject": "Reject",
+			"untitled": "Untitled"
 		},
 		"roles": {
 			"noRoleFound": "No role found",
@@ -198,7 +283,23 @@
 			"roleCreated": "Role created",
 			"failedToCreateRole": "Failed to create role",
 			"roleDeleted": "Role deleted",
-			"failedToDeleteRole": "Failed to delete role"
+			"failedToDeleteRole": "Failed to delete role",
+			"creating": "Creating...",
+			"manageMembers": "Manage members",
+			"manageRoles": "Manage roles",
+			"editTagInfo": "Edit tag info",
+			"deleteTag": "Delete tag",
+			"addPage": "Add a page",
+			"revokePage": "Revoke a page",
+			"managePageAccess": "Manage page access",
+			"handleRequests": "Handle requests",
+			"newRole": "+ New role",
+			"roleNameLabel": "Role name",
+			"hierarchyHint": "Rank limited to your own level or below",
+			"hierarchyLevelLabel": "Rank",
+			"save": "Save",
+			"cancel": "Cancel",
+			"deleteRoleConfirm": "Delete this role? Members with it will lose their linked access."
 		},
 		"slugNamespace": "Slug Namespace (Optional)",
 		"noneUseAccountOnly": "None (Use only my account)"
@@ -264,7 +365,18 @@
 		"previewMode": "Preview Mode",
 		"edit": "Edit",
 		"less": "Less",
-		"more": "more"
+		"more": "more",
+		"noImage": "No image"
+	},
+	"MyPages": {
+		"myPages": "My pages",
+		"sharedPages": "Shared pages",
+		"preview": "Preview",
+		"owner": "Owner: {owner}",
+		"edit": "Edit",
+		"noPagesFound": "No pages found",
+		"failedToFetch": "Failed to fetch",
+		"error": "Error: {message}"
 	},
 	"Home": {
 		"tagline": "A wiki for wikis",
@@ -303,5 +415,18 @@
 		"title": "recently edited",
 		"editedBy": "edited by {name} · {time}",
 		"untitled": "Untitled"
+	},
+	"LocaleSwitcher": {
+		"ariaLabel": "Change language"
+	},
+	"DeleteAccount": {
+		"exportData": "Export my data",
+		"deleteAccount": "Delete my account",
+		"irreversible": "This action is irreversible.",
+		"password": "Password",
+		"deleting": "Deleting...",
+		"confirmDeletion": "Confirm deletion",
+		"cancel": "Cancel",
+		"error": "Something went wrong"
 	}
 }

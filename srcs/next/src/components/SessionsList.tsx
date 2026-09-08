@@ -41,7 +41,7 @@ export default function SessionList() {
         if (res.ok){
             loadSessions();
         } else {
-            setMessage("Something went wrong")
+            setMessage(t("error"));
         }
     }
     
@@ -55,7 +55,7 @@ export default function SessionList() {
                     <li key={s.id} className="border p-2 rounded flex justify-between items-center text-sm">
                         <div>
                             <p>
-                                {s.ipAddress === "::1" || s.ipAddress === "127.0.0.1" ? "Localhost" : s.ipAddress}{" "}
+                                {s.ipAddress === "::1" || s.ipAddress === "127.0.0.1" ? t("localhost") : s.ipAddress}{" "}
                                 {s.isCurrent && (
                                     <span className="text-green-600 font-semibold">{t("device")}</span>
                                 )}

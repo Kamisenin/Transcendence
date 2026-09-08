@@ -20,12 +20,24 @@
 		"color": "Couleur",
 		"namespace": "Namespace",
 		"visibility": "Visibilité",
+		"public": "Public",
+		"private": "Privé",
 		"owner": "Propriétaire",
 		"members": "Membres",
 		"roles": "Rôles",
 		"pages": "Pages",
 		"tags": "Tags",
-		"byOwner": "par {owner}"
+		"byOwner": "par {owner}",
+		"noImage": "Pas d'image",
+		"noImagesYet": "Aucune image pour le moment.",
+		"kb": "Ko",
+		"mb": "Mo",
+		"selectValidImage": "Veuillez sélectionner une image.",
+		"imageTooLarge": "L'image ne doit pas dépasser 10 Mo.",
+		"uploadImageFailed": "Impossible d'envoyer l'image.",
+		"dragOrBrowse": "Glissez une image ici ou cliquez pour parcourir",
+		"acceptedFormats": "PNG, JPG, WEBP · 10 Mo max",
+		"languageSwitcher": "Changer de langue"
 	},
 	"Auth": {
 		"login": {
@@ -41,7 +53,7 @@
 			"title": "Créer un compte",
 			"emailPlaceholder": "Email",
 			"accountNamePlaceholder": "Nom de compte",
-			"userNamePlaceholder" : "Nom d'utilisateur (optionnel)",
+			"userNamePlaceholder": "Nom d'utilisateur (optionnel)",
 			"passwordPlaceholder": "Mot de passe",
 			"submit": "S'inscrire"
 		},
@@ -103,18 +115,26 @@
 		"changePassword": "Changer le mot de passe",
 		"username": "Nom d'utilisateur",
 		"email": "Email",
-		"2fa disable": "Email updated. 2FA has been disabled."
-
+		"2fa disable": "Email mis à jour. La 2FA a été désactivée.",
+		"exportMyData": "Exporter mes données",
+		"deleteMyAccount": "Supprimer mon compte",
+		"deleteIrreversibleWarning": "Cette action est irréversible. Entrez votre mot de passe pour confirmer.",
+		"passwordPlaceholder": "mot de passe",
+		"deletingInProgress": "Suppression...",
+		"confirmDeletionAction": "confirmer la suppression",
+		"cancel": "Annuler",
+		"somethingWentWrongGeneric": "Une erreur est survenue"
 	},
-		"Session": {
+	"Session": {
 		"loading": "Chargement des sessions...",
 		"Active_sessions": "Sessions actives",
 		"device": "cet appareil",
 		"2fa disable": "E-mail mis à jour. La 2FA a été désactivée.",
 		"Since": "Depuis",
-		"Revoke": "Révoquer"
+		"Revoke": "Révoquer",
+		"somethingWentWrong": "Une erreur est survenue"
 	},
-		"Terms": {
+	"Terms": {
 		"title": "Conditions d'utilisation",
 		"intro": "En utilisant ce forum, vous acceptez de respecter les présentes conditions d'utilisation.",
 		"respectTitle": "Respect des autres utilisateurs",
@@ -128,7 +148,7 @@
 		"changesTitle": "Modifications",
 		"changesText": "Ces conditions peuvent être mises à jour si nécessaire. La poursuite de l'utilisation du forum signifie que vous acceptez les conditions mises à jour."
 	},
-		"Privacy": {
+	"Privacy": {
 		"title": "Politique de confidentialité",
 		"intro": "Votre vie privée est importante pour nous. Cette politique de confidentialité explique comment vos informations sont traitées lorsque vous utilisez notre forum.",
 		"informationTitle": "Informations que nous collectons",
@@ -147,7 +167,30 @@
 		"organizationNotFound": "Organisation introuvable",
 		"manageDescription": "Gérez vos organisations et contrôles d'accès",
 		"dangerousZone": "Zone dangereuse",
-		"deleteOrganization": "Supprimer l'organisation"
+		"deleteOrganization": "Supprimer l'organisation",
+		"searchMemberPlaceholder": "Rechercher par identifiant ou nom d'utilisateur",
+		"roleNamePlaceholder": "Nom du rôle",
+		"hierarchyLevelPlaceholder": "Niveau hiérarchique",
+		"permissionDenied": "Permission refusée",
+		"deleteFailed": "Échec de la suppression",
+		"remove": "Retirer",
+		"addSelected": "Ajouter la sélection ({count})",
+		"deleteOrgWarning": "Cette action supprimera définitivement {name} et ne pourra pas être annulée.",
+		"deleting": "Suppression…",
+		"owner": "Propriétaire",
+		"view": "Voir",
+		"manage": "Gérer",
+		"viewAria": "Voir {name}",
+		"manageAria": "Gérer {name}",
+		"newOrganization": "Nouvelle organisation",
+		"created": "Créé le {date}",
+		"manageOrganization": "Gérer l'organisation",
+		"noRoleFound": "Aucun rôle trouvé",
+		"noPageFound": "Aucune page trouvée",
+		"noTagFound": "Aucun tag trouvé",
+		"noMemberFound": "Aucun membre trouvé",
+		"member": "Membre",
+		"createdLabel": "Créé le"
 	},
 	"Tags": {
 		"myTags": "Mes tags",
@@ -157,6 +200,32 @@
 		"noPageFound": "Aucune page trouvée",
 		"noPagesFound": "Aucune page trouvée",
 		"tagNameRequired": "Le nom du tag est obligatoire.",
+		"confirmDeletion": "Confirmer la suppression",
+		"lastConfirmation": "Dernière confirmation",
+		"deletingInProgress": "Suppression en cours...",
+		"tagDeletedRedirecting": "Tag supprimé, redirection...",
+		"deleteError": "Erreur lors de la suppression",
+		"tagNameRequiredCreate": "Le nom du tag est requis.",
+		"tagNameUnavailable": "Ce nom de tag n'est pas disponible.",
+		"namespaceInvalid": "Le namespace donné n'est pas valide.",
+		"genericError": "Une erreur est survenue.",
+		"namePlaceholderExample": "Ex: Personnage, Lore, Univers...",
+		"namespacePlaceholderExample": "Ex: mon-namespace",
+		"nameAlreadyTaken": "Ce nom est déjà pris",
+		"validNamespace": "Namespace valide",
+		"invalidNamespace": "Namespace invalide",
+		"deleteTagBtn": "Supprimer le tag",
+		"noAccessToPage": "Vous n'avez pas accès à cette page",
+		"name": "Nom",
+		"description": "Description",
+		"color": "Couleur",
+		"namespace": "Namespace",
+		"namespacePlaceholderShort": "ex. épée",
+		"namespaceHint": "Utilisé pour regrouper les tags liés entre eux",
+		"save": "Enregistrer",
+		"dangerousZone": "Zone dangereuse",
+		"noRoleAvailable": "Aucun rôle disponible à assigner (crée d'abord un rôle inférieur à ton rang).",
+		"deleteIrreversible": "Cette action est irréversible",
 		"createModal": {
 			"title": "Créer un nouveau Tag",
 			"nameLabel": "Nom du Tag *",
@@ -166,7 +235,15 @@
 			"namespacePlaceholder": "Ex: my-namespace",
 			"colorLabel": "Couleur",
 			"namespaceUnavailable": "Le namespace indiqué est indisponible.",
-			"namespaceAvailable": "Namespace disponible"
+			"namespaceAvailable": "Namespace disponible",
+			"required": "Le nom du tag est obligatoire.",
+			"nameUnavailable": "Ce nom de tag n'est pas disponible.",
+			"namespaceInvalid": "Le namespace donné n'est pas valide.",
+			"checkingAvailability": "Vérification...",
+			"checking": "Vérification...",
+			"nameAvailable": "Nom disponible",
+			"validNamespace": "Namespace valide",
+			"invalidNamespace": "Namespace invalide"
 		},
 		"members": {
 			"noMemberYet": "Aucun membre pour l'instant.",
@@ -184,10 +261,18 @@
 			"pleaseSelectRole": "Veuillez sélectionner un rôle",
 			"memberRoleUpdated": "Rôle du membre mis à jour",
 			"failedToChangeMemberRole": "Échec du changement de rôle",
-			"ownerRoleCannotBeChanged": "Le rôle du propriétaire ne peut pas être changé"
+			"ownerRoleCannotBeChanged": "Le rôle du propriétaire ne peut pas être changé",
+			"alreadyMember": "Déjà membre",
+			"remove": "Retirer",
+			"add": "Ajouter",
+			"you": "toi"
 		},
 		"requests": {
-			"noPendingRequests": "Aucune demande en attente."
+			"noPendingRequests": "Aucune demande en attente.",
+			"requestText": "{username} demande à ajouter la page {title}",
+			"accept": "Accepter",
+			"reject": "Refuser",
+			"untitled": "Sans titre"
 		},
 		"roles": {
 			"noRoleFound": "Aucun rôle trouvé",
@@ -198,7 +283,23 @@
 			"roleCreated": "Rôle créé",
 			"failedToCreateRole": "Échec de la création du rôle",
 			"roleDeleted": "Rôle supprimé",
-			"failedToDeleteRole": "Échec de la suppression du rôle"
+			"failedToDeleteRole": "Échec de la suppression du rôle",
+			"creating": "Création...",
+			"manageMembers": "Gérer les membres",
+			"manageRoles": "Gérer les rôles",
+			"editTagInfo": "Éditer les infos du tag",
+			"deleteTag": "Supprimer le tag",
+			"addPage": "Ajouter une page",
+			"revokePage": "Révoquer une page",
+			"managePageAccess": "Gérer les accès de page",
+			"handleRequests": "Traiter les demandes",
+			"deleteRoleConfirm": "Supprimer ce rôle ? Les membres l'ayant perdront leur accès lié.",
+			"roleNameLabel": "Nom du rôle",
+			"hierarchyHint": "Rang limité à ton propre niveau ou en dessous",
+			"newRole": "+ Nouveau rôle",
+			"hierarchyLevelLabel": "Rang",
+			"save": "Enregistrer",
+			"cancel": "Annuler"
 		},
 		"slugNamespace": "Namespace du Slug (Optionnel)",
 		"noneUseAccountOnly": "Aucun (Utiliser uniquement mon compte)"
@@ -264,9 +365,20 @@
 		"previewMode": "Mode Prévisualisation",
 		"edit": "Éditer",
 		"less": "Moins",
-		"more": "plus"
+		"more": "plus",
+		"noImage": "Pas d'image"
 	},
-	"Home":{
+	"MyPages": {
+		"myPages": "Mes pages",
+		"sharedPages": "Pages partagées",
+		"preview": "Aperçu",
+		"owner": "Propriétaire : {owner}",
+		"edit": "Éditer",
+		"noPagesFound": "Aucune page trouvée",
+		"failedToFetch": "Échec du chargement",
+		"error": "Erreur : {message}"
+	},
+	"Home": {
 		"tagline": "Un wiki pour wikis",
 		"title": "trouvez n'importe quelle page du wiki"
 	},
@@ -303,5 +415,18 @@
 		"title": "modifiées récemment",
 		"editedBy": "modifié par {name} · {time}",
 		"untitled": "Sans titre"
+	},
+	"LocaleSwitcher": {
+		"ariaLabel": "Changer de langue"
+	},
+	"DeleteAccount": {
+		"exportData": "Exporter mes données",
+		"deleteAccount": "Supprimer mon compte",
+		"irreversible": "Cette action est irréversible.",
+		"password": "Mot de passe",
+		"deleting": "Suppression...",
+		"confirmDeletion": "Confirmer la suppression",
+		"cancel": "Annuler",
+		"error": "Une erreur est survenue"
 	}
 }

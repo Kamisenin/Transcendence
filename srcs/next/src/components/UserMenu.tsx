@@ -4,9 +4,10 @@ import { useState, useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { createPage } from "@/actions/pages";
 import Link from "next/link";
+import Image from "next/image";
 
 type UserMenuProps = {
-    user: { username: string  } | null; 
+    user: { username: string, imgLink: string  } | null; 
 };
 
 export default function UserMenu({ user }: UserMenuProps) {
@@ -57,10 +58,19 @@ export default function UserMenu({ user }: UserMenuProps) {
     }
     return (
         <div ref={menuRef} className="relative">
-            <button
-                onClick={() => setOpen(!open)}
-                className="w-10 h-10 rounded-full bg-white border-2 border-black shadow-md hover:shadow-lg cursor-pointer transition">
-            </button>
+			<button
+				onClick={() => setOpen(!open)}
+				className="w-10 h-10 rounded-full bg-white border-2 border-black shadow-md hover:shadow-lg cursor-pointer transition flex items-center justify-center overflow-hidden"
+			>
+				<Image
+					src={user.imgLink || "/defaultUserProfilePicture.svg"}
+					alt="Logo"
+					width={44}
+					height={44}
+					className="w-full h-full object-cover"
+					style={{ filter: "drop-shadow(0 0 2px black)" }}
+				/>
+			</button>
             {open && (
                 <div className="absolute right-0 mt-2 w-48 bg-white text-back rounded shadow-lg border">
                     <div className="px-4 py-2 border-b text-sm font-semibold">
@@ -75,6 +85,9 @@ export default function UserMenu({ user }: UserMenuProps) {
                     <Link href="/orgs/" className="block px-4 py-2 hover:bg-gray-100">
                         {tOrgs("myOrganizations")}
                     </Link>
+                    <Link href="/tags" className="block px-4 py-2 hover:bg-gray-100">
+                        tags
+                    </Link>
                     <button
                         onClick={handleCreatePage}
                         disabled={creating}
@@ -84,6 +97,9 @@ export default function UserMenu({ user }: UserMenuProps) {
                     <Link href="/settings" className="block px-4 py-2 hover:bg-gray-100">
                         {t("settings")}
                     </Link>
+					<Link href="/uploads-manager" className="block px-4 py-2 hover:bg-gray-100">
+						Upload Manager
+					</Link >
                     <button onClick={handleLogout} className="w-full text-left px-4 py-2 hover:bg-gray-100">
                         {t("logOut")}
                     </button>

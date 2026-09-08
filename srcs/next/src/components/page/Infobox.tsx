@@ -56,13 +56,13 @@ export default function Infobox({ accountId, id, pageId, data, onChange, onDelet
         <div className="group relative h-full w-full bg-white rounded-xl border border-blue-200 ring-1 ring-blue-50 p-4 shadow-sm flex flex-col overflow-hidden">
             {/* En-tête */}
             <div className="pl-7 flex items-center justify-between border-b pb-2 mb-3 shrink-0">
-                <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Page Options</span>
+                <span className="text-xs font-bold uppercase tracking-wider text-gray-400">{t('options')}</span>
                 <button
                     type="button"
                     onClick={() => setIsPreview(true)}
                     className="flex items-center gap-1 text-xs bg-blue-50 text-blue-600 hover:bg-blue-100 font-medium px-2 py-1 rounded-md transition cursor-pointer"
                 >
-                    <Eye size={13} /> Preview
+                    <Eye size={13} /> {t('preview')}
                 </button>
             </div>
 

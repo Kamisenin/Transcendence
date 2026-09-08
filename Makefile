@@ -1,4 +1,5 @@
 MODE ?= prod
+NEXT_UPLOADS_PATH ?= /home/${USER}/data/next_uploads
 
 ifeq ($(MODE),dev)
 	ADDRESS := host.parent
@@ -12,17 +13,18 @@ endif
 
 DOCKER_COMPOSE = docker compose
 export ADDRESS
+export NEXT_UPLOADS_PATH
+
 
 upb:
-	mkdir -p data/db
 	@echo "ADDRESS vaut : $(ADDRESS)"
 	@echo "running 42chan in $(MODE) mode"
-	$(DOCKER_COMPOSE) $(PROFILE_FLAG) up --build
+	@mkdir -p data/db $(NEXT_UPLOADS_PATH)
 	$(NEXT_RUN)
 
 up:
-	mkdir -p data/db
 	@echo "running 42chan in $(MODE) mode"
+	@mkdir -p data/db $(NEXT_UPLOADS_PATH)
 	$(DOCKER_COMPOSE) $(PROFILE_FLAG) up
 	$(NEXT_RUN)
 
