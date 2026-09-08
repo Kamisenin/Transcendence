@@ -4,6 +4,7 @@ import { getCurrentUser } from "%/lib/session";
 import { notFound } from "next/navigation";
 import PagesList from "@/components/user/PagesList";
 import FriendList from "@/components/user/friends/FriendList";
+import FriendButtons from "@/components/user/friends/FriendButtons";
 
 type Params = {
   params: Promise<{
@@ -24,6 +25,7 @@ export default async function UserWikiPage({ params }: Params) {
 	return (
     <div>
       <FriendList target_id={target.user_id}/>
+	  {currentUser && (<FriendButtons target_id={target.user_id} user_id={currentUser?.user_id} />)}
       <div className="grid grid-cols-3 gap-6 w-full mx-auto p-6 pt-22 items-start">
         <PagesList target={target} currentUserId={currentUser?.user_id}/>
 

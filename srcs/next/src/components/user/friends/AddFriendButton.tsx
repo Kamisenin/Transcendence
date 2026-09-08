@@ -2,7 +2,6 @@
 
 import { useTransition } from "react";
 import { addFriends } from "@/actions/friendship";
-import { revalidatePath } from "next/cache";
 import { useTranslations } from "next-intl";
 
 type Props = {
@@ -17,7 +16,6 @@ export default function AddFriendButton({ receiver_id, sender_id }: Props) {
     const handleAddFriend = () => {
         startTransition(async () => {
             await addFriends(sender_id, receiver_id);
-            revalidatePath("/wiki/${receiver_id}")
         });
     };
 
