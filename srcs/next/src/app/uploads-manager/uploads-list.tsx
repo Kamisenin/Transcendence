@@ -15,10 +15,10 @@ function UploadsList({ uploads }: { uploads: SerializedUpload[] }) {
 		const seuilMo = 1024 * 1024; // 1 Mo
 
 		if (bytes < seuilMo) {
-			return `${(bytes / 1024).toFixed(1)} Ko`;
+			return `${(bytes / 1024).toFixed(1)} ${t('kb')}`;
 		}
 
-		return `${(bytes / seuilMo).toFixed(2)} Mo`;
+		return `${(bytes / seuilMo).toFixed(2)} ${t('mb')}`;
 	}
 	async function handleDelete(uploadId: number) {
 		setDeletingId(uploadId);

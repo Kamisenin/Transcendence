@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 export default function UploadProfilePicture({
 	initialImgLink,
@@ -10,6 +11,7 @@ export default function UploadProfilePicture({
 }) {
 	const [isUploading, setIsUploading] = useState(false);
 	const [imgLink, setImgLink] = useState(initialImgLink);
+	const t = useTranslations("Common");
 
 	function handleUpload(event: React.ChangeEvent<HTMLInputElement>) {
 		const file = event.target.files?.[0];
@@ -19,12 +21,12 @@ export default function UploadProfilePicture({
 
 	async function uploadFile(file: File) {
 		if (!file.type.startsWith("image/")) {
-			alert("Veuillez sélectionner une image.");
+			alert(t("selectValidImage"))
 			return;
 		}
 
 		if (file.size > 10 * 1024 * 1024) {
-			alert("L'image ne doit pas dépasser 10 Mo.");
+			alert(t("imageTooLarge"))
 			return;
 		}
 
@@ -62,7 +64,7 @@ export default function UploadProfilePicture({
 			setImgLink(data.path);
 		} catch (error) {
 			console.error(error);
-			alert("Impossible d'envoyer l'image.");
+			alert(t("uploadImageFailed"))
 		} finally {
 			setIsUploading(false);
 		}

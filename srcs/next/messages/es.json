@@ -30,6 +30,13 @@
 		"byOwner": "por {owner}",
 		"noImage": "Sin imagen",
 		"noImagesYet": "Aún no hay imágenes.",
+		"kb": "KB",
+		"mb": "MB",
+		"selectValidImage": "Por favor, selecciona una imagen.",
+		"imageTooLarge": "La imagen no debe superar los 10 MB.",
+		"uploadImageFailed": "No se pudo enviar la imagen.",
+		"dragOrBrowse": "Arrastra una imagen aquí o haz clic para buscar",
+		"acceptedFormats": "PNG, JPG, WEBP · 10 MB máx.",
 		"languageSwitcher": "Cambiar idioma"
 	},
 	"Auth": {
@@ -217,6 +224,7 @@
 		"namespaceHint": "Se usa para agrupar etiquetas relacionadas",
 		"save": "Guardar",
 		"dangerousZone": "Zona peligrosa",
+		"noRoleAvailable": "No hay ningún rol disponible para asignar (crea primero un rol por debajo de tu rango).",
 		"deleteIrreversible": "Esta acción es irreversible",
 		"createModal": {
 			"title": "Crear una nueva etiqueta",
@@ -256,6 +264,7 @@
 			"ownerRoleCannotBeChanged": "El rol del propietario no se puede cambiar",
 			"alreadyMember": "Ya es miembro",
 			"remove": "Eliminar",
+			"add": "Añadir",
 			"you": "tú"
 		},
 		"requests": {

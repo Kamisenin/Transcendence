@@ -30,6 +30,13 @@
 		"byOwner": "by {owner}",
 		"noImage": "No image",
 		"noImagesYet": "No images yet.",
+		"kb": "KB",
+		"mb": "MB",
+		"selectValidImage": "Please select an image.",
+		"imageTooLarge": "The image must not exceed 10 MB.",
+		"uploadImageFailed": "Unable to upload the image.",
+		"dragOrBrowse": "Drag an image here or click to browse",
+		"acceptedFormats": "PNG, JPG, WEBP · 10 MB max",
 		"languageSwitcher": "Change language"
 	},
 	"Auth": {
@@ -217,6 +224,7 @@
 		"namespaceHint": "Used to group related tags",
 		"save": "Save",
 		"dangerousZone": "Dangerous Zone",
+		"noRoleAvailable": "No role available to assign (create a role below your rank first).",
 		"deleteIrreversible": "This action is irreversible",
 		"createModal": {
 			"title": "Create a new Tag",
@@ -256,6 +264,7 @@
 			"ownerRoleCannotBeChanged": "Owner role cannot be changed",
 			"alreadyMember": "Already a member",
 			"remove": "Remove",
+			"add": "Add",
 			"you": "you"
 		},
 		"requests": {

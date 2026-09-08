@@ -30,6 +30,13 @@
 		"byOwner": "par {owner}",
 		"noImage": "Pas d'image",
 		"noImagesYet": "Aucune image pour le moment.",
+		"kb": "Ko",
+		"mb": "Mo",
+		"selectValidImage": "Veuillez sélectionner une image.",
+		"imageTooLarge": "L'image ne doit pas dépasser 10 Mo.",
+		"uploadImageFailed": "Impossible d'envoyer l'image.",
+		"dragOrBrowse": "Glissez une image ici ou cliquez pour parcourir",
+		"acceptedFormats": "PNG, JPG, WEBP · 10 Mo max",
 		"languageSwitcher": "Changer de langue"
 	},
 	"Auth": {
@@ -217,6 +224,7 @@
 		"namespaceHint": "Utilisé pour regrouper les tags liés entre eux",
 		"save": "Enregistrer",
 		"dangerousZone": "Zone dangereuse",
+		"noRoleAvailable": "Aucun rôle disponible à assigner (crée d'abord un rôle inférieur à ton rang).",
 		"deleteIrreversible": "Cette action est irréversible",
 		"createModal": {
 			"title": "Créer un nouveau Tag",
@@ -255,8 +263,9 @@
 			"failedToChangeMemberRole": "Échec du changement de rôle",
 			"ownerRoleCannotBeChanged": "Le rôle du propriétaire ne peut pas être changé",
 			"alreadyMember": "Déjà membre",
-			"you": "toi",
-			"remove": "Retirer"
+			"remove": "Retirer",
+			"add": "Ajouter",
+			"you": "toi"
 		},
 		"requests": {
 			"noPendingRequests": "Aucune demande en attente.",

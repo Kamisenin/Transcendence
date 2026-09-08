@@ -319,7 +319,8 @@ export function UploadButton({ onUploadSuccess }: { onUploadSuccess: (path: stri
 
 	const [isDragging, setIsDragging] = useState(false)
 	const [isUploading, setIsUploading] = useState(false)
-	
+	const tCommon = useTranslations("Common")
+
 	function handleUpload(event: React.ChangeEvent<HTMLInputElement>) {
 		const file = event.target.files?.[0]
 
@@ -357,12 +358,12 @@ export function UploadButton({ onUploadSuccess }: { onUploadSuccess: (path: stri
 
 	async function uploadFile(file: File) {
 		if (!file.type.startsWith("image/")) {
-			alert("Veuillez sélectionner une image.")
+		    alert(tCommon("selectValidImage"))
 			return
 		}
 
 		if (file.size > 10 * 1024 * 1024) {
-			alert("L'image ne doit pas dépasser 10 Mo.")
+			alert(tCommon("imageTooLarge"))
 			return
 		}
 		try {
@@ -383,7 +384,7 @@ export function UploadButton({ onUploadSuccess }: { onUploadSuccess: (path: stri
 			onUploadSuccess(data.path);
 		} catch (error) {
 			console.error(error)
-			alert("Impossible d'envoyer l'image.")
+			alert(tCommon("uploadImageFailed"))
 		} finally {
 			setIsUploading(false)
 		}
@@ -407,11 +408,11 @@ export function UploadButton({ onUploadSuccess }: { onUploadSuccess: (path: stri
 		>
 			<label>
 				<span className="text-[11px] text-gray-500">
-					Glissez une image ici ou cliquez pour parcourir
+					{tCommon("dragOrBrowse")}
 				</span>
 				<br />
 				<span className="mt-1 text-[10px] text-gray-400">
-					PNG, JPG, WEBP · 10 Mo max
+					{tCommon("acceptedFormats")}
 				</span>
 
 				<p className="text-[11px] text-gray-400 flex items-center justify-center gap-1">
