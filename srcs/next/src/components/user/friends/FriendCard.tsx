@@ -34,9 +34,10 @@ export default async function FriendCard({ friend } : FriendCardProps)
                     className="rounded-full object-cover w-12 h-12"
                 />
                 <span
-                    className={`absolute bottom-0 right-0 w-3,5 h-3,5 rounded-full border-2 border-white ${
+                    className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${
                         isOnline ? "bg-green-500" : "bg-gray-400" }`}
                     title={isOnline ? t("online") : t("offline")}
+                    aria-label={isOnline ? t("online") : t("offline")}
                 />
             </div>
             <div className="flex flex-col min-w-0 flex-1">
@@ -45,6 +46,9 @@ export default async function FriendCard({ friend } : FriendCardProps)
                 </span>
                 <span className="text-xs text-gray-500 truncate">
                     @{friend.accountId}
+                </span>
+                <span className="flex items-center gap-1 text-[11px] text-gray-500">
+                    {isOnline ? t("online") : t("offline")}
                 </span>
             </div>
         </Link>

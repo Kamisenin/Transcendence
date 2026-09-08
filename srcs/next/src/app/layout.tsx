@@ -6,6 +6,7 @@ import UserMenu from "@/components/UserMenu";
 import HomeButton from "@/components/HomeButton";
 import LocaleSwitcher from "@/components/LocaleSwitcher";
 import NotificationBell from "@/components/NotificationBell";
+import UserPresence from "@/components/UserPresence";
 import Link from "next/link"
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
@@ -35,6 +36,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <html lang={locale} className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
         <body>
         <NextIntlClientProvider locale={locale} messages={messages}>
+        {user && <UserPresence />}
         <header className="fixed top-0 z-50 h-16 w-full bg-beige flex items-center justify-between px-6">
             <HomeButton />
             <div className="flex items-center gap-4">
