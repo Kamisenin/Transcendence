@@ -25,6 +25,30 @@ export default function NotificationBell() {
     const [loading, setLoading] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
+    async function handleAcceptFriend(id: number) {
+        setNotifications((prev) => prev.filter((n) => n.id !== id));
+        setUnreadCount((prev) => Math.max(0, prev - 1));
+        try {
+            await fetch("/api/friends/accept", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ notificationId: id }),
+            });
+        } catch {}
+    }
+
+    async function handleRefuseFriend(id: number) {
+        setNotifications((prev) => prev.filter((n) => n.id !== id));
+        setUnreadCount((prev) => Math.max(0, prev - 1));
+        try {
+            await fetch("/api/friends/refuse", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ notificationId: id }),
+            });
+        } catch {}
+    }
+
     async function fetchUnreadCount() {
         try {
             const res = await fetch("/api/notifications/unread-count");
@@ -147,19 +171,52 @@ export default function NotificationBell() {
                         <div className="px-4 py-6 text-sm text-center text-gray-500">{t("empty")}</div>
                     )}
 
-                    {!loading && notifications.map((n) => (
-                        <Link
-                            key={n.id}
-                            href={pageHref(n)}
-                            onClick={() => handleNotificationClick(n.id)}
-                            className={`block px-4 py-3 border-b last:border-b-0 hover:bg-gray-50 ${!n.read ? "bg-blue-50" : ""}`}
-                        >
-                            <p className="text-sm">
-                                {t("pageEdited", { actor: n.actor?.username ?? t("someone"), title: n.page?.title || t("untitled") })}
-                            </p>
-                            <p className="text-xs text-gray-500 mt-1">{timeAgo(n.createdAt)}</p>
-                        </Link>
-                    ))}
+                    {!loading && notifications.map((n) =>
+                        n.type === "FRIEND_REQUEST" ? (
+                            <div
+                                key={n.id}
+                                className={`px-4 py-3 border-b last:border-b-0 ${!n.read ? "bg-blue-50" : ""}`}
+                            >
+                                <p className="text-sm">
+                                    {t("friendRequest", { actor: n.actor?.username ?? t("someone") })}
+                                </p>
+                                <div className="flex items-center gap-2 mt-2">
+                                    <button
+                                        onClick={() => handleAcceptFriend(n.id)}
+                                        className="text-xs px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+                                    >
+                                        {t("accept")}
+                                    </button>
+                                    <button
+                                        onClick={() => handleRefuseFriend(n.id)}
+                                        className="text-xs px-2 py-1 rounded bg-gray-200 hover:bg-gray-300 cursor-pointer"
+                                    >
+                                        {t("refuse")}
+                                    </button>
+                                    {!n.read && (
+                                        <button
+                                            onClick={() => handleNotificationClick(n.id)}
+                                            className="text-xs px-2 py-1 rounded text-gray-500 hover:underline cursor-pointer ml-auto"
+                                        >
+                                            {t("ignore")}
+                                        </button>
+                                    )}
+                                </div>
+                                <p className="text-xs text-gray-500 mt-1">{timeAgo(n.createdAt)}</p>
+                            </div>
+                        ) : (
+                            <Link
+                                key={n.id}
+                                href={pageHref(n)}
+                                onClick={() => handleNotificationClick(n.id)}
+                                className={`block px-4 py-3 border-b last:border-b-0 hover:bg-gray-50 ${!n.read ? "bg-blue-50" : ""}`}
+                            >
+                                <p className="text-sm">
+                                    {t("pageEdited", { actor: n.actor?.username ?? t("someone"), title: n.page?.title || t("untitled") })}
+                                </p>
+                                <p className="text-xs text-gray-500 mt-1">{timeAgo(n.createdAt)}</p>
+                            </Link>
+                        ))}
                 </div>
             )}
         </div>

@@ -436,7 +436,7 @@
 		"addFriend" : "Add friend",
 		"sent" : "Request sent",
 		"noPageFound" : "No page found",
-		"pages" : "Pages {user} ({number})"
+		"pages" : "Pages of {user} ({number})"
 
 
 	}
