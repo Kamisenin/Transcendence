@@ -8,6 +8,7 @@ import { notFound } from "next/navigation";
 
 export default function UserWikiPage({ params }: Params) {
 	return (
+		
 		<div className="grid grid-cols-3 gap-6 w-full mx-auto p-6 pt-22 items-start">
 			<ListPages params={params}/>
 
@@ -36,7 +37,6 @@ async function ListPages({ params }: Params) {
 			<h2 className="text-xl font-bold mb-4">
 				Pages créées par {target.username} ({filteredPages.length})
 			</h2>
-
 
 			<div className="max-h-[600px] overflow-y-auto pr-2 space-y-4 scrollbar-thin">
 				{filteredPages.length > 0 ? (
