@@ -2,8 +2,8 @@ import { getUserOrgs } from "@/actions/orgs";
 import { User } from "@prisma/client";
 import OrgCard from "../OrgCard";
 
-export default async function OrgsList() {
-	const orgs = await getUserOrgs();
+export default async function OrgsList({ target }: Props) {
+	const orgs = await getUserOrgs(target);
  
 	return (
 		<section className="bg-card text-card-foreground border border-border rounded-lg p-4 shadow-md h-[600px] flex flex-col">

@@ -60,7 +60,7 @@ export default async function UserWikiPage({ params }: Params) {
 
 				<ListTags />
 
-				<OrgsList />
+				<OrgsList target={target}/>
 			</div>
 		</div>
 	);
