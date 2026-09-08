@@ -34,6 +34,10 @@ enum NotificationType {
   FRIEND_REQUEST
 }
 
+enum PageReactionType {
+  FAVORITE
+  DISLIKE
+}
 
 // ════════════════════════════════════════════
 // USERS
@@ -459,35 +463,4 @@ model PageReaction {
   @@id([userId, pageId])
   @@index([userId, type])
   @@map("page_reactions")
-}
-
-enum PermissionLevel {
-  READ
-  WRITE
-  ADMIN
-}
-
-enum RequestStatus {
-  PENDING
-  APPROVED
-  REJECTED
-}
-
-enum FriendshipStatus {
-  PENDING
-  ACCEPTED
-}
-
-enum SlugType {
-  USER
-  TAG
-}
-
-enum NotificationType {
-  PAGE_EDITED
-}
-
-enum PageReactionType {
-  FAVORITE
-  DISLIKE
 }
