@@ -6,6 +6,12 @@ import { getUserOrgs } from "@/actions/orgs";
 import { getCurrentUser } from "%/lib/session";
 import { notFound } from "next/navigation";
 
+type Params = {
+  params: Promise<{
+    namespace: string;
+  }>;
+};
+
 export default function UserWikiPage({ params }: Params) {
 	return (
 		
@@ -31,28 +37,37 @@ async function ListPages({ params }: Params) {
 
 	const ownedPages = await getEditablePages(namespace);
 
-	const filteredPages = await filterPages(currentUser?.user_id, ownedPages)
+	const formattedPages: PageData[] = ownedPages.map((p) => ({
+		pageId: p.pageId,
+		title: p.title,
+		description: null,
+		img: p.img || null,
+		slug: p.slug || "",
+		namespace: p.namespace || "",
+		tags: [],
+	}));
+
 	return (
-		<section className="bg-card text-card-foreground border border-border rounded-lg p-4 shadow-md">
+		<section className="bg-card text-card-foreground border border-border rounded-lg p-4 shadow-md h-[600px] flex flex-col">
 			<h2 className="text-xl font-bold mb-4">
-				Pages créées par {target.username} ({filteredPages.length})
+				Pages créées par {target.username} ({formattedPages.length})
 			</h2>
 
-			<div className="max-h-[600px] overflow-y-auto pr-2 space-y-4 scrollbar-thin">
-				{filteredPages.length > 0 ? (
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-					{filteredPages.map((page) => (
-						<ForumCard
-							key={page.pageId}
-							page={page}
-							userId={currentUser?.user_id}
-						/>
-					))}
-				</div>
+			<div className="flex-1 overflow-y-auto pr-2 space-y-4 scrollbar-thin">
+				{formattedPages.length > 0 ? (
+					<div className="grid grid-cols-1 gap-4">
+						{formattedPages.map((page) => (
+							<ForumCard
+								key={page.pageId}
+								page={page}
+								userId={currentUser?.user_id}
+							/>
+						))}
+					</div>
 				) : (
-				<p className="text-sm text-muted-foreground py-8 text-center">
-					Aucune page trouvée pour cet utilisateur.
-				</p>
+					<p className="text-sm text-muted-foreground py-8 text-center">
+						Aucune page trouvée pour cet utilisateur.
+					</p>
 				)}
 			</div>
 		</section>

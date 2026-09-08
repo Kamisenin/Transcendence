@@ -37,7 +37,9 @@
 		"uploadImageFailed": "No se pudo enviar la imagen.",
 		"dragOrBrowse": "Arrastra una imagen aquí o haz clic para buscar",
 		"acceptedFormats": "PNG, JPG, WEBP · 10 MB máx.",
-		"languageSwitcher": "Cambiar idioma"
+		"languageSwitcher": "Cambiar idioma",
+		"online" : "En línea",
+		"offline" : "Fuera de línea"
 	},
 	"Auth": {
 		"login": {
