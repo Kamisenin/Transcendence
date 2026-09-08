@@ -18,7 +18,7 @@ export default async function AccountPage() {
 				<main className="flex justify-center bg-[#f0e0d6] px-4 pb-12 pt-20">
 						<div className="w-full max-w-md border border-[#d9bfb7] border-t-4 border-t-[#800000] bg-[#fffaf7] p-6 shadow-[0_2px_10px_rgba(128,0,0,0.08)]">
 				<div className="mb-6 flex items-center gap-4 border-b border-[#ead7d0] pb-5">
-					<UploadProfilePicture initialImgLink={user.imgLink} />
+					<UploadProfilePicture accountId={user.accountId} initialImgLink={user.imgLink} />
 					<div>
 						<h1 className="text-2xl font-bold text-[#800000]">
 							{t("title")}

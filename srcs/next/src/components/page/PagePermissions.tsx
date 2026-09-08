@@ -8,6 +8,7 @@ import {
     addTagRolePageAccess, removeTagRolePageAccess,
     addOrgRolePageAccess, removeOrgRolePageAccess,
 } from '@/actions/pages';
+import UserAvatar from '@/components/UserAvatar';
 
 type SearchUser = {
     user_id: string;
@@ -233,11 +234,7 @@ export default function PagePermissions({ pageId, ownerAccountId, initialPermiss
                             {results.map(u => (
                                 <div key={u.user_id} className="flex items-center justify-between p-2">
                                     <div className="flex items-center gap-2">
-                                        <img
-                                            src={u.imgLink || '/default-avatar.png'}
-                                            alt=""
-                                            className="w-6 h-6 rounded-full bg-gray-200"
-                                        />
+                                        <UserAvatar accountId={u.accountId} imgLink={u.imgLink} alt={u.username || u.accountId} size={24} className="h-6 w-6" />
                                         <div>
                                             <p className="text-sm font-medium leading-tight">{u.username}</p>
                                             <p className="text-xs text-gray-400 leading-tight">@{u.accountId}</p>
@@ -334,11 +331,7 @@ export default function PagePermissions({ pageId, ownerAccountId, initialPermiss
                     permissions.map((p) => (
                         <div key={p.userToken} className="flex items-center justify-between p-2">
                             <div className="flex items-center gap-2">
-                                <img
-                                    src={p.user.imgLink || '/default-avatar.png'}
-                                    alt=""
-                                    className="w-6 h-6 rounded-full bg-gray-200"
-                                />
+                                <UserAvatar accountId={p.user.accountId} imgLink={p.user.imgLink} alt={p.user.username || p.user.accountId} size={24} className="h-6 w-6" />
                                 <div>
                                     <p className="text-sm font-medium leading-tight">{p.user.username}</p>
                                     <p className="text-xs text-gray-400 leading-tight">@{p.user.accountId}</p>

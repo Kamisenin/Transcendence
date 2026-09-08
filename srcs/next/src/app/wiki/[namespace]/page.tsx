@@ -1,12 +1,15 @@
 import { getUser } from "%/lib/prisma/prisma-utils";
 import { getCurrentUser } from "%/lib/session";
+import { getRelation } from "@/actions/friendship";
+import { FriendshipStatus } from "@prisma/client";
 import { notFound } from "next/navigation";
 import PagesList from "@/components/user/PagesList";
 import OrgsList from "@/components/user/OrgsList";
 import FriendList from "@/components/user/friends/FriendList";
 import FriendButtons from "@/components/user/friends/FriendButtons";
 import TagList from "@/components/user/TagList";
-import Image from "next/image";
+import UserAvatar from "@/components/UserAvatar";
+import { isUserOnline } from "@/components/user/profile-utils";
 
 type Params = {
   params: Promise<{
@@ -23,10 +26,13 @@ export default async function UserWikiPage({ params }: Params) {
 		notFound();
 
 	const currentUser = await getCurrentUser();
+	const relation = currentUser ? await getRelation(currentUser.user_id, target.user_id) : null;
+	const isFriend = relation?.status === FriendshipStatus.ACCEPTED;
+	const displayName = isFriend && target.firstName && target.lastName
+		? `${target.firstName} ${target.lastName}`
+		: target.username || target.accountId;
 
-	const isOnline =
-		target.lastSeen &&
-		Date.now() - new Date(target.lastSeen).getTime() < 60 * 1000;
+	const isOnline = isUserOnline(target.lastSeen, 60 * 1000);
 
 	return (
 		<div className="min-h-screen bg-[#f0e0d6] px-4 pb-12 pt-20 text-[#3f2924]">
@@ -39,12 +45,12 @@ export default async function UserWikiPage({ params }: Params) {
 				<div className="flex aspect-[5/3] w-full flex-col items-center justify-center border border-[#d9bfb7] border-t-4 border-t-[#800000] bg-[#fffaf7] p-6 shadow-[0_2px_8px_rgba(128,0,0,0.08)] md:w-3/9">
 					<div className="relative w-28 h-28">
 						<div className="h-28 w-28 overflow-hidden rounded-full shadow-md ring-4 ring-[#f0e0d6]">
-							<Image
-								src={target.imgLink || "/defaultUserProfilePicture.svg"}
-								alt="Profile picture"
-								width={112}
-								height={112}
-								className="w-full h-full object-cover"
+							<UserAvatar
+								accountId={target.accountId}
+								imgLink={target.imgLink}
+								alt={target.username || target.accountId}
+								size={112}
+								className="h-full w-full"
 							/>
 						</div>
 						<div
@@ -55,7 +61,7 @@ export default async function UserWikiPage({ params }: Params) {
 					</div>
 					<div className="mt-4 text-center">
 						<h2 className="text-lg font-semibold text-[#3f2924]">
-							{target.firstName} {target.lastName}
+							{displayName}
 						</h2>
 
 						<p className="mt-1 text-sm text-[#8a6b63]">

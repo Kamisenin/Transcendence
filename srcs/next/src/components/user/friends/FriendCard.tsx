@@ -1,11 +1,13 @@
 import Link from "next/link";
-import Image from "next/image";
 import { getTranslations } from "next-intl/server";
+import UserAvatar from "@/components/UserAvatar";
 
 type FriendInfos = {
     accountId : string;
     username : string;
-    imgLink : string;
+    firstName?: string | null;
+    lastName?: string | null;
+    imgLink : string | null;
     lastSeen : Date;
 }
 
@@ -18,6 +20,9 @@ export default async function FriendCard({ friend } : FriendCardProps)
 {
     const t = await getTranslations("Common");
     const isOnline = new Date(friend.lastSeen).getTime() > new Date().getTime() - 2 * 60 * 1000;
+    const displayName = friend.firstName && friend.lastName
+        ? `${friend.firstName} ${friend.lastName}`
+        : friend.username || friend.accountId;
 
     return (
         <Link
@@ -25,13 +30,7 @@ export default async function FriendCard({ friend } : FriendCardProps)
             className="flex w-full max-w-sm items-center gap-3 border border-[#d9bfb7] bg-[#fffaf7] p-3 transition-shadow duration-200 hover:border-[#800000] hover:shadow-md"
         >
             <div className="relative flex-shrink-0">
-                <Image
-                    src={friend.imgLink || "/defaultUserProfilePicture.svg"}
-                    alt={friend.username}
-                    width={48}
-                    height={48}
-                    className="rounded-full object-cover w-12 h-12"
-                />
+                <UserAvatar accountId={friend.accountId} imgLink={friend.imgLink} alt={displayName} size={48} className="h-12 w-12" />
                 <span
                     className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-[#fffaf7] ${
                         isOnline ? "bg-[#4f8f52]" : "bg-[#a89088]" }`}
@@ -41,7 +40,7 @@ export default async function FriendCard({ friend } : FriendCardProps)
             </div>
             <div className="flex flex-col min-w-0 flex-1">
                 <span className="truncate font-semibold text-[#3f2924]">
-                    {friend.username}
+                    {displayName}
                 </span>
                 <span className="truncate text-xs text-[#8a6b63]">
                     @{friend.accountId}

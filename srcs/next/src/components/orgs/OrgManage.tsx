@@ -11,6 +11,7 @@ import {
     updateOrganizationMemberRole,
 } from "@/actions/orgs";
 import { OrgPermissionError } from "%/lib/errors";
+import UserAvatar from "@/components/UserAvatar";
 
 type Role = {
     id: number;
@@ -38,7 +39,15 @@ type SearchUser = {
     imgLink: string | null;
 };
 
-export default function OrgManageClient({ org, canManage }: { org: any; canManage: boolean }) {
+type OrganizationManageData = {
+    id: number;
+    name: string;
+    ownerToken: string;
+    roles: Role[];
+    members: Member[];
+};
+
+export default function OrgManageClient({ org, canManage }: { org: OrganizationManageData; canManage: boolean }) {
     const t = useTranslations("Orgs");
     const tMembers = useTranslations("Tags.members");
     const tRoles = useTranslations("Tags.roles");
@@ -63,7 +72,7 @@ export default function OrgManageClient({ org, canManage }: { org: any; canManag
         canManageOrgTagGrants: false,
     });
 
-    const [memberRoleId, setMemberRoleId] = useState<number>(0);
+    const [memberRoleId, setMemberRoleId] = useState<number>(() => org.roles?.[0]?.id ?? 0);
     const [userQuery, setUserQuery] = useState("");
     const [searchResults, setSearchResults] = useState<SearchUser[]>([]);
     const [showMenu, setShowMenu] = useState(false);
@@ -76,21 +85,10 @@ export default function OrgManageClient({ org, canManage }: { org: any; canManag
         setTimeout(() => setToast(null), 3500);
     };
 
-    const initials = (name: string) =>
-        name
-            ?.split(" ")
-            .map((p: string) => p[0])
-            .slice(0, 2)
-            .join("")
-            .toUpperCase() ?? "?";
-
     const roleColors = [
-        "bg-indigo-50 text-indigo-700 ring-indigo-600/20",
-        "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
-        "bg-amber-50 text-amber-700 ring-amber-600/20",
-        "bg-sky-50 text-sky-700 ring-sky-600/20",
-        "bg-rose-50 text-rose-700 ring-rose-600/20",
-        "bg-violet-50 text-violet-700 ring-violet-600/20",
+        "bg-[#f7e9e2] text-[#800000] ring-[#d9bfb7]",
+        "bg-[#ead7d0] text-[#6f4d44] ring-[#cda99d]",
+        "bg-[#f4e8c1] text-[#765a12] ring-[#d8bc68]",
     ];
     const colorFor = (id: string | number) => {
         const s = String(id);
@@ -101,10 +99,6 @@ export default function OrgManageClient({ org, canManage }: { org: any; canManag
 
     const ownerToken = org.ownerToken as string;
     const sortedRoles = useMemo(() => [...roles].sort((a, b) => a.hierarchyLevel - b.hierarchyLevel), [roles]);
-
-    useEffect(() => {
-        if (!memberRoleId && sortedRoles.length) setMemberRoleId(sortedRoles[0].id);
-    }, [sortedRoles, memberRoleId]);
 
     useEffect(() => {
         const timeout = setTimeout(async () => {
@@ -152,7 +146,7 @@ export default function OrgManageClient({ org, canManage }: { org: any; canManag
 
             setMembers((prev) => {
                 const map = new Map(prev.map((m) => [m.userToken, m]));
-                for (const m of created as any[]) map.set(m.userToken, m);
+                for (const m of created) map.set(m.userToken, m);
                 return Array.from(map.values());
             });
 
@@ -259,13 +253,13 @@ export default function OrgManageClient({ org, canManage }: { org: any; canManag
     };
 
     return (
-        <div className="min-h-screen bg-white">
-            <div className="mx-auto max-w-5xl px-6 py-10">
-                <h1 className="mb-6 text-2xl font-semibold">{org.name}</h1>
+        <div className="min-h-screen bg-[#f0e0d6]">
+            <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
+                <h1 className="mb-6 border-b-2 border-[#800000] pb-3 text-2xl font-semibold text-[#800000]">{org.name}</h1>
 
-                <section className="mb-8 overflow-visible rounded-xl border border-slate-200">
-                    <div className="border-b border-slate-100 bg-slate-50/60 px-5 py-3">
-                        <h2 className="text-sm font-semibold text-slate-900">{tMembers("addUsers")}</h2>
+                <section className="mb-8 overflow-visible border border-[#d9bfb7] border-t-4 border-t-[#800000] bg-[#fffaf7] shadow-[0_2px_8px_rgba(128,0,0,0.06)]">
+                    <div className="border-b border-[#ead7d0] bg-[#f7e9e2] px-5 py-3">
+                        <h2 className="text-sm font-semibold text-[#3f2924]">{tMembers("addUsers")}</h2>
                     </div>
 
                     <div className="space-y-3 px-5 py-4">
@@ -274,18 +268,12 @@ export default function OrgManageClient({ org, canManage }: { org: any; canManag
                                 {selectedUsers.map((u) => (
                                     <span
                                         key={u.user_id}
-                                        className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs"
+                                        className="inline-flex items-center gap-2 rounded-full bg-[#f7e9e2] px-3 py-1 text-xs"
                                     >
-                    {u.imgLink ? (
-                        <img src={u.imgLink} alt={u.accountId} className="h-4 w-4 rounded-full" />
-                    ) : (
-                        <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-slate-300 text-[10px]">
-                        {initials(u.username || u.accountId)}
-                      </span>
-                    )}
+                                        <UserAvatar accountId={u.accountId} imgLink={u.imgLink} alt={u.username || u.accountId} size={16} className="h-4 w-4 text-[8px]" />
                                         <span>{u.username || u.accountId}</span>
-                    <span className="text-slate-500">@{u.accountId}</span>
-                    <button onClick={() => removePickedUser(u.user_id)} className="text-slate-500 hover:text-slate-900">
+                    <span className="text-[#8a6b63]">@{u.accountId}</span>
+                    <button onClick={() => removePickedUser(u.user_id)} className="text-[#8a6b63] hover:text-[#800000]">
                       ×
                     </button>
                   </span>
@@ -302,30 +290,24 @@ export default function OrgManageClient({ org, canManage }: { org: any; canManag
                                 }}
                                 onFocus={() => setShowMenu(true)}
                                 placeholder={t("searchMemberPlaceholder")}
-                                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-indigo-500 focus:ring-2"
+                                className="w-full border border-[#d9bfb7] bg-[#fffaf7] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#d9bfb7]"
                             />
 
                             {showMenu && searchResults.length > 0 && (
-                                <div className="absolute z-50 mt-1 max-h-64 w-full overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-lg">
+                                <div className="absolute z-50 mt-1 max-h-64 w-full overflow-y-auto border border-[#d9bfb7] bg-[#fffaf7] shadow-lg">
                                     {searchResults.map((u) => (
                                         <button
                                             key={u.user_id}
                                             type="button"
                                             onClick={() => pickUser(u)}
-                                            className="flex w-full items-center gap-3 px-3 py-2 text-left hover:bg-slate-50"
+                                            className="flex w-full items-center gap-3 px-3 py-2 text-left hover:bg-[#f7e9e2]"
                                         >
-                                            {u.imgLink ? (
-                                                <img src={u.imgLink} alt={u.accountId} className="h-8 w-8 rounded-full object-cover" />
-                                            ) : (
-                                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-200 text-xs">
-                                                    {initials(u.username || u.accountId)}
-                                                </div>
-                                            )}
+                                            <UserAvatar accountId={u.accountId} imgLink={u.imgLink} alt={u.username || u.accountId} size={32} className="h-8 w-8" />
                                             <div className="min-w-0">
-                                                <div className="truncate text-sm font-medium text-slate-900">
+                                                <div className="truncate text-sm font-medium text-[#3f2924]">
                                                     {u.username || u.accountId}
                                                 </div>
-                                                <div className="truncate text-xs text-slate-500">@{u.accountId}</div>
+                                                <div className="truncate text-xs text-[#8a6b63]">@{u.accountId}</div>
                                             </div>
                                         </button>
                                     ))}
@@ -337,7 +319,7 @@ export default function OrgManageClient({ org, canManage }: { org: any; canManag
                             <select
                                 value={memberRoleId}
                                 onChange={(e) => setMemberRoleId(Number(e.target.value))}
-                                className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                                className="border border-[#d9bfb7] bg-[#fffaf7] px-3 py-2 text-sm"
                             >
                                 {sortedRoles.map((r) => (
                                     <option key={r.id} value={r.id}>
@@ -349,7 +331,7 @@ export default function OrgManageClient({ org, canManage }: { org: any; canManag
                             <button
                                 onClick={handleAddSelectedUsers}
                                 disabled={busyKey === "add-members"}
-                                className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60"
+                                className="bg-[#800000] px-4 py-2 text-sm font-medium text-[#fffaf7] hover:bg-[#5f0000] disabled:opacity-60"
                             >
                                 {busyKey === "add-members" ? tMembers("adding") : t("addSelected", { count: selectedUsers.length })}
                             </button>
@@ -357,26 +339,20 @@ export default function OrgManageClient({ org, canManage }: { org: any; canManag
                     </div>
                 </section>
 
-                <section className="mb-8 overflow-hidden rounded-xl border border-slate-200">
-                    <div className="border-b border-slate-100 bg-slate-50/60 px-5 py-3">
-                        <h2 className="text-sm font-semibold text-slate-900">{tCommon("members")}</h2>
+                <section className="mb-8 overflow-hidden border border-[#d9bfb7] bg-[#fffaf7]">
+                    <div className="border-b border-[#ead7d0] bg-[#f7e9e2] px-5 py-3">
+                        <h2 className="text-sm font-semibold text-[#3f2924]">{tCommon("members")}</h2>
                     </div>
-                    <ul className="divide-y divide-slate-100">
+                    <ul className="divide-y divide-[#ead7d0]">
                         {members.map((m) => (
                             <li key={m.userToken} className="flex flex-wrap items-center gap-3 px-5 py-3">
                                 <div className="mr-auto flex items-center gap-3">
-                                    {m.user?.imgLink ? (
-                                        <img src={m.user.imgLink} alt={m.user.accountId} className="h-8 w-8 rounded-full" />
-                                    ) : (
-                                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-xs text-white">
-                                            {initials(m.user?.username || m.user?.accountId || m.userToken)}
-                                        </div>
-                                    )}
+                                    <UserAvatar accountId={m.user?.accountId || m.userToken} imgLink={m.user?.imgLink} alt={m.user?.username || m.user?.accountId || m.userToken} size={32} className="h-8 w-8" />
                                     <div>
-                                        <div className="text-sm font-medium text-slate-800">
+                                        <div className="text-sm font-medium text-[#3f2924]">
                                             {m.user?.username || m.user?.accountId || m.userToken}
                                         </div>
-                                        <div className="text-xs text-slate-500">@{m.user?.accountId || m.userToken}</div>
+                                        <div className="text-xs text-[#8a6b63]">@{m.user?.accountId || m.userToken}</div>
                                     </div>
                                 </div>
 
@@ -384,7 +360,7 @@ export default function OrgManageClient({ org, canManage }: { org: any; canManag
                                     value={m.roleId}
                                     disabled={m.userToken === ownerToken || busyKey === `member-role-${m.userToken}`}
                                     onChange={(e) => handleChangeMemberRole(m, Number(e.target.value))}
-                                    className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                                    className="border border-[#d9bfb7] bg-[#fffaf7] px-3 py-2 text-sm"
                                 >
                                     {sortedRoles.map((r) => (
                                         <option key={r.id} value={r.id}>
@@ -396,7 +372,7 @@ export default function OrgManageClient({ org, canManage }: { org: any; canManag
                                 <button
                                     disabled={m.userToken === ownerToken || busyKey === `remove-member-${m.userToken}`}
                                     onClick={() => handleRemoveMember(m)}
-                                    className="rounded-lg bg-red-600 px-3 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-60"
+                                    className="bg-[#a33a2b] px-3 py-2 text-sm font-medium text-white hover:bg-[#81291f] disabled:opacity-60"
                                 >
                                     {t("remove")}
                                 </button>
@@ -405,28 +381,28 @@ export default function OrgManageClient({ org, canManage }: { org: any; canManag
                     </ul>
                 </section>
 
-                <section className="mb-10 overflow-hidden rounded-xl border border-slate-200">
-                    <div className="border-b border-slate-100 bg-slate-50/60 px-5 py-3">
-                        <h2 className="text-sm font-semibold text-slate-900">{tRoles("createRole")}</h2>
+                <section className="mb-10 overflow-hidden border border-[#d9bfb7] bg-[#fffaf7]">
+                    <div className="border-b border-[#ead7d0] bg-[#f7e9e2] px-5 py-3">
+                        <h2 className="text-sm font-semibold text-[#3f2924]">{tRoles("createRole")}</h2>
                     </div>
                     <div className="grid gap-3 px-5 py-4 md:grid-cols-2">
                         <input
                             value={newRole.roleName}
                             onChange={(e) => setNewRole((p) => ({ ...p, roleName: e.target.value }))}
                             placeholder={t("roleNamePlaceholder")}
-                            className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                            className="border border-[#d9bfb7] bg-[#fffaf7] px-3 py-2 text-sm"
                         />
                         <input
                             type="number"
                             value={newRole.hierarchyLevel}
                             onChange={(e) => setNewRole((p) => ({ ...p, hierarchyLevel: Number(e.target.value) || 100 }))}
                             placeholder={t("hierarchyLevelPlaceholder")}
-                            className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                            className="border border-[#d9bfb7] bg-[#fffaf7] px-3 py-2 text-sm"
                         />
                         <button
                             onClick={handleCreateRole}
                             disabled={busyKey === "create-role"}
-                            className="w-fit rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60"
+                            className="w-fit bg-[#800000] px-4 py-2 text-sm font-medium text-[#fffaf7] hover:bg-[#5f0000] disabled:opacity-60"
                         >
                             {busyKey === "create-role" ? tRoles("creating") : tRoles("createRole")}
                         </button>
@@ -434,14 +410,14 @@ export default function OrgManageClient({ org, canManage }: { org: any; canManag
 
                     <div className="space-y-2 px-5 pb-5">
                         {sortedRoles.map((r) => (
-                            <div key={r.id} className="flex items-center justify-between rounded border border-slate-200 px-3 py-2">
+                            <div key={r.id} className="flex items-center justify-between border border-[#ead7d0] px-3 py-2">
                 <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset ${colorFor(r.id)}`}>
                   {r.roleName}
                 </span>
                                 <button
                                     onClick={() => handleDeleteRole(r)}
                                     disabled={r.roleName === "Owner" || busyKey === `delete-role-${r.id}`}
-                                    className="rounded bg-red-600 px-3 py-1 text-xs text-white disabled:opacity-60"
+                                    className="bg-[#a33a2b] px-3 py-1 text-xs text-white disabled:opacity-60"
                                 >
                                     {tCommon("delete")}
                                 </button>
@@ -450,11 +426,11 @@ export default function OrgManageClient({ org, canManage }: { org: any; canManag
                     </div>
                 </section>
 
-                <section className="rounded-xl border border-red-200 bg-red-50/40">
+                <section className="border border-[#d9a49a] bg-[#f8e3de]">
                     <div className="flex items-center justify-between px-5 py-4">
                         <div>
-                            <h2 className="text-sm font-semibold text-red-900">{t("deleteOrganization")}</h2>
-                            <p className="mt-0.5 text-sm text-red-700/80">
+                            <h2 className="text-sm font-semibold text-[#7d2117]">{t("deleteOrganization")}</h2>
+                            <p className="mt-0.5 text-sm text-[#a33a2b]">
                                 {t("deleteOrgWarning", { name: org.name })}
                             </p>
                         </div>
@@ -462,7 +438,7 @@ export default function OrgManageClient({ org, canManage }: { org: any; canManag
                             disabled={isDeleting}
                             onClick={handleDeleteOrganization}
                             className={`rounded-lg px-4 py-2 text-sm font-medium text-white ${
-                                confirmingDelete ? "bg-red-800 hover:bg-red-900" : "bg-red-600 hover:bg-red-700"
+                                confirmingDelete ? "bg-[#7d2117] hover:bg-[#5f1711]" : "bg-[#a33a2b] hover:bg-[#81291f]"
                             }`}
                         >
                             {isDeleting ? t("deleting") : confirmingDelete ? tCommon("clickAgainToConfirm") : t("deleteOrganization")}
@@ -474,7 +450,7 @@ export default function OrgManageClient({ org, canManage }: { org: any; canManag
             {toast && (
                 <div
                     className={`fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-lg px-4 py-3 text-sm font-medium shadow-lg ${
-                        toast.tone === "error" ? "bg-red-600 text-white" : "bg-slate-900 text-white"
+                        toast.tone === "error" ? "bg-[#a33a2b] text-white" : "bg-[#800000] text-white"
                     }`}
                 >
                     {toast.message}

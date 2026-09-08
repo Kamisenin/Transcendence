@@ -1,62 +1,64 @@
 import React from 'react';
 import Link from 'next/link';
+import UserAvatar from '@/components/UserAvatar';
+import { isUserOnline } from '@/components/user/profile-utils';
 import { useTranslations } from 'next-intl';
 import type { Organization } from '@prisma/client';
 
     type OrgWithAccess = Organization & {
-    members?: Array<any>;
-    roles?: Array<any>;
-    orgTagAccess?: Array<{ tag: any; minRole?: any; permissions?: any }>;
-    orgPageAccess?: Array<{ page: any; minRole?: any; permissions?: any }>;
+    members?: Array<{ id?: number; user?: { accountId?: string; user_id?: string; username?: string | null; firstName?: string | null; lastName?: string | null; imgLink?: string | null; lastSeen?: Date | null }; role?: { roleName?: string } }>;
+    roles?: Array<{ id: number; roleName: string }>;
+    orgTagAccess?: Array<{ tag: { id: number; name: string }; minRole?: unknown; permissions?: string }>;
+    orgPageAccess?: Array<{ page: { pageId: number; title?: string | null; owner?: { accountId?: string; user_id?: string } }; minRole?: unknown; permissions?: string }>;
 };
 
-export default function OrgDetails({ org }: { org: OrgWithAccess }) {
+export default function OrgDetails({ org, canManage, friendIds = [] }: { org: OrgWithAccess; canManage: boolean; friendIds?: string[] }) {
     const t = useTranslations('Orgs');
     const createdDate = org.createdAt ? new Date(org.createdAt).toLocaleDateString() : '—';
 
     return (
-            <div className="max-w-6xl mx-auto">
-                    <div className="bg-white border border-gray-200 rounded-md shadow-sm p-6">
-                        <header className="flex items-start justify-between gap-4">
+            <div className="mx-auto max-w-6xl">
+                    <div className="border border-[#d9bfb7] border-t-4 border-t-[#800000] bg-[#fffaf7] p-4 shadow-[0_2px_10px_rgba(128,0,0,0.08)] sm:p-6">
+                        <header className="flex flex-col items-start justify-between gap-4 sm:flex-row">
                             <div>
-                                <h1 className="text-2xl font-semibold text-gray-900">{org.name}</h1>
-                                <p className="text-sm text-gray-500 mt-1">{t('created', { date: createdDate })}</p>
+                                <h1 className="text-2xl font-semibold text-[#800000]">{org.name}</h1>
+                                <p className="mt-1 text-sm text-[#8a6b63]">{t('created', { date: createdDate })}</p>
                             </div>
 
-                            <div className="flex items-center gap-2">
+                            {canManage && (
                                 <Link
                                     href={`/orgs/${encodeURIComponent(org.name)}/manage`}
-                                    className="inline-flex items-center px-3 py-1.5 rounded-md text-sm font-medium bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
+                                    className="inline-flex items-center border border-[#800000] px-3 py-1.5 text-sm font-medium text-[#800000] hover:bg-[#f7e9e2]"
                                 >
                                     {t('manageOrganization')}
                                 </Link>
-                            </div>
+                            )}
                         </header>
 
-            <section className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <section className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
                         <div className="col-span-1 md:col-span-2 space-y-6">
                             <div>
-                                <h2 className="font-medium text-gray-900 mb-2">{t('roles')}</h2>
-                                <div className="rounded-md border border-gray-100 bg-gray-50 p-3">
+                                <h2 className="mb-2 font-medium text-[#3f2924]">{t('roles')}</h2>
+                                <div className="border border-[#ead7d0] bg-[#f7e9e2] p-3">
                                     <ul className="space-y-2">
                                         {org.roles && org.roles.length > 0 ? (
-                                            org.roles.map((r: any) => (
-                                                    <li key={r.id} className="text-sm text-gray-800">
+                                            org.roles.map((r) => (
+                                                    <li key={r.id} className="text-sm text-[#3f2924]">
                                                             {r.roleName}
                                                         </li>
                                                 ))
                                         ) : (
-                                            <div className="text-sm text-gray-500">{t('noRoleFound')}</div>
+                                            <div className="text-sm text-[#8a6b63]">{t('noRoleFound')}</div>
                                         )}
                                     </ul>
                                 </div>
                             </div>
 
                             <div>
-                                <h2 className="font-medium text-gray-900 mb-2">{t('pages')}</h2>
+                                <h2 className="mb-2 font-medium text-[#3f2924]">{t('pages')}</h2>
                                 {org.orgPageAccess && org.orgPageAccess.length > 0 ? (
                                     <ul className="space-y-2">
-                                            {org.orgPageAccess.map((a: any) => {
+                                            {org.orgPageAccess.map((a) => {
                                                 const page = a.page;
                                                 const owner = page?.owner;
                                                 const namespace = owner?.accountId || owner?.user_id || '';
@@ -64,14 +66,14 @@ export default function OrgDetails({ org }: { org: OrgWithAccess }) {
                                                 return (
                                                         <li
                                             key={page.pageId}
-                                                        className="flex items-center justify-between border rounded p-3 bg-white"
+                                                        className="flex items-center justify-between border border-[#ead7d0] bg-[#fffaf7] p-3"
                                                         >
                                                             <div>
-                                                                    <div className="font-medium text-gray-900">{page.title || `Page #${page.pageId}`}</div>
-                                                                    <div className="text-sm text-gray-500">{t('permissionsLabel', { defaultValue: 'Permissions' })}: {a.permissions || '—'}</div>
+                                                                    <div className="font-medium text-[#3f2924]">{page.title || `Page #${page.pageId}`}</div>
+                                                                    <div className="text-sm text-[#8a6b63]">{t('permissionsLabel')}: {a.permissions || '—'}</div>
                                                                 </div>
                                                             <div className="flex gap-2">
-                                                                    <Link href={pageLink} className="text-sm text-blue-600 hover:underline">
+                                                                    <Link href={pageLink} className="text-sm text-[#800000] hover:underline">
                                                                         {t('view')}
                                                                     </Link>
                                                                 </div>
@@ -80,23 +82,23 @@ export default function OrgDetails({ org }: { org: OrgWithAccess }) {
                                             })}
                                         </ul>
                                 ) : (
-                                    <div className="text-sm text-gray-500">{t('noPageFound')}</div>
+                                    <div className="text-sm text-[#8a6b63]">{t('noPageFound')}</div>
                                 )}
                             </div>
                         </div>
 
                         <aside className="col-span-1 space-y-6">
                             <div>
-                                <h3 className="font-medium text-gray-900 mb-2">{t('tags')}</h3>
+                                <h3 className="mb-2 font-medium text-[#3f2924]">{t('tags')}</h3>
                                 {org.orgTagAccess && org.orgTagAccess.length > 0 ? (
                                     <div className="flex flex-wrap gap-2">
-                                            {org.orgTagAccess.map((a: any) => {
+                                            {org.orgTagAccess.map((a) => {
                                                 const tag = a.tag;
                                                 return (
                                                         <Link
                                             key={tag.id}
                                                         href={`/tags/${encodeURIComponent(tag.name)}`}
-                                                        className="inline-flex items-center px-2 py-1 rounded-md bg-gray-100 text-sm text-gray-700 hover:bg-gray-200"
+                                                        className="inline-flex items-center border border-[#d9bfb7] bg-[#f7e9e2] px-2 py-1 text-sm text-[#800000] hover:bg-[#ead7d0]"
                                                         >
                                                             #{tag.name}
                                                     </Link>
@@ -104,31 +106,57 @@ export default function OrgDetails({ org }: { org: OrgWithAccess }) {
                                             })}
                                         </div>
                                 ) : (
-                                    <div className="text-sm text-gray-500">{t('noTagFound')}</div>
+                                    <div className="text-sm text-[#8a6b63]">{t('noTagFound')}</div>
                                 )}
                             </div>
 
                             <div>
-                                <h3 className="font-medium text-gray-900 mb-2">{t('members')}</h3>
+                                <h3 className="mb-2 font-medium text-[#3f2924]">{t('members')}</h3>
                                 {org.members && org.members.length > 0 ? (
                                     <ul className="space-y-2">
-                                            {org.members.map((m: any) => {
+                                            {org.members.map((m) => {
                                                 const user = m.user;
                                                 const profileId = user?.accountId || user?.user_id || `member-${m.id}`;
+                                                const isOnline = isUserOnline(user?.lastSeen);
+                                                const isFriend = Boolean(user?.user_id && friendIds.includes(user.user_id));
+                                                const displayName = isFriend && user?.firstName && user?.lastName
+                                                    ? `${user.firstName} ${user.lastName}`
+                                                    : user?.username || profileId;
                                                 return (
-                                                        <li key={profileId} className="flex items-center justify-between">
-                                                                <div>
-                                                                    <Link href={`/users/${profileId}`} className="text-sm font-medium text-blue-600 hover:underline">
-                                                                        {user?.username || profileId}
-                                                                    </Link>
-                                                                    <div className="text-xs text-gray-500">{m.role?.roleName || t('member')}</div>
+                                                        <li key={profileId}>
+                                                            <Link
+                                                                href={`/wiki/${encodeURIComponent(profileId)}`}
+                                                                className="flex items-center gap-3 border border-[#ead7d0] bg-[#fffaf7] p-2 transition-colors hover:border-[#800000] hover:bg-[#f7e9e2]"
+                                                            >
+                                                                <div className="relative shrink-0">
+                                                                    <UserAvatar
+                                                                        accountId={profileId}
+                                                                        imgLink={user?.imgLink}
+                                                                        alt={displayName}
+                                                                        size={40}
+                                                                        className="h-10 w-10"
+                                                                    />
+                                                                    <span
+                                                                        className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-[#fffaf7] ${
+                                                                            isOnline ? "bg-[#4f8f52]" : "bg-[#a89088]"
+                                                                        }`}
+                                                                    />
                                                                 </div>
+                                                                <div className="min-w-0">
+                                                                    <div className="truncate text-sm font-medium text-[#800000]">
+                                                                        {displayName}
+                                                                    </div>
+                                                                    <div className="truncate text-xs text-[#8a6b63]">
+                                                                        @{profileId} · {m.role?.roleName || t('member')}
+                                                                    </div>
+                                                                </div>
+                                                            </Link>
                                                             </li>
                                                     );
                                             })}
                                         </ul>
                                 ) : (
-                                    <div className="text-sm text-gray-500">{t('noMemberFound')}</div>
+                                    <div className="text-sm text-[#8a6b63]">{t('noMemberFound')}</div>
                                 )}
                             </div>
                         </aside>

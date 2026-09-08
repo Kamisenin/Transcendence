@@ -1,13 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { useTranslations } from "next-intl";
+import UserAvatar from "@/components/UserAvatar";
 
 export default function UploadProfilePicture({
 	initialImgLink,
+	accountId,
 }: {
 	initialImgLink?: string | null;
+	accountId: string;
 }) {
 	const [isUploading, setIsUploading] = useState(false);
 	const [imgLink, setImgLink] = useState(initialImgLink);
@@ -81,13 +83,7 @@ export default function UploadProfilePicture({
 			/>
 
 			<div className="w-11 h-11 shrink-0 rounded-full bg-white border-2 border-black shadow-sm hover:shadow-md transition flex items-center justify-center overflow-hidden">
-				<Image
-					src={imgLink || "/defaultUserProfilePicture.svg"}
-					alt="Profile picture"
-					width={44}
-					height={44}
-					className="w-full h-full object-cover"
-				/>
+				<UserAvatar accountId={accountId} imgLink={imgLink} alt={accountId} size={44} className="h-full w-full" />
 
 				{isUploading && (
 					<div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40">

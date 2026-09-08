@@ -53,6 +53,8 @@ type Props = {
     currentUserToken: string;
 };
 
+type TabKey = 'members' | 'roles' | 'requests' | 'settings';
+
 export default function TagManagement({tag, capabilities, roles, members, pendingRequests, currentUserToken,}: Props) {
     const [activeTab, setActiveTab] = useState<TabKey>('members');
     const t = useTranslations('Tags');

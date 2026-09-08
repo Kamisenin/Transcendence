@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode; }>) {
     const user = await getCurrentUser();
-    const menuUser = user ? { username: user.username, imgLink: user.imgLink } : null;
+    const menuUser = user ? { accountId: user.accountId, username: user.username, imgLink: user.imgLink } : null;
     const locale = await getLocale();
     const messages = await getMessages();
     const t = await getTranslations("Footer");

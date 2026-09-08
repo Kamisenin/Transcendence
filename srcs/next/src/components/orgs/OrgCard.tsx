@@ -1,54 +1,67 @@
-'use client';
-import Link from 'next/link';
-import React from 'react';
-import { useTranslations } from 'next-intl';
+import Link from "next/link";
+import type { Organization } from "@prisma/client";
+import { getLocale, getTranslations } from "next-intl/server";
+import type { OrgSummary } from "./orgTypes";
 
-export type OrgSummary = {
-    id: number;
-    name: string;
-    createdAt?: string;
-    isOwner?: boolean;
-};
+interface OrgCardProps {
+	org?: OrgSummary;
+	organization?: Organization & { members?: unknown[] };
+}
 
-export default function OrgCard({ org }: { org: OrgSummary }) {
-    const t = useTranslations('Orgs');
-    return (
-        <article
-            className="bg-white border border-gray-200 rounded-md shadow-sm hover:shadow-md transition-shadow p-4">
-            <header className="flex items-start justify-between gap-4">
-                <div>
-                    <h3 className="text-lg font-semibold text-gray-900">{org.name}</h3>
-                    <p className="text-sm text-gray-500 mt-1">
-                        {t('created', { date: org.createdAt ? new Date(org.createdAt).toLocaleDateString() : '—' })}
-                    </p>
-                </div>
-                <div className="text-right">
-                    {org.isOwner && (
-                        <span
-                            className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 border border-yellow-200">
-                        {t('owner')}
-                    </span>
-                    )}
-                </div>
-            </header>
+export default async function OrgCard({ org, organization }: OrgCardProps) {
+	const data = org ?? organization;
+	if (!data) return null;
+	const t = await getTranslations("Orgs");
+	const locale = await getLocale();
 
-            <div className="mt-4 flex gap-2">
-                <Link
-                    href={`/orgs/${encodeURIComponent(org.name)}`}
-                    className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-200 rounded hover:bg-gray-200"
-                    aria-label={t('viewAriaLabel', { name: org.name })}
-                >
-                    {t('view')}
-                </Link>
+	const initials = data.name
+		.split(" ")
+		.slice(0, 2)
+		.map((word) => word[0])
+		.join("")
+		.toUpperCase();
 
-                <Link
-                    href={`/orgs/${encodeURIComponent(org.name)}/manage`}
-                    className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-700 bg-white border border-blue-100 rounded hover:bg-blue-50"
-                    aria-label={t('manageAriaLabel', { name: org.name })}
-                >
-                    {t('manage')}
-                </Link>
-            </div>
-        </article>
-    );
+	const createdAt = data.createdAt ? new Date(data.createdAt).toLocaleDateString(
+		locale,
+		{
+			day: "numeric",
+			month: "short",
+			year: "numeric",
+		}
+	) : "—";
+
+	return (
+		<Link
+			href={`/orgs/${encodeURIComponent(data.name)}`}
+		>
+			<div className="w-full border border-[#d9bfb7] border-l-4 border-l-[#800000] bg-[#fffaf7] p-4 shadow-[0_2px_8px_rgba(128,0,0,0.06)] transition hover:-translate-y-0.5 hover:border-[#800000] hover:shadow-md">
+				<div className="flex items-center gap-4">
+					{/* Logo / Initiales */}
+					<div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#f7e9e2] font-bold text-[#800000]">
+						{initials}
+					</div>
+
+					{/* Informations */}
+					<div className="min-w-0 flex-1">
+						<h3 className="truncate text-base font-semibold text-[#3f2924]">
+							{data.name}
+						</h3>
+
+						<p className="mt-1 text-xs text-[#8a6b63]">
+							{t("created", { date: createdAt })}
+						</p>
+					</div>
+				</div>
+
+				{organization?.members && (
+					<div className="mt-4 border-t border-[#ead7d0] pt-3">
+						<p className="text-sm text-[#8a6b63]">
+							<span className="font-semibold text-[#3f2924]">{organization.members.length}</span>{" "}
+							{t("membersCount", { count: organization.members.length })}
+						</p>
+					</div>
+				)}
+			</div>
+		</Link>
+	);
 }

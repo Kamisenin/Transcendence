@@ -14,7 +14,7 @@ export default async function TagPage({ params }: Params) {
 
     const members = await prisma.tagMember.findMany({
         where: {tagId: tag.id},
-        include: { user: { select: { user_id: true, username: true, imgLink: true}}, role: true}});
+        include: { user: { select: { user_id: true, accountId: true, username: true, imgLink: true}}, role: true}});
 
     return (
         <TagOverview

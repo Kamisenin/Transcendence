@@ -1,6 +1,7 @@
 import { getUserOrgs } from "@/actions/orgs";
 import { User } from "@prisma/client";
-import OrgCard from "../OrgCard";
+import OrgCard from "../orgs/OrgCard";
+import { getTranslations } from "next-intl/server";
 
 type Props = {
 	target: User;
@@ -8,11 +9,12 @@ type Props = {
 
 export default async function OrgsList({ target }: Props) {
 	const orgs = await getUserOrgs(target);
+	const t = await getTranslations("Orgs");
  
 	return (
-		<section className="bg-card text-card-foreground border border-border rounded-lg p-4 shadow-md h-[400px] flex flex-col">
-			<h2 className="text-xl font-bold mb-4">
-				Organisations ({orgs?.length ?? 0})
+		<section className="flex h-[400px] flex-col border border-[#d9bfb7] border-t-4 border-t-[#800000] bg-[#fffaf7] p-4 shadow-[0_2px_8px_rgba(128,0,0,0.08)]">
+			<h2 className="mb-4 text-xl font-bold text-[#3f2924]">
+				{t("organizationsOf", { user: target.username, count: orgs?.length ?? 0 })}
 			</h2>
  
 			<div className="flex-1 overflow-y-auto pr-2 space-y-4 scrollbar-thin">
@@ -26,8 +28,8 @@ export default async function OrgsList({ target }: Props) {
 						))}
 					</div>
 				) : (
-					<p className="text-sm text-muted-foreground py-8 text-center">
-						Aucune organisation trouvée.
+					<p className="py-8 text-center text-sm text-[#8a6b63]">
+						{t("noOrganizationsFound")}
 					</p>
 				)}
 			</div>

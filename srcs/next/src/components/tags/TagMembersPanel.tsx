@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react';
 import { assignTagRole, removeTagMember } from '@/actions/tags';
 import AddMember from './AddMember';
 import { useTranslations } from 'next-intl';
+import UserAvatar from '@/components/UserAvatar';
 
 import type { TagCapabilities } from '%/lib/tag_permissions';
 
@@ -17,7 +18,7 @@ export type Member = {
     tagId: number;
     userToken: string;
     roleId: number;
-    user: { user_id: string; username: string; imgLink: string };
+    user: { user_id: string; accountId: string; username: string; imgLink: string | null };
     role: Role;
 };
 
@@ -91,11 +92,7 @@ export default function TagMembersPanel({ tagId, members, roles, capabilities, c
                     return (
                         <div key={member.userToken} className="flex items-center justify-between p-3">
                             <div className="flex items-center gap-3">
-                                <img
-                                    src={member.user.imgLink || '/default-avatar.png'}
-                                    alt=""
-                                    className="w-8 h-8 rounded-full bg-gray-200"
-                                />
+                                <UserAvatar accountId={member.user.accountId} imgLink={member.user.imgLink} alt={member.user.username} size={32} className="h-8 w-8" />
                                 <span className="text-sm font-medium">{member.user.username}</span>
                                 {member.userToken === currentUserToken && (
                                     <span className="text-xs text-gray-400">({t('you')})</span>

@@ -199,9 +199,13 @@
 		"noMemberFound": "No se encontró ningún miembro",
 		"member": "Miembro",
 		"createdLabel": "Creado"
+		,"organizationsOf": "Organizaciones de {user} ({count})"
+		,"permissionsLabel": "Permisos"
+		,"membersCount": "{count, plural, =0 {Ningún miembro} one {# miembro} other {# miembros}}"
 	},
 	"Tags": {
 		"myTags": "Mis etiquetas",
+		"tagsOf": "Etiquetas de {user} ({count})",
 		"newTag": "Nueva etiqueta",
 		"noTagFound": "No se encontró ninguna etiqueta",
 		"youDontHaveAccess": "No tienes acceso",
