@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
 import { deletePage } from "@/actions/pages";
+import { isDefaultTitle } from "@/app/lib/page/title";
 
 type PageItem = {
     pageId: number;
@@ -39,7 +40,7 @@ function PageRow({ item, onDeleted }: { item: PageItem; onDeleted: (pageId: numb
             <div className="w-28 h-20 bg-gray-100 flex-shrink-0 overflow-hidden rounded">
                 {item.preview ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={item.preview} alt={item.title || `Page ${item.pageId}`} className="w-full h-full object-cover" />
+                    <img src={item.preview} alt={!isDefaultTitle(item.title) ? item.title : `Page ${item.pageId}`} className="w-full h-full object-cover" />
                 ) : (
                     <div className="w-full h-full bg-gray-200 flex items-center justify-center text-sm text-gray-500">{t("preview")}</div>
                 )}
@@ -47,7 +48,7 @@ function PageRow({ item, onDeleted }: { item: PageItem; onDeleted: (pageId: numb
 
             <div className="flex-1 min-w-0">
                 <Link href={pageHref} className="text-lg font-medium text-blue-600 hover:underline truncate">
-                    {item.title || `Page #${item.pageId}`}
+                    {!isDefaultTitle(item.title) ? item.title : `Page #${item.pageId}`}
                 </Link>
                  <div className="text-sm text-gray-500 truncate">{t("owner", { owner: item.ownerAccount })}</div>
             </div>

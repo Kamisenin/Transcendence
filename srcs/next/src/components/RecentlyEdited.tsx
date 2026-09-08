@@ -1,6 +1,7 @@
 import { getRecentlyEditedPages } from "@/actions/pages";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+import { isDefaultTitle } from "@/app/lib/page/title";
 
 function timeAgo(date: Date, t: (key: string, values?: any) => string): string {
     const seconds = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
@@ -37,7 +38,7 @@ export default async function RecentlyEdited() {
                             className="block border border-border rounded-lg p-4 hover:bg-accent transition"
                         >
                             <div className="flex items-start justify-between gap-2">
-                                <span className="font-medium text-sm">{page.title === 'Untitled' ? t("untitled") : page.title}</span>
+                                <span className="font-medium text-sm">{isDefaultTitle(page.title) ? t("untitled") : page.title}</span>
                                 {page.tag && (
                                     <span
                                         className="text-xs px-2 py-0.5 rounded-full whitespace-nowrap text-white"

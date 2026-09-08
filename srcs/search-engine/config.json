@@ -2,6 +2,6 @@
 	"languages": ["french", "english", "spanish"],
 	"limit": 15,
 	"score_threshold": 65,
-	"title_weight": 0.6
+	"title_weight": 0.6,
+	"stopword_weight": 0.3
 }
-	

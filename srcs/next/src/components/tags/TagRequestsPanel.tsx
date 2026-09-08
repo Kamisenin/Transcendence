@@ -3,6 +3,7 @@
 import { useTransition, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { reviewTagPageRequest } from '@/actions/tags';
+import { isDefaultTitle } from '@/app/lib/page/title';
 
 type PendingRequest = {
     id: number;
@@ -54,7 +55,7 @@ export default function TagRequestsPanel({ requests }: Props) {
                             <div>
                                 <p className="text-sm">
                                     <span className="font-medium">{req.requester.username}</span>
-                                    {' '}{t('requestText', { username: req.requester.username, title: req.page.title || t('untitled') })}
+                                    {' '}{t('requestText', { username: req.requester.username, title: isDefaultTitle(req.page.title) ? t('untitled') : req.page.title })}
                                 </p>
                                 <p className="text-xs text-gray-400">
                                     {new Date(req.createdAt).toLocaleDateString()}

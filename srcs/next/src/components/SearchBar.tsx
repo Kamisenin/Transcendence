@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
+import { isDefaultTitle } from "@/app/lib/page/title";
 
 interface Page 
 {
@@ -60,14 +61,17 @@ export default function SearchBar()
 							{t("noResults")}
 						</li>
 					) : (
-						results.map((item) => (
-							<li key={item.id}>
+						results.map((item, index) => (
+							<li
+								key={item.id}
+								className={index > 0 ? "border-t border-border" : ""}
+							>
 								<Link
 									href={`/wiki/${item.namespace}/${item.slug}`}
 									className="block px-4 py-2 hover:bg-accent cursor-pointer"
 								>
 									<div className="flex items-center justify-between gap-2">
-										<span className="font-medium truncate">{item.title}</span>
+										<span className="font-medium truncate">{isDefaultTitle(item.title) ? t("untitled") : item.title}</span>
 										{item.owner && (
 											<span className="text-xs text-muted-foreground shrink-0">
 												{t("byOwner", { owner: item.owner })}

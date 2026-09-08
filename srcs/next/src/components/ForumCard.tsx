@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
+import { isDefaultTitle } from "@/app/lib/page/title";
 
 export interface TagData {
   id: number;
@@ -75,7 +76,7 @@ export default function ForumCard({ page, userId, className = "" }: ForumCardPro
           {hasValidImg ? (
             <img
               src={formatImgSrc(page.img!)}
-              alt={page.title}
+              alt={isDefaultTitle(page.title) ? t("untitled") : page.title}
               onError={() => setImgError(true)}
               loading="eager"
               style={{ width: "auto", height: "100%" }}
@@ -90,7 +91,7 @@ export default function ForumCard({ page, userId, className = "" }: ForumCardPro
 
       <div className="flex-1 flex flex-col justify-start min-h-0 pb-1">
         <h4 className="font-semibold text-card-foreground text-base leading-snug line-clamp-2 flex-shrink-0">
-          {page.title}
+          {isDefaultTitle(page.title) ? t("untitled") : page.title}
         </h4>
 
         <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed opacity-0 max-h-0 group-hover:opacity-100 group-hover:max-h-24 group-hover:mt-2 transition-all duration-300 overflow-hidden">

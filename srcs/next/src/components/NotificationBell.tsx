@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { isDefaultTitle } from "@/app/lib/page/title";
 
 type Notification = {
     id: number;
@@ -257,7 +258,7 @@ export default function NotificationBell() {
                                 className={`block px-4 py-3 border-b last:border-b-0 hover:bg-gray-50 ${!n.read ? "bg-blue-50" : ""}`}
                             >
                                 <p className="text-sm">
-                                    {t("pageEdited", { actor: n.actor?.username ?? t("someone"), title: n.page?.title || t("untitled") })}
+                                    {t("pageEdited", { actor: n.actor?.username ?? t("someone"), title: isDefaultTitle(n.page?.title) ? t("untitled") : n.page!.title })}
                                 </p>
                                 <p className="text-xs text-gray-500 mt-1">{timeAgo(n.createdAt)}</p>
                             </Link>

@@ -2,6 +2,7 @@
 	"Common": {
 		"search": "Buscar...",
 		"searching": "Buscando...",
+		"untitled": "Sin título",
 		"noResults": "Sin resultados",
 		"delete": "Eliminar",
 		"cancel": "Cancelar",
@@ -39,7 +40,9 @@
 		"acceptedFormats": "PNG, JPG, WEBP · 10 MB máx.",
 		"languageSwitcher": "Cambiar idioma",
 		"online" : "En línea",
-		"offline" : "Fuera de línea"
+		"offline" : "Fuera de línea",
+		"myImages": "Mis imágenes",
+		"fileCount": "{count} archivo(s)"
 	},
 	"Auth": {
 		"login": {
@@ -104,7 +107,7 @@
 		"createPage": "Crear una nueva página",
 		"creatingPage": "Creando...",
 		"logOut": "Cerrar sesión",
-		"uploadManager": "Gestor de archivos"
+		"uploadManager": "Gestor de medios"
 	},
 	"Account": {
 		"title": "Mi cuenta",

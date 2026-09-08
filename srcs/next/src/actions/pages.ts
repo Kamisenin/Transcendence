@@ -388,7 +388,7 @@ export async function createPage() {
 
     const page = await prisma.page.create({
         data: {
-            title : '',
+            title : crypto.randomUUID(),
             ownerId: user.user_id,
             content: { blocks: [] },
         },
@@ -560,7 +560,7 @@ export async function getRecentlyEditedPages(limit: number = 6) {
 
     return pages.map((p: typeof pages[number]) => ({
         pageId: p.pageId,
-        title: p.title || 'Untitled',
+        title: p.title,
         lastModified: p.lastModified,
         canonicalSlug: p.slugs[0] ? { namespace: p.slugs[0].namespace, slug: p.slugs[0].slug } : null,
         lastEditorName: p.lastEditor?.username ?? null,

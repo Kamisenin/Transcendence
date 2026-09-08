@@ -1,18 +1,20 @@
 import { getMyUploads } from "@/actions/uploads";
 import UploadsList from "./uploads-list";
+import { getTranslations } from "next-intl/server";
 
 export default async function UploadsPage() {
 	const uploads = await getMyUploads();
+	const t = await getTranslations("Common");
 
 	return (
 		<div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 px-6 pt-20 py-10">
 			<div className="mx-auto max-w-5xl">
 				<div className="mb-8 flex items-center justify-between border-b border-slate-200 pb-4">
 					<h1 className="text-3xl font-semibold tracking-tight text-slate-900">
-						Mes images
+						{t("myImages")}
 					</h1>
 					<span className="rounded-full bg-slate-900 px-3 py-1 text-sm font-medium text-white">
-						{uploads?.length ?? 0} fichier(s)
+						{t("fileCount", { count: uploads?.length ?? 0 })}
 					</span>
 				</div>
 

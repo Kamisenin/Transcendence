@@ -2,6 +2,7 @@
 	"Common": {
 		"search": "Search...",
 		"searching": "Searching...",
+		"untitled": "Untitled",
 		"noResults": "No results",
 		"delete": "Delete",
 		"cancel": "Cancel",
@@ -39,7 +40,9 @@
 		"acceptedFormats": "PNG, JPG, WEBP · 10 MB max",
 		"languageSwitcher": "Change language",
 		"online" : "Online",
-		"offline" : "Offline"
+		"offline" : "Offline",
+		"myImages": "My images",
+		"fileCount": "{count} file(s)"
 	},
 	"Auth": {
 		"login": {
@@ -104,7 +107,7 @@
 		"createPage": "Create a new page",
 		"creatingPage": "Creating...",
 		"logOut": "Log out",
-		"uploadManager": "Upload Manager"
+		"uploadManager": "Media Manager"
 	},
 	"Account": {
 		"title": "My Account",

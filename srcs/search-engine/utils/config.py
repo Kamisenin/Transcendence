@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    config.py                                          :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: humontas@student.42.fr <humontas>          +#+  +:+       +#+         #
+#    By: humontas <humontas@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/07/01 14:18:21 by humontas@st       #+#    #+#              #
-#    Updated: 2026/07/08 20:41:06 by humontas@st      ###   ########.fr        #
+#    Updated: 2026/09/08 20:29:35 by humontas         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,3 +22,4 @@ LANGUAGES = _config["languages"]
 LIMIT = _config["limit"]
 SCORE_THRESHOLD = _config["score_threshold"]
 TITLE_WEIGHT = _config["title_weight"]
+STOPWORD_WEIGHT = _config["stopword_weight"]

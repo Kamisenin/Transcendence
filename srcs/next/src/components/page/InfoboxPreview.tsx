@@ -5,6 +5,7 @@ import { Edit3, ChevronDown, ChevronUp } from "lucide-react";
 import TagBadge from "../tags/TagBadge";
 import { InfoboxData } from "./Infobox";
 import { useTranslations } from "next-intl";
+import { isDefaultTitle } from "@/app/lib/page/title";
 
 type InfoboxPreviewProps = {
     data: InfoboxData;
@@ -35,7 +36,7 @@ export default function InfoboxPreview({ data, isReadOnly, onEdit }: InfoboxPrev
             )}
 
             <h2 className="text-lg font-bold text-gray-900 border-b border-gray-100 pb-1.5 leading-tight shrink-0">
-                {data.title || <span className="text-gray-300 italic">{t("untitled")}</span>}
+                {isDefaultTitle(data.title) ? <span className="text-gray-300 italic">{t("untitled")}</span> : data.title}
             </h2>
 
             {data.imageUrl?.trim() && (

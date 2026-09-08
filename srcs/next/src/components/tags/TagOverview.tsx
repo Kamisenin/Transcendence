@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import UserAvatar from "@/components/UserAvatar";
+import { isDefaultTitle } from "@/app/lib/page/title";
 
 type Member = {
     userToken: string;
@@ -29,7 +30,7 @@ type TagOverviewProps = {
 
 export default async function TagOverview({ tag, members, pages, isOwnerOrManager }: TagOverviewProps) {
     const t = await getTranslations("Tags");
-    const r = await getTranslations("requests");
+    const r = await getTranslations("Tags.requests");
 
     const colorHex = tag.color
         ? `#${tag.color.toString(16).padStart(6, "0")}`
@@ -83,7 +84,7 @@ export default async function TagOverview({ tag, members, pages, isOwnerOrManage
                                                     href={href}
                                                     className="flex items-center justify-between px-4 py-3 hover:bg-[#f6f8fa] transition-colors">
                                                     <span className="truncate font-medium text-[#0969da] hover:underline">
-                                                        {page.title || r("untitled")}
+                                                        {isDefaultTitle(page.title) ? r("untitled") : page.title}
                                                     </span>
                                                     {page.ownerAccount && (
                                                         <span className="text-xs text-[#8c959f] shrink-0 ml-3">

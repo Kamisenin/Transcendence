@@ -11,6 +11,7 @@ import { type EditorInstance } from "./WikiEditor"
 import Infobox, { type InfoboxData } from "@/components/page/Infobox";
 import { savePage } from "@/actions/pages";
 import { useTranslations } from "next-intl";
+import { isDefaultTitle } from "@/app/lib/page/title";
 
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
@@ -78,7 +79,7 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
                 {
                     id: "block-infobox",
                     type: "infobox",
-                    infoboxData: { ...DEFAULT_INFOBOX, title: initialTitle || "", public: visibility, canonicalNamespace },
+                    infoboxData: { ...DEFAULT_INFOBOX, title: isDefaultTitle(initialTitle) ? "" : initialTitle, public: visibility, canonicalNamespace },
                     x: 0, y: 0, w: 4, h: 8
                 },
                 ...initialBlocks
@@ -88,7 +89,7 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
             {
                 id: "block-infobox",
                 type: "infobox",
-                infoboxData: { ...DEFAULT_INFOBOX, title: initialTitle || "", public: visibility, canonicalNamespace },
+                infoboxData: { ...DEFAULT_INFOBOX, title: isDefaultTitle(initialTitle) ? "" : initialTitle, public: visibility, canonicalNamespace },
                 x: 0, y: 0, w: 4, h: 8
             },
             {
@@ -177,7 +178,7 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
         const infoboxData = mainInfobox?.infoboxData || DEFAULT_INFOBOX;
 
         const pageTitle =
-        infoboxData.title || initialTitle || t("untitled");
+        infoboxData.title || initialTitle;
 
         const visibility =
         infoboxData.public || false;

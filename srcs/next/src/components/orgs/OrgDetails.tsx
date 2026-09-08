@@ -4,6 +4,7 @@ import UserAvatar from '@/components/UserAvatar';
 import { isUserOnline } from '@/components/user/profile-utils';
 import { useTranslations } from 'next-intl';
 import type { Organization } from '@prisma/client';
+import { isDefaultTitle } from '@/app/lib/page/title';
 
     type OrgWithAccess = Organization & {
     members?: Array<{ id?: number; user?: { accountId?: string; user_id?: string; username?: string | null; firstName?: string | null; lastName?: string | null; imgLink?: string | null; lastSeen?: Date | null }; role?: { roleName?: string } }>;
@@ -69,7 +70,7 @@ export default function OrgDetails({ org, canManage, friendIds = [] }: { org: Or
                                                         className="flex items-center justify-between border border-[#ead7d0] bg-[#fffaf7] p-3"
                                                         >
                                                             <div>
-                                                                    <div className="font-medium text-[#3f2924]">{page.title || `Page #${page.pageId}`}</div>
+                                                                    <div className="font-medium text-[#3f2924]">{!isDefaultTitle(page.title) ? page.title : `Page #${page.pageId}`}</div>
                                                                     <div className="text-sm text-[#8a6b63]">{t('permissionsLabel')}: {a.permissions || '—'}</div>
                                                                 </div>
                                                             <div className="flex gap-2">

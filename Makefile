@@ -11,7 +11,7 @@ else
 	NEXT_RUN :=
 endif
 
-DOCKER_COMPOSE = docker compose
+DOCKER_COMPOSE = docker-compose
 export ADDRESS
 export NEXT_UPLOADS_PATH
 
