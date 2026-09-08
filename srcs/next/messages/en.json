@@ -37,7 +37,9 @@
 		"uploadImageFailed": "Unable to upload the image.",
 		"dragOrBrowse": "Drag an image here or click to browse",
 		"acceptedFormats": "PNG, JPG, WEBP · 10 MB max",
-		"languageSwitcher": "Change language"
+		"languageSwitcher": "Change language",
+		"online" : "Online",
+		"offline" : "Offline"
 	},
 	"Auth": {
 		"login": {

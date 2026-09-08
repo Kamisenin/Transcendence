@@ -3,6 +3,7 @@ import { filterPages, getAccessiblePages, getEditablePages} from "@/actions/page
 import { getCurrentUser } from "%/lib/session";
 import { getUser } from "@/app/lib/prisma/prisma-utils";
 import { notFound } from "next/navigation";
+import FriendList from "@/components/friends/FriendList";
 
 type Params = {
   params: Promise<{
@@ -29,8 +30,9 @@ export default async function UserWikiPage({ params }: Params) {
       
       <section className="bg-card text-card-foreground border border-border rounded-lg p-4 shadow-md">
         <h2 className="text-xl font-bold mb-4">
-          Pages créées par {namespace} ({filteredPages.length})
-        </h2>
+          Pages créées par {target.username} ({filteredPages.length})
+        </h2> 
+        <FriendList target_id={target.user_id}/>
 
         <div className="max-h-[600px] overflow-y-auto pr-2 space-y-4 scrollbar-thin">
           {filteredPages.length > 0 ? (
