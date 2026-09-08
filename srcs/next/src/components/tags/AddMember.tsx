@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useTransition, useRef } from 'react';
 import { addTagMember } from '@/actions/tags';
+import { useTranslations } from 'next-intl';
 
 type SearchUser = {
     user_id: string;
@@ -31,6 +32,9 @@ export default function AddMember({ tagId, assignableRoles, existingMemberTokens
     const [isPending, startTransition] = useTransition();
     const [error, setError] = useState<string | null>(null);
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const t = useTranslations("Tags.members")
+    const tTags = useTranslations("Tags")
+    const tCommon = useTranslations("Common")
 
     useEffect(() => {
         if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -74,7 +78,7 @@ export default function AddMember({ tagId, assignableRoles, existingMemberTokens
     if (assignableRoles.length === 0) {
         return (
             <p className="text-sm text-gray-400">
-                Aucun rôle disponible à assigner (crée d'abord un rôle inférieur à ton rang).
+                {tTags("noRoleAvailable")}
             </p>
         );
     }
@@ -92,7 +96,7 @@ export default function AddMember({ tagId, assignableRoles, existingMemberTokens
                     type="text"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Rechercher par pseudo ou identifiant..."
+                    placeholder={t("searchPlaceholder")}
                     className="flex-1 border rounded px-2 py-1.5 text-sm bg-white"
                 />
                 <select
@@ -106,7 +110,7 @@ export default function AddMember({ tagId, assignableRoles, existingMemberTokens
                 </select>
             </div>
 
-            {loading && <p className="text-xs text-gray-400 px-1">Recherche...</p>}
+            {loading && <p className="text-xs text-gray-400 px-1">{tCommon("searching")}</p>}
 
             {results.length > 0 && (
                 <div className="divide-y border rounded bg-white">
@@ -130,7 +134,7 @@ export default function AddMember({ tagId, assignableRoles, existingMemberTokens
                                     disabled={isPending || alreadyMember}
                                     className="text-xs bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed text-white px-2.5 py-1 rounded"
                                 >
-                                    {alreadyMember ? 'Déjà membre' : 'Ajouter'}
+                                    {alreadyMember ? t("alreadyMember") : t("add")}
                                 </button>
                             </div>
                         );
@@ -139,7 +143,7 @@ export default function AddMember({ tagId, assignableRoles, existingMemberTokens
             )}
 
             {!loading && query.trim().length >= 2 && results.length === 0 && (
-                <p className="text-xs text-gray-400 px-1">Aucun résultat.</p>
+                <p className="text-xs text-gray-400 px-1">{t("noMemberFound")}</p>
             )}
         </div>
     );

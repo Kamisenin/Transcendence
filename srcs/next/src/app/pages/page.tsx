@@ -2,17 +2,19 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
 
 type PageItem = {
     pageId: number;
     title?: string;
     preview?: string | null;
-    ownerAccount?: string;
+    ownerAccount: string;
     canonicalSlug?: { namespace: string; slug: string } | null;
 };
 
 function PageRow({ item }: { item: PageItem }) {
+    const t = useTranslations("MyPages");
     const pageHref = item.canonicalSlug
         ? `/wiki/${item.canonicalSlug.namespace}/${item.canonicalSlug.slug}`
         : `/wiki/${item.ownerAccount}/${item.pageId}`;
@@ -25,7 +27,7 @@ function PageRow({ item }: { item: PageItem }) {
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={item.preview} alt={item.title || `Page ${item.pageId}`} className="w-full h-full object-cover" />
                 ) : (
-                    <div className="w-full h-full bg-gray-200 flex items-center justify-center text-sm text-gray-500">Preview</div>
+                    <div className="w-full h-full bg-gray-200 flex items-center justify-center text-sm text-gray-500">{t("preview")}</div>
                 )}
             </div>
 
@@ -33,12 +35,12 @@ function PageRow({ item }: { item: PageItem }) {
                 <Link href={pageHref} className="text-lg font-medium text-blue-600 hover:underline truncate">
                     {item.title || `Page #${item.pageId}`}
                 </Link>
-                <div className="text-sm text-gray-500 truncate">Owner: {item.ownerAccount}</div>
+                 <div className="text-sm text-gray-500 truncate">{t("owner", { owner: item.ownerAccount })}</div>
             </div>
 
             <div className="flex-shrink-0">
                 <Link href={editHref} className="px-3 py-1 rounded bg-blue-600 text-white text-sm hover:opacity-95">
-                    Edit
+                    {t("edit")}
                 </Link>
             </div>
         </div>
@@ -49,31 +51,32 @@ export default function MyPages() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const urlTab = searchParams?.get("tab") || "owned";
+    const t = useTranslations("MyPages");
 
     const [tab, setTab] = useState<string>(urlTab);
     const [items, setItems] = useState<PageItem[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
-    const fetchPages = useCallback(async (t: string) => {
+    const fetchPages = useCallback(async (tabName: string) => {
         setLoading(true);
         setError(null);
         try {
-            const res = await fetch(`/api/pages?tab=${encodeURIComponent(t)}`, { cache: "no-store" });
+            const res = await fetch(`/api/pages?tab=${encodeURIComponent(tabName)}`, { cache: "no-store" });
             const json = await res.json();
             if (!res.ok || !json.ok) {
-                setError(json?.error || "Failed to fetch");
+                setError(json?.error || t("failedToFetch"));
                 setItems([]);
             } else {
                 setItems(json.pages || []);
             }
         } catch (err: any) {
-            setError(err?.message || "Network error");
+            setError(err?.message || t("failedToFetch"));
             setItems([]);
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [t]);
 
     useEffect(() => {
         fetchPages(tab);
@@ -93,13 +96,13 @@ export default function MyPages() {
                     onClick={() => setTab("owned")}
                     className={`px-3 py-1 rounded ${tab === "owned" ? "bg-blue-600 text-white" : "bg-gray-100"}`}
                 >
-                    My pages
+                    {t("myPages")}
                 </button>
                 <button
                     onClick={() => setTab("accessible")}
                     className={`px-3 py-1 rounded ${tab === "accessible" ? "bg-blue-600 text-white" : "bg-gray-100"}`}
                 >
-                    Shared pages
+                    {t("sharedPages")}
                 </button>
             </nav>
 
@@ -110,9 +113,9 @@ export default function MyPages() {
                         <div className="h-20 bg-gray-100 animate-pulse rounded" />
                     </div>
                 ) : error ? (
-                    <div className="text-sm text-red-500">Error: {error}</div>
+                    <div className="text-sm text-red-500">{t("error", { message: error })}</div>
                 ) : items.length === 0 ? (
-                    <div className="text-sm text-gray-500">No pages found</div>
+                    <div className="text-sm text-gray-500">{t("noPagesFound")}</div>
                 ) : (
                     items.map((it) => <PageRow key={it.pageId} item={it} />)
                 )}

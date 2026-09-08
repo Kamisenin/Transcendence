@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 export default function DeleteAccountButton() {
+    const t = useTranslations("DeleteAccount");
     const [showConfirm, setShowConfirm] = useState(false);
     const [password, setPassword] = useState("");
     const [message, setMessage] = useState("");
@@ -21,7 +23,7 @@ export default function DeleteAccountButton() {
         if (res.ok) {
             window.location.href = "/";
         } else {
-            setMessage(data.error || "something went wrong");
+            setMessage(data.error || t("error"));
             setLoading(false);
         }
     }
@@ -30,7 +32,7 @@ export default function DeleteAccountButton() {
             <a
                 href="/api/auth/export_data"
                 className="text-sm text-blue-500 underline">
-                    Export my data
+                    {t("exportData")}
             </a>
 
             {!showConfirm ? (
@@ -38,19 +40,19 @@ export default function DeleteAccountButton() {
                     onClick={() => setShowConfirm(true)}
                     className="text-sm text-red-600 underline w-fit"
                 >
-                    Delete my account
+                    {t("deleteAccount")}
                 </button>
                 
             ) : (
                 <div className="border border-red-500 p-4 rounded flex flex-col gap-3">
                     <p className="text-sm font-semibold text-red-600">
-                        This action is irreversible. Enter your password to confirm.    
+                        {t("irreversible")}
                     </p>
                     <input
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        placeholder="password"
+                        placeholder={t("password")}
                         className="border p-2 rounded text-black"
                     />
                     <div className="flex gap-2">
@@ -59,13 +61,13 @@ export default function DeleteAccountButton() {
                             disabled={loading || !password}
                             className="bg-red-600 text-white px-4 py-2 rounded"
                         >
-                            {loading ? "Deleting..." : "confirm deletion"}
+                            {loading ? t("deleting") : t("confirmDeletion")}
                         </button>
                         <button
                             onClick={() => setShowConfirm(false)}
                             className="px-4 py-2 rounded border"
                         >
-                            Cancel
+                            {t("cancel")}
                         </button>
                     </div>
                     {message && <p className="text-sm text-red-500">{message}</p>}

@@ -106,13 +106,6 @@ gmail_user # The associated google account
 
 ### Gmail Configuration
 
-Inside the `/next` folder, create a `.env` file:
-
-```env
-GMAIL_USER="your-gmail-address@gmail.com"
-GMAIL_APP_PASSWORD="xxxx xxxx xxxx xxxx"
-```
-
 To get a **Gmail App Password**:
 
 1. Go to your Google Account → **Security**.
@@ -237,7 +230,7 @@ Most, or pretty much all the communication was made on discord, either in privat
 - Major: Use a framework for both the frontend and backend. (Here NextJS) 
 - Minor: A complete notification system for all creation, update, and deletion actions. 
 - Minor: Server-Side Rendering (SSR) for improved performance and SEO. 
-- Minor: File upload and management system. 
+- Minor: File upload and management system.                         
 - Minor: Use an ORM for the database.
 
 #### Accessibility and Internationalization (2pts) :
@@ -257,9 +250,12 @@ Most, or pretty much all the communication was made on discord, either in privat
 
 - Minor : Custom Website editor, manage multiple editor at the same time, have
 
-- Major : Advanced AI search software 
+- Major : Multilingual Real-Time Search Engine
+  A Fandom-style wiki relies entirely on fast content discovery; this module provides instant, accurate article search across multiple languages with typo tolerance.
 
-TODO : Justify customs !
+  It combines FastAPI endpoints for low-latency queries, PostgreSQL fuzzy matching, and custom NLP preprocessing (stemming and stop-word filtering).
+
+  it integrates database optimization, natural language processing, and a custom ranking algorithm into a single full-stack search engine.
 
 
 ### Total : 19

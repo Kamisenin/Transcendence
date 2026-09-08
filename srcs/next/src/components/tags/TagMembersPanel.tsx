@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react';
 import { assignTagRole, removeTagMember } from '@/actions/tags';
 import AddMember from './AddMember';
+import { useTranslations } from 'next-intl';
 
 import type { TagCapabilities } from '%/lib/tag_permissions';
 
@@ -30,6 +31,7 @@ type Props = {
 
 export default function TagMembersPanel({ tagId, members, roles, capabilities, currentUserToken }: Props) {
     const [isPending, startTransition] = useTransition();
+    const t = useTranslations('Tags.members');
     const [error, setError] = useState<string | null>(null);
 
     // rôles que l'utilisateur courant peut assigner (strictement inférieurs à son rang)
@@ -47,7 +49,7 @@ export default function TagMembersPanel({ tagId, members, roles, capabilities, c
     }
 
     function handleRemove(targetUserToken: string) {
-        if (!confirm("Retirer ce membre du tag ?")) return;
+        if (!confirm(t('removeConfirm'))) return;
         setError(null);
         startTransition(async () => {
             try {

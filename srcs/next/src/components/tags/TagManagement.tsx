@@ -71,7 +71,7 @@ export default function TagManagement({tag, capabilities, roles, members, pendin
     });
 
     return (
-        <div className="max-w-5xl mx-auto p-8 pt-20">
+        <div className="max-w-5xl mx-auto p-8 pt-20 min-h-screen">
             <div className="flex items-center gap-3 mb-6">
                 <span
                     className="w-4 h-4 rounded-full"

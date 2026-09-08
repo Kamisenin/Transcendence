@@ -45,6 +45,7 @@ export default async function WikiViewPage({ params }: Params) {
     const user = await getCurrentUser();
     if (!page.public)
     {
+        console.log(user);
         if (!user || !await canViewPage(page.pageId, user.user_id))
             notFound();
     }
