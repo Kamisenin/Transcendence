@@ -1,6 +1,10 @@
 MODE ?= prod
 NEXT_UPLOADS_PATH ?= /home/${USER}/data/next_uploads
 
+DOCKER_COMPOSE = docker compose
+export ADDRESS
+export NEXT_UPLOADS_PATH
+
 ifeq ($(MODE),dev)
 	ADDRESS := host.parent
 	NEXT_RUN := ./dev_start.sh
@@ -10,11 +14,6 @@ else
 	PROFILE_FLAG := --profile prod
 	NEXT_RUN :=
 endif
-
-DOCKER_COMPOSE = docker-compose
-export ADDRESS
-export NEXT_UPLOADS_PATH
-
 
 upb:
 	@echo "ADDRESS vaut : $(ADDRESS)"

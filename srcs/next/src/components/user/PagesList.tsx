@@ -18,7 +18,7 @@ export default async function PagesList({ target, currentUserId }: Props)
     const filteredpages = await filterPages(currentUserId, editablePages);
 	
 	return (
-		<section className="bg-card text-card-foreground border border-border rounded-lg p-4 shadow-md h-[400px] flex flex-col">
+		<section className="flex h-[400px] flex-col border border-[#d9bfb7] border-t-4 border-t-[#800000] bg-[#fffaf7] p-4 shadow-[0_2px_8px_rgba(128,0,0,0.08)]">
 			<h2 className="text-xl font-bold mb-4">
 			{t("pages", { user: target.username, number: filteredpages.length })}
 			</h2>
