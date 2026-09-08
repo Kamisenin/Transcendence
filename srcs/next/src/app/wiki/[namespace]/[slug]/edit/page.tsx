@@ -3,7 +3,8 @@ import { cookies } from 'next/headers'
 import { getSessionUser, getSessionCookie } from '%/lib/session';
 import { resolvePage } from '%/lib/page/page_resolver';
 import PageBuilder from '@/components/page/editor/PageBuilder';
-import { canEditPage, getCanonicalNamespace } from '@/actions/pages'
+import { canEditPage, getCanonicalNamespace, getPagePermissions } from '@/actions/pages'
+import { prisma } from '%/lib/prisma/prisma';
 
 type Params = {
     params: Promise<{
@@ -34,6 +35,10 @@ export default async function WikiEditPage({ params }: Params) {
     const canoNamespace = await getCanonicalNamespace(page.pageId);
     const content = page.content as { blocks: any[] } | null;
 
+    const isOwner = page.ownerId === user.user_id;
+    const owner = await prisma.user.findUnique({ where: { user_id: page.ownerId }, select: { accountId: true } });
+    const permissions = isOwner ? await getPagePermissions(page.pageId) : [];
+
     return (
         <PageBuilder
             accountId={user.accountId}
@@ -42,6 +47,9 @@ export default async function WikiEditPage({ params }: Params) {
             initialBlocks={content?.blocks ?? []}
             visibility={page.public}
             canonicalNamespace={canoNamespace ? canoNamespace.namespace : null}
+            isOwner={isOwner}
+            ownerAccountId={owner?.accountId}
+            initialPermissions={permissions as any}
         />
     );
 }

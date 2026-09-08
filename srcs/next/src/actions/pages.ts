@@ -9,6 +9,8 @@ import { init_slug, syncUserSlugs, slugify, removeTagSlug, setTagSlug } from "%/
 import { User, Page } from '@prisma/client';
 import { type InfoboxData } from "@/components/page/Infobox"
 import { notifyPageEdit } from "%/lib/notifications";
+import { PagePermissionError } from "%/lib/errors";
+import { revalidatePath } from "next/cache";
 
 function findPreviewImageFromContent(content: any): string | null {
     try {
@@ -434,4 +436,93 @@ export async function getRecentlyEditedPages(limit: number = 6) {
         lastEditorName: p.lastEditor?.username ?? null,
         tag: p.tagPages[0]?.tag ? { name: p.tagPages[0].tag.name, color: p.tagPages[0].tag.color } : null,
     }));
+}
+
+// ───────────── PAGE PERMISSIONS ─────────────
+
+async function hasPageManagePermission(pageId: number, userToken: string): Promise<boolean> {
+    const page = await prisma.page.findUnique({ where: { pageId }, select: { ownerId: true } });
+    if (!page) return false;
+    if (page.ownerId === userToken) return true;
+
+    const permission = await prisma.pagePermission.findUnique({
+        where: { pageId_userToken: { pageId, userToken } },
+    });
+
+    return Boolean(permission?.canManagePermissions || permission?.permissions === 'ADMIN');
+}
+
+export async function searchUsersForPageAdd(query: string) {
+    await requireUser();
+
+    const q = query.trim();
+    if (!q) return [];
+
+    return prisma.user.findMany({
+        where: {
+            OR: [
+                { accountId: { contains: q, mode: "insensitive" } },
+                { username: { contains: q, mode: "insensitive" } },
+            ],
+        },
+        select: {
+            user_id: true,
+            username: true,
+            accountId: true,
+            imgLink: true,
+        },
+        orderBy: { accountId: "asc" },
+        take: 20,
+    });
+}
+
+export async function getPagePermissions(pageId: number) {
+    return prisma.pagePermission.findMany({
+        where: { pageId },
+        include: { user: { select: { user_id: true, username: true, accountId: true, imgLink: true } } },
+    });
+}
+
+export async function addPagePermission(pageId: number, accountId: string, level: PermissionLevel) {
+    const user = await requireUser();
+    const can = await hasPageManagePermission(pageId, user.user_id);
+    if (!can) throw new PagePermissionError("Forbidden");
+
+    const targetUser = await prisma.user.findUnique({ where: { accountId }, select: { user_id: true } });
+    if (!targetUser) throw new Error("User not found. Please select a user from suggestions.");
+
+    const result = await prisma.pagePermission.upsert({
+        where: { pageId_userToken: { pageId, userToken: targetUser.user_id } },
+        update: { permissions: level },
+        create: { pageId, userToken: targetUser.user_id, permissions: level },
+        include: { user: { select: { user_id: true, username: true, accountId: true, imgLink: true } } },
+    });
+
+    revalidatePath(`/wiki/${accountId}/${pageId}/edit`);
+    return result;
+}
+
+export async function removePagePermission(pageId: number, userToken: string) {
+    const user = await requireUser();
+    const can = await hasPageManagePermission(pageId, user.user_id);
+    if (!can) throw new PagePermissionError("Forbidden");
+
+    await prisma.pagePermission.delete({
+        where: { pageId_userToken: { pageId, userToken } },
+    }).catch(() => {});
+
+    revalidatePath(`/pages`);
+}
+
+export async function deletePage(pageId: number) {
+    const user = await requireUser();
+
+    const page = await prisma.page.findUnique({ where: { pageId }, select: { ownerId: true } });
+    if (!page) throw new Error("Page not found");
+    if (page.ownerId !== user.user_id) throw new PagePermissionError("Forbidden");
+
+    await prisma.page.delete({ where: { pageId } });
+
+    revalidatePath(`/pages`);
+    return { success: true };
 }

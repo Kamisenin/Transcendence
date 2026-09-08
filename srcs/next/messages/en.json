@@ -102,10 +102,12 @@
 		"createPage": "Create a new page",
 		"creatingPage": "Creating...",
 		"settings": "Settings",
-		"logOut": "Log out"
+		"logOut": "Log out",
+		"uploadManager": "Upload Manager"
 	},
 	"Account": {
 		"title": "My Account",
+		"manageYourAccount": "Manage your account",
 		"accountName": "Account name",
 		"firstName": "First name",
 		"lastName": "Last name",
@@ -123,8 +125,7 @@
 		"deletingInProgress": "Deleting...",
 		"confirmDeletionAction": "confirm deletion",
 		"cancel": "Cancel",
-		"somethingWentWrongGeneric": "Something went wrong",
-		"manageAccount": "Manage your account"
+		"somethingWentWrongGeneric": "Something went wrong"
 	},
 	"Session": {
 		"loading": "Loading sessions...",
@@ -182,8 +183,12 @@
 		"owner": "Owner",
 		"view": "View",
 		"manage": "Manage",
-		"viewAria": "View {name}",
-		"manageAria": "Manage {name}",
+		"viewAriaLabel": "View {name}",
+		"manageAriaLabel": "Manage {name}",
+		"roles": "Roles",
+		"pages": "Pages",
+		"tags": "Tags",
+		"members": "Members",
 		"created": "Created {date}",
 		"newOrganization": "New organization",
 		"manageOrganization": "Manage organization",
@@ -196,6 +201,7 @@
 	},
 	"Tags": {
 		"myTags": "My Tags",
+		"newTag": "New tag",
 		"noTagFound": "No tag found",
 		"youDontHaveAccess": "You don't have access",
 		"youDontHaveAccessToAnyTag": "You don't have access to any tag at the moment.",
@@ -214,6 +220,11 @@
 		"namePlaceholderExample": "Ex: Character, Lore, Universe...",
 		"namespacePlaceholderExample": "Ex: my-namespace",
 		"nameAlreadyTaken": "This name is already taken",
+		"tabMembers": "Members",
+		"tabRoles": "Roles",
+		"tabRequests": "Requests",
+		"tabSettings": "Settings",
+		"ownerBadge": "Owner",
 		"validNamespace": "Valid namespace",
 		"invalidNamespace": "Invalid namespace",
 		"deleteTagBtn": "Delete tag",
@@ -228,6 +239,7 @@
 		"dangerousZone": "Dangerous Zone",
 		"noRoleAvailable": "No role available to assign (create a role below your rank first).",
 		"deleteIrreversible": "This action is irreversible",
+		"manageAndBrowse": "Manage and browse tags you can access.",
 		"createModal": {
 			"title": "Create a new Tag",
 			"nameLabel": "Tag Name *",
@@ -312,7 +324,22 @@
 		"titlePlaceholder": "Ex: Excalibur Sword",
 		"descriptionPlaceholder": "Add a description...",
 		"options": "Page Options",
+		"preview": "Preview",
 		"noAccess": "You do not have the current access right to this page.",
+		"permissions": {
+			"title": "Permissions",
+			"searchPlaceholder": "Search by accountId or username",
+			"levelRead": "Read",
+			"levelWrite": "Write",
+			"levelAdmin": "Admin",
+			"add": "Add",
+			"remove": "Remove",
+			"noPermissionsYet": "No one else has access to this page yet.",
+			"owner": "Owner",
+			"you": "you",
+			"addFailed": "Failed to add permission",
+			"removeFailed": "Failed to remove permission"
+		},
 		"editor": {
 			"typeHere": "Type your text here...",
 			"addBlock": "Add block",
@@ -378,7 +405,10 @@
 		"edit": "Edit",
 		"noPagesFound": "No pages found",
 		"failedToFetch": "Failed to fetch",
-		"error": "Error: {message}"
+		"error": "Error: {message}",
+		"delete": "Delete",
+		"confirmDelete": "Delete this page permanently?",
+		"deleteFailed": "Failed to delete page"
 	},
 	"Home": {
 		"tagline": "A wiki for wikis",

@@ -37,6 +37,9 @@ type Props = {
     initialBlocks: SavedBlock[];
     visibility: boolean;
     canonicalNamespace: string | null;
+    isOwner?: boolean;
+    ownerAccountId?: string;
+    initialPermissions?: any[];
 };
 
 const emptyValue = (): Descendant[] => [
@@ -51,7 +54,7 @@ const DEFAULT_INFOBOX: InfoboxData = {
     public: false
 };
 
-export default function PageBuilder({ accountId, pageId, initialTitle, initialBlocks, visibility, canonicalNamespace}: Props) {
+export default function PageBuilder({ accountId, pageId, initialTitle, initialBlocks, visibility, canonicalNamespace, isOwner = false, ownerAccountId, initialPermissions = [] }: Props) {
     const t = useTranslations("Page");
     const tCommon = useTranslations("Common");
     const [saving, setSaving] = useState(false);
@@ -223,7 +226,7 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
                 disabled={saving}
                 className="fixed bottom-6 right-6 z-40 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-lg text-sm font-semibold"
             >
-                {saving ? 'Saving...' : 'Save'}
+                {saving ? tCommon('saving') : tCommon('save')}
             </button>
 
             <div ref={containerRef} className="max-w-6xl mx-auto border rounded-xl bg-white p-4 min-h-[500px] shadow-sm relative mt-4">
@@ -243,6 +246,9 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
                                     data={block.infoboxData || DEFAULT_INFOBOX}
                                     onChange={(newData) => handleInfoboxChange(block.id, newData)}
                                     canonicalNamespace={canonicalNamespace}
+                                    isOwner={isOwner}
+                                    ownerAccountId={ownerAccountId}
+                                    initialPermissions={initialPermissions}
                                 />
                             ) : (
                                 <WikiEditor

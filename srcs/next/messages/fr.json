@@ -102,10 +102,12 @@
 		"createPage": "Créer une nouvelle page",
 		"creatingPage": "Création...",
 		"settings": "Paramètres",
-		"logOut": "Se déconnecter"
+		"logOut": "Se déconnecter",
+		"uploadManager": "Gestionnaire d'uploads"
 	},
 	"Account": {
 		"title": "Mon compte",
+		"manageYourAccount": "Gérez votre compte",
 		"accountName": "Nom du compte",
 		"firstName": "Prénom",
 		"lastName": "Nom",
@@ -123,8 +125,7 @@
 		"deletingInProgress": "Suppression...",
 		"confirmDeletionAction": "confirmer la suppression",
 		"cancel": "Annuler",
-		"somethingWentWrongGeneric": "Une erreur est survenue",
-		"manageAccount": "Gérer votre compte"
+		"somethingWentWrongGeneric": "Une erreur est survenue"
 	},
 	"Session": {
 		"loading": "Chargement des sessions...",
@@ -182,8 +183,12 @@
 		"owner": "Propriétaire",
 		"view": "Voir",
 		"manage": "Gérer",
-		"viewAria": "Voir {name}",
-		"manageAria": "Gérer {name}",
+		"viewAriaLabel": "Voir {name}",
+		"manageAriaLabel": "Gérer {name}",
+		"roles": "Rôles",
+		"pages": "Pages",
+		"tags": "Tags",
+		"members": "Membres",
 		"newOrganization": "Nouvelle organisation",
 		"created": "Créé le {date}",
 		"manageOrganization": "Gérer l'organisation",
@@ -196,6 +201,7 @@
 	},
 	"Tags": {
 		"myTags": "Mes tags",
+		"newTag": "Nouveau tag",
 		"noTagFound": "Aucun tag trouvé",
 		"youDontHaveAccess": "Vous n'avez pas accès",
 		"youDontHaveAccessToAnyTag": "Vous n'avez accès à aucun tag pour le moment.",
@@ -214,6 +220,11 @@
 		"namePlaceholderExample": "Ex: Personnage, Lore, Univers...",
 		"namespacePlaceholderExample": "Ex: mon-namespace",
 		"nameAlreadyTaken": "Ce nom est déjà pris",
+		"tabMembers": "Membres",
+		"tabRoles": "Rôles",
+		"tabRequests": "Demandes",
+		"tabSettings": "Paramètres",
+		"ownerBadge": "Propriétaire",
 		"validNamespace": "Namespace valide",
 		"invalidNamespace": "Namespace invalide",
 		"deleteTagBtn": "Supprimer le tag",
@@ -228,6 +239,7 @@
 		"dangerousZone": "Zone dangereuse",
 		"noRoleAvailable": "Aucun rôle disponible à assigner (crée d'abord un rôle inférieur à ton rang).",
 		"deleteIrreversible": "Cette action est irréversible",
+		"manageAndBrowse": "Gère et parcours les tags auxquels tu as accès.",
 		"createModal": {
 			"title": "Créer un nouveau Tag",
 			"nameLabel": "Nom du Tag *",
@@ -312,7 +324,22 @@
 		"titlePlaceholder": "Ex: Épée Excalibur",
 		"descriptionPlaceholder": "Ajouter une description...",
 		"options": "Options de la page",
+		"preview": "Aperçu",
 		"noAccess": "Vous n'avez pas les droits d'accès actuels à cette page.",
+		"permissions": {
+			"title": "Permissions",
+			"searchPlaceholder": "Rechercher par identifiant ou pseudo",
+			"levelRead": "Lecture",
+			"levelWrite": "Écriture",
+			"levelAdmin": "Admin",
+			"add": "Ajouter",
+			"remove": "Retirer",
+			"noPermissionsYet": "Personne d'autre n'a accès à cette page pour l'instant.",
+			"owner": "Propriétaire",
+			"you": "toi",
+			"addFailed": "Échec de l'ajout de la permission",
+			"removeFailed": "Échec du retrait de la permission"
+		},
 		"editor": {
 			"typeHere": "Tapez votre texte ici...",
 			"addBlock": "Ajouter un bloc",
@@ -378,7 +405,10 @@
 		"edit": "Éditer",
 		"noPagesFound": "Aucune page trouvée",
 		"failedToFetch": "Échec du chargement",
-		"error": "Erreur : {message}"
+		"error": "Erreur : {message}",
+		"delete": "Supprimer",
+		"confirmDelete": "Supprimer cette page définitivement ?",
+		"deleteFailed": "Échec de la suppression"
 	},
 	"Home": {
 		"tagline": "Un wiki pour wikis",

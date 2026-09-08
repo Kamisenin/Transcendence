@@ -102,10 +102,12 @@
 		"createPage": "Crear una nueva página",
 		"creatingPage": "Creando...",
 		"settings": "Ajustes",
-		"logOut": "Cerrar sesión"
+		"logOut": "Cerrar sesión",
+		"uploadManager": "Gestor de archivos"
 	},
 	"Account": {
 		"title": "Mi cuenta",
+		"manageYourAccount": "Gestiona tu cuenta",
 		"accountName": "Nombre de la cuenta",
 		"firstName": "Nombre",
 		"lastName": "Apellido",
@@ -123,8 +125,7 @@
 		"deletingInProgress": "Eliminando...",
 		"confirmDeletionAction": "confirmar eliminación",
 		"cancel": "Cancelar",
-		"somethingWentWrongGeneric": "Algo salió mal",
-		"manageAccount": "Gestionar tu cuenta"
+		"somethingWentWrongGeneric": "Algo salió mal"
 	},
 	"Session": {
 		"loading": "Cargando sesiones...",
@@ -182,8 +183,12 @@
 		"owner": "Propietario",
 		"view": "Ver",
 		"manage": "Gestionar",
-		"viewAria": "Ver {name}",
-		"manageAria": "Gestionar {name}",
+		"viewAriaLabel": "Ver {name}",
+		"manageAriaLabel": "Gestionar {name}",
+		"roles": "Roles",
+		"pages": "Páginas",
+		"tags": "Etiquetas",
+		"members": "Miembros",
 		"newOrganization": "Nueva organización",
 		"created": "Creado {date}",
 		"manageOrganization": "Gestionar organización",
@@ -196,6 +201,7 @@
 	},
 	"Tags": {
 		"myTags": "Mis etiquetas",
+		"newTag": "Nueva etiqueta",
 		"noTagFound": "No se encontró ninguna etiqueta",
 		"youDontHaveAccess": "No tienes acceso",
 		"youDontHaveAccessToAnyTag": "No tienes acceso a ninguna etiqueta por el momento.",
@@ -214,6 +220,11 @@
 		"namePlaceholderExample": "Ej: Personaje, Historia, Universo...",
 		"namespacePlaceholderExample": "Ej: mi-espacio",
 		"nameAlreadyTaken": "Este nombre ya está ocupado",
+		"tabMembers": "Miembros",
+		"tabRoles": "Roles",
+		"tabRequests": "Solicitudes",
+		"tabSettings": "Ajustes",
+		"ownerBadge": "Propietario",
 		"validNamespace": "Espacio de nombres válido",
 		"invalidNamespace": "Espacio de nombres no válido",
 		"deleteTagBtn": "Eliminar etiqueta",
@@ -228,6 +239,7 @@
 		"dangerousZone": "Zona peligrosa",
 		"noRoleAvailable": "No hay ningún rol disponible para asignar (crea primero un rol por debajo de tu rango).",
 		"deleteIrreversible": "Esta acción es irreversible",
+		"manageAndBrowse": "Gestiona y explora las etiquetas a las que tienes acceso.",
 		"createModal": {
 			"title": "Crear una nueva etiqueta",
 			"nameLabel": "Nombre de la etiqueta *",
@@ -312,7 +324,22 @@
 		"titlePlaceholder": "Ej: Espada Excalibur",
 		"descriptionPlaceholder": "Añadir una descripción...",
 		"options": "Opciones de la página",
+		"preview": "Vista previa",
 		"noAccess": "No tienes los derechos de acceso actuales a esta página.",
+		"permissions": {
+			"title": "Permisos",
+			"searchPlaceholder": "Buscar por identificador o nombre de usuario",
+			"levelRead": "Lectura",
+			"levelWrite": "Escritura",
+			"levelAdmin": "Admin",
+			"add": "Añadir",
+			"remove": "Eliminar",
+			"noPermissionsYet": "Nadie más tiene acceso a esta página todavía.",
+			"owner": "Propietario",
+			"you": "tú",
+			"addFailed": "Error al añadir el permiso",
+			"removeFailed": "Error al eliminar el permiso"
+		},
 		"editor": {
 			"typeHere": "Escribe tu texto aquí...",
 			"addBlock": "Añadir bloque",
@@ -378,7 +405,10 @@
 		"edit": "Editar",
 		"noPagesFound": "No se encontraron páginas",
 		"failedToFetch": "Error al cargar",
-		"error": "Error: {message}"
+		"error": "Error: {message}",
+		"delete": "Eliminar",
+		"confirmDelete": "¿Eliminar esta página definitivamente?",
+		"deleteFailed": "Error al eliminar la página"
 	},
 	"Home": {
 		"tagline": "Un wiki para wikis",

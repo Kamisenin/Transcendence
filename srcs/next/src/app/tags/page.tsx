@@ -2,18 +2,21 @@ import Link from 'next/link';
 import { requireUser } from '@/actions/tags';
 import { getUserTags } from '%/lib/tag_permissions';
 import TagsPageClient from '@/components/tags/TagsPageClient';
+import { getTranslations } from 'next-intl/server';
 
 export default async function MyTagsPage() {
     const user = await requireUser();
     const tags = await getUserTags(user.user_id);
+    const t = await getTranslations('Tags');
+    const tCommon = await getTranslations('Common');
 
     return (
         <div className="min-h-screen bg-[#f6f8fa] pt-16">
             <div className="mx-auto max-w-4xl px-6 py-10">
                 <div className="mb-6 border-b border-[#d0d7de] pb-4">
-                    <h1 className="text-[32px] leading-tight font-semibold text-[#24292f]">My tags</h1>
+                    <h1 className="text-[32px] leading-tight font-semibold text-[#24292f]">{t("myTags")}</h1>
                     <p className="mt-1 text-sm text-[#57606a]">
-                        Manage and browse tags you can access.
+                        {t("manageAndBrowse")}
                     </p>
                 </div>
 
@@ -23,7 +26,7 @@ export default async function MyTagsPage() {
 
                 {tags.length === 0 ? (
                     <div className="rounded-md border border-[#d0d7de] bg-white p-6 text-sm text-[#57606a]">
-                        You don&apos;t have access to any tag at the moment.
+                        {t("youDontHaveAccessToAnyTag")}
                     </div>
                 ) : (
                     <div className="overflow-hidden rounded-md border border-[#d0d7de] bg-white">
@@ -50,7 +53,7 @@ export default async function MyTagsPage() {
 
                                         {tag.ownerToken === user.user_id && (
                                             <span className="rounded-full border border-[#d0d7de] bg-[#f6f8fa] px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-[#57606a]">
-                                                Owner
+                                                {tCommon("owner")}
                                             </span>
                                         )}
                                     </Link>

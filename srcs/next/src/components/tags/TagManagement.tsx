@@ -7,6 +7,7 @@ import TagRequestsPanel from './TagRequestsPanel';
 import TagSettingsPanel from './TagSettingsPanel';
 import type { TagCapabilities } from '%/lib/tag_permissions';
 import { type Member } from "./TagMembersPanel"
+import { useTranslations } from 'next-intl';
 
 
 export type Tag = {
@@ -52,17 +53,16 @@ type Props = {
     currentUserToken: string;
 };
 
-const TABS = [
-    { key: 'members', label: 'Membres' },
-    { key: 'roles', label: 'Rôles' },
-    { key: 'requests', label: 'Demandes' },
-    { key: 'settings', label: 'Paramètres' },
-] as const;
-
-type TabKey = typeof TABS[number]['key'];
-
 export default function TagManagement({tag, capabilities, roles, members, pendingRequests, currentUserToken,}: Props) {
     const [activeTab, setActiveTab] = useState<TabKey>('members');
+    const t = useTranslations('Tags');
+
+    const TABS = [
+        { key: 'members', label: t('tabMembers') },
+        { key: 'roles', label: t('tabRoles') },
+        { key: 'requests', label: t('tabRequests') },
+        { key: 'settings', label: t('tabSettings') },
+    ] as const;
 
     const visibleTabs = TABS.filter(t => {
         if (t.key === 'requests') return capabilities.canReviewRequests;
@@ -80,7 +80,7 @@ export default function TagManagement({tag, capabilities, roles, members, pendin
                 <h1 className="text-2xl font-bold">{tag.name}</h1>
                 {capabilities.isOwner && (
                     <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full uppercase tracking-wide">
-                        Owner
+                        {t('ownerBadge')}
                     </span>
                 )}
             </div>

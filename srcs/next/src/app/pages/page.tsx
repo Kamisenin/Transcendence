@@ -4,6 +4,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
+import { deletePage } from "@/actions/pages";
 
 type PageItem = {
     pageId: number;
@@ -13,12 +14,25 @@ type PageItem = {
     canonicalSlug?: { namespace: string; slug: string } | null;
 };
 
-function PageRow({ item }: { item: PageItem }) {
+function PageRow({ item, onDeleted }: { item: PageItem; onDeleted: (pageId: number) => void }) {
     const t = useTranslations("MyPages");
+    const [deleting, setDeleting] = useState(false);
     const pageHref = item.canonicalSlug
         ? `/wiki/${item.canonicalSlug.namespace}/${item.canonicalSlug.slug}`
         : `/wiki/${item.ownerAccount}/${item.pageId}`;
     const editHref = `/wiki/${item.ownerAccount}/${item.pageId}/edit`;
+
+    async function handleDelete() {
+        if (!window.confirm(t("confirmDelete"))) return;
+
+        setDeleting(true);
+        try {
+            await deletePage(item.pageId);
+            onDeleted(item.pageId);
+        } catch {
+            setDeleting(false);
+        }
+    }
 
     return (
         <div className="flex items-center gap-4 border rounded p-3">
@@ -38,10 +52,17 @@ function PageRow({ item }: { item: PageItem }) {
                  <div className="text-sm text-gray-500 truncate">{t("owner", { owner: item.ownerAccount })}</div>
             </div>
 
-            <div className="flex-shrink-0">
+            <div className="flex-shrink-0 flex items-center gap-2">
                 <Link href={editHref} className="px-3 py-1 rounded bg-blue-600 text-white text-sm hover:opacity-95">
                     {t("edit")}
                 </Link>
+                <button
+                    onClick={handleDelete}
+                    disabled={deleting}
+                    className="px-3 py-1 rounded bg-red-50 text-red-600 text-sm hover:bg-red-100 disabled:opacity-50"
+                >
+                    {t("delete")}
+                </button>
             </div>
         </div>
     );
@@ -88,6 +109,10 @@ export default function MyPages() {
         if (urlTab && urlTab !== tab) setTab(urlTab);
     }, [urlTab]);
 
+    function handleDeleted(pageId: number) {
+        setItems((prev) => prev.filter((it) => it.pageId !== pageId));
+    }
+
     return (
         <div className="p-6 pt-20">
 
@@ -117,7 +142,7 @@ export default function MyPages() {
                 ) : items.length === 0 ? (
                     <div className="text-sm text-gray-500">{t("noPagesFound")}</div>
                 ) : (
-                    items.map((it) => <PageRow key={it.pageId} item={it} />)
+                    items.map((it) => <PageRow key={it.pageId} item={it} onDeleted={handleDeleted} />)
                 )}
             </section>
         </div>

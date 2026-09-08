@@ -98,7 +98,7 @@ export default function UserMenu({ user }: UserMenuProps) {
                         {t("settings")}
                     </Link>
 					<Link href="/uploads-manager" className="block px-4 py-2 hover:bg-gray-100">
-						Upload Manager
+						{t("uploadManager")}
 					</Link >
                     <button onClick={handleLogout} className="w-full text-left px-4 py-2 hover:bg-gray-100">
                         {t("logOut")}
