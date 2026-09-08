@@ -338,7 +338,18 @@
 			"owner": "Owner",
 			"you": "you",
 			"addFailed": "Failed to add permission",
-			"removeFailed": "Failed to remove permission"
+			"removeFailed": "Failed to remove permission",
+			"grantType": "Grant access to",
+			"byUser": "A user",
+			"byTagRole": "A tag role",
+			"byOrgRole": "An org role",
+			"selectTag": "Select a tag",
+			"selectOrgLabel": "Select an organization",
+			"selectRole": "Select a role",
+			"noTagsAvailable": "No tag available",
+			"noOrgsAvailable": "No organization available",
+			"tagAccessList": "Tag role access",
+			"orgAccessList": "Org role access"
 		},
 		"editor": {
 			"typeHere": "Type your text here...",

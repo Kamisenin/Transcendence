@@ -338,7 +338,18 @@
 			"owner": "Propietario",
 			"you": "tú",
 			"addFailed": "Error al añadir el permiso",
-			"removeFailed": "Error al eliminar el permiso"
+			"removeFailed": "Error al eliminar el permiso",
+			"grantType": "Dar acceso a",
+			"byUser": "Un usuario",
+			"byTagRole": "Un rol de etiqueta",
+			"byOrgRole": "Un rol de organización",
+			"selectTag": "Selecciona una etiqueta",
+			"selectOrgLabel": "Selecciona una organización",
+			"selectRole": "Selecciona un rol",
+			"noTagsAvailable": "No hay etiquetas disponibles",
+			"noOrgsAvailable": "No hay organizaciones disponibles",
+			"tagAccessList": "Acceso por rol de etiqueta",
+			"orgAccessList": "Acceso por rol de organización"
 		},
 		"editor": {
 			"typeHere": "Escribe tu texto aquí...",

@@ -338,7 +338,18 @@
 			"owner": "Propriétaire",
 			"you": "toi",
 			"addFailed": "Échec de l'ajout de la permission",
-			"removeFailed": "Échec du retrait de la permission"
+			"removeFailed": "Échec du retrait de la permission",
+			"grantType": "Donner l'accès à",
+			"byUser": "Un utilisateur",
+			"byTagRole": "Un rôle de tag",
+			"byOrgRole": "Un rôle d'org",
+			"selectTag": "Sélectionner un tag",
+			"selectOrgLabel": "Sélectionner une organisation",
+			"selectRole": "Sélectionner un rôle",
+			"noTagsAvailable": "Aucun tag disponible",
+			"noOrgsAvailable": "Aucune organisation disponible",
+			"tagAccessList": "Accès par rôle de tag",
+			"orgAccessList": "Accès par rôle d'org"
 		},
 		"editor": {
 			"typeHere": "Tapez votre texte ici...",
