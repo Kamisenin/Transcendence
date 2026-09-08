@@ -17,13 +17,12 @@ interface FriendCardProps {
 export default async function FriendCard({ friend } : FriendCardProps)
 {
     const t = await getTranslations("Common");
-    const isOnline = Date.now() - new Date(friend.lastSeen).getTime() < 2 * 60 * 1000;
+    const isOnline = new Date(friend.lastSeen).getTime() > new Date().getTime() - 2 * 60 * 1000;
 
     return (
         <Link
             href={`/wiki/${friend.accountId}`}
-            className="flex items-center gap-3 p-3 bg-white border border-gray-200 
-                rounded-xl hover:shadow-md transition-shadow duration-200 w-full max-w-sm"
+            className="flex w-full max-w-sm items-center gap-3 border border-[#d9bfb7] bg-[#fffaf7] p-3 transition-shadow duration-200 hover:border-[#800000] hover:shadow-md"
         >
             <div className="relative flex-shrink-0">
                 <Image
@@ -34,20 +33,20 @@ export default async function FriendCard({ friend } : FriendCardProps)
                     className="rounded-full object-cover w-12 h-12"
                 />
                 <span
-                    className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${
-                        isOnline ? "bg-green-500" : "bg-gray-400" }`}
+                    className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-[#fffaf7] ${
+                        isOnline ? "bg-[#4f8f52]" : "bg-[#a89088]" }`}
                     title={isOnline ? t("online") : t("offline")}
                     aria-label={isOnline ? t("online") : t("offline")}
                 />
             </div>
             <div className="flex flex-col min-w-0 flex-1">
-                <span className="font-semibold text-gray-900 truncate">
+                <span className="truncate font-semibold text-[#3f2924]">
                     {friend.username}
                 </span>
-                <span className="text-xs text-gray-500 truncate">
+                <span className="truncate text-xs text-[#8a6b63]">
                     @{friend.accountId}
                 </span>
-                <span className="flex items-center gap-1 text-[11px] text-gray-500">
+                <span className="flex items-center gap-1 text-[11px] text-[#8a6b63]">
                     {isOnline ? t("online") : t("offline")}
                 </span>
             </div>

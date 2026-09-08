@@ -37,7 +37,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <body>
         <NextIntlClientProvider locale={locale} messages={messages}>
         {user && <UserPresence />}
-        <header className="fixed top-0 z-50 h-16 w-full bg-beige flex items-center justify-between px-6">
+        <header className="fixed top-0 z-50 flex h-16 w-full items-center justify-between border-b border-[#cda99d] bg-[#e6cfc4] px-4 shadow-[0_2px_10px_rgba(128,0,0,0.08)] sm:px-6">
             <HomeButton />
             <div className="flex items-center gap-4">
                 <LocaleSwitcher />
@@ -46,7 +46,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             </div>
         </header>
         <main className="min-h-full item-center flex flex-col">{children}</main>
-        <footer className={"flex z-50 h-16 w-full bg-beige items-center justify-center"}>
+        <footer className="flex min-h-16 w-full items-center justify-center border-t border-[#cda99d] bg-[#e6cfc4] px-4 py-4 text-[#6f4d44]">
           <div className="flex gap-4 text-sm">
             <Link href="/privacy" className="hover:underline">
               <p>{t("privacyPolicy")}</p>

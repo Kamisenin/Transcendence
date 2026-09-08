@@ -16,12 +16,12 @@ export default async function OrgsPage() {
     }));
 
     return (
-        <main className="min-h-screen bg-gray-50 p-6 pt-20">
+        <main className="min-h-screen bg-[#f0e0d6] p-6 pt-20">
             <div className="max-w-6xl mx-auto">
                 <header className="mb-6 flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-semibold text-gray-900">{t('myOrganizations')}</h1>
-                        <p className="text-sm text-gray-500 mt-1">{t('manageDescription')}</p>
+                        <h1 className="text-2xl font-semibold text-[#800000]">{t('myOrganizations')}</h1>
+                        <p className="mt-1 text-sm text-[#8a6b63]">{t('manageDescription')}</p>
                     </div>
 
                     <div>
@@ -39,11 +39,11 @@ export default async function OrgsPage() {
                             <input
                                 name="name"
                                 placeholder={t('newOrganizationPlaceholder')}
-                                className="px-3 py-1.5 border border-gray-200 rounded-md text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-200"
+                                className="border border-[#d9bfb7] bg-[#fffaf7] px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#d9bfb7]"
                             />
                             <button
                                 type="submit"
-                                className="inline-flex items-center px-3 py-1.5 rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700"
+                                className="inline-flex items-center bg-[#800000] px-3 py-1.5 text-sm font-medium text-[#fffaf7] hover:bg-[#5f0000]"
                             >
                                 {t('newOrganization')}
                             </button>

@@ -2,6 +2,10 @@ import { getUserOrgs } from "@/actions/orgs";
 import { User } from "@prisma/client";
 import OrgCard from "../OrgCard";
 
+type Props = {
+	target: User;
+};
+
 export default async function OrgsList({ target }: Props) {
 	const orgs = await getUserOrgs(target);
  

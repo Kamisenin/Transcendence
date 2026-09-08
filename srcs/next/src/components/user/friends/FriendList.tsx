@@ -1,5 +1,4 @@
 import { getFriends } from "@/actions/friendship";
-import { Prisma } from "@prisma/client"
 import FriendCard from "./FriendCard";
 
 
@@ -12,7 +11,7 @@ export default async function FriendList({ target_id } : Props)
     const friendships = await getFriends(target_id);
 
 	return (
-		<div className="flex aspect-square w-64 flex-col rounded-2xl border-2 border-blue-500 p-4">
+		<div className="flex aspect-square w-64 flex-col border border-[#d9bfb7] border-t-4 border-t-[#800000] bg-[#fffaf7] p-4 shadow-[0_2px_8px_rgba(128,0,0,0.06)]">
 			
 			{/* Titre */}
 			<h2 className="mb-4 text-xl font-bold">
@@ -37,7 +36,7 @@ export default async function FriendList({ target_id } : Props)
 					})
 				) : (
 					<p className="py-8 text-center text-sm text-muted-foreground">
-						T'as pas d'amis Mdrr
+						Tu n&apos;as pas encore d&apos;amis.
 					</p>
 				)}
 			</div>
