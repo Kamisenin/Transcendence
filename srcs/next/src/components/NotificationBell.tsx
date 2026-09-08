@@ -51,6 +51,22 @@ export default function NotificationBell() {
         } catch {}
     }
 
+    async function handleIgnoreFriend(id: number) {
+        const notification = notifications.find((n) => n.id === id);
+        setNotifications((prev) => prev.filter((n) => n.id !== id));
+        if (notification && !notification.read) {
+            setUnreadCount((prev) => Math.max(0, prev - 1));
+        }
+
+        try {
+            await fetch("/api/notifications/delete", {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id }),
+            });
+        } catch {}
+    }
+
     async function fetchUnreadCount() {
         try {
             const res = await fetch("/api/notifications/unread-count");
@@ -221,17 +237,15 @@ export default function NotificationBell() {
                                     >
                                         {t("refuse")}
                                     </button>
-                                    {!n.read && (
-                                        <button
-                                            onClick={(event) => {
-                                                event.stopPropagation();
-                                                handleNotificationClick(n.id);
-                                            }}
-                                            className="text-xs px-2 py-1 rounded text-gray-500 hover:underline cursor-pointer ml-auto"
-                                        >
-                                            {t("ignore")}
-                                        </button>
-                                    )}
+                                    <button
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            handleIgnoreFriend(n.id);
+                                        }}
+                                        className="text-xs px-2 py-1 rounded text-gray-500 hover:underline cursor-pointer ml-auto"
+                                    >
+                                        {t("ignore")}
+                                    </button>
                                 </div>
                                 <p className="text-xs text-gray-500 mt-1">{timeAgo(n.createdAt)}</p>
                             </div>
