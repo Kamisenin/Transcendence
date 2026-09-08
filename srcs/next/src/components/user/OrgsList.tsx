@@ -6,7 +6,7 @@ export default async function OrgsList({ target }: Props) {
 	const orgs = await getUserOrgs(target);
  
 	return (
-		<section className="bg-card text-card-foreground border border-border rounded-lg p-4 shadow-md h-[600px] flex flex-col">
+		<section className="bg-card text-card-foreground border border-border rounded-lg p-4 shadow-md h-[400px] flex flex-col">
 			<h2 className="text-xl font-bold mb-4">
 				Organisations ({orgs?.length ?? 0})
 			</h2>
