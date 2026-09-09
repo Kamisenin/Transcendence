@@ -52,11 +52,14 @@ export default async function TagOverview({ tag, members, pages, isOwnerOrManage
                                 {tag.namespace}
                             </span>
                         )}
-                        <Link
-                            href={`/tags/${tag.namespace}/manage`}
-                            className="ml-auto rounded-md border border-[#d9bfb7] bg-[#fffaf7] px-3 py-1.5 text-sm font-semibold text-[#800000] transition hover:bg-[#f7e9e2]">
-                            {t("Manage")}
-                        </Link>
+                        { isOwnerOrManager && (
+                            <Link
+                                href={`/tags/${tag.namespace}/manage`}
+                                className="ml-auto rounded-md border border-[#d9bfb7] bg-[#fffaf7] px-3 py-1.5 text-sm font-semibold text-[#800000] transition hover:bg-[#f7e9e2]">
+                                {t("Manage")}
+                            </Link>
+                        )
+                        }
                     </div>
                     {tag.description && (
                         <p className="mt-2 text-sm text-[#8a6b63]">{tag.description}</p>)}

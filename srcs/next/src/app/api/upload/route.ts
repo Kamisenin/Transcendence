@@ -5,7 +5,6 @@ import crypto from "crypto"
 import { requireUser } from '@/actions/tags'
 
 export async function POST(request: Request) {
-    console.log("1 - route appelée")
     const user = await requireUser();
 
     const formData = await request.formData()

@@ -16,7 +16,7 @@ export default function TagCard({ tag }: Props) {
 
     return (
         <Link
-            href={`/tags/${encodeURIComponent(tag.name)}`}
+            href={`/tags/${encodeURIComponent(tag.namespace)}`}
             className="group block border border-[#d9bfb7] bg-[#fffaf7] p-3 transition-colors hover:border-[#800000] hover:bg-[#f7e9e2]"
             style={{ borderLeftColor: tagColor, borderLeftWidth: "4px" }}
         >

@@ -2,6 +2,7 @@
 
 import { X } from "lucide-react";
 import { Tag } from "./tagType";
+import Link from "next/link";
 
 type TagBadgeProps = {
     tag: Tag;
@@ -10,21 +11,23 @@ type TagBadgeProps = {
 
 export default function TagBadge({ tag, onRemove }: TagBadgeProps) {
     return (
-        <span
-            style={{
-                backgroundColor: `${tag.color}15`,
-                color: tag.color,
-                borderColor: `${tag.color}30`,
-            }}
-            className="inline-flex min-w-0 max-w-full items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium shrink-0"
-        >
-            <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: tag.color }} />
-            <span className="min-w-0 break-words">{tag.name}</span>
-            {onRemove && (
-                <button type="button" onClick={onRemove} className="hover:opacity-75 p-0.5 ml-0.5 cursor-pointer">
-                    <X size={10} />
-                </button>
-            )}
-        </span>
+        <Link href={`/tags/${tag.namespace}`}>
+            <span
+                style={{
+                    backgroundColor: `${tag.color}15`,
+                    color: tag.color,
+                    borderColor: `${tag.color}30`,
+                }}
+                className="inline-flex min-w-0 max-w-full items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium shrink-0"
+            >
+                <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: tag.color }} />
+                <span className="min-w-0 break-words">{tag.name}</span>
+                {onRemove && (
+                    <button type="button" onClick={onRemove} className="hover:opacity-75 p-0.5 ml-0.5 cursor-pointer">
+                        <X size={10} />
+                    </button>
+                )}
+            </span>
+        </Link>
     );
 }

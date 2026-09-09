@@ -71,7 +71,7 @@ export default function PagePermissions({ pageId, ownerAccountId, initialPermiss
     useEffect(() => {
         (async () => {
             const [{ grantableTags, grantableOrgs }, { tagAccess, orgAccess }] = await Promise.all([
-                getGrantableTagsAndOrgs(),
+                getGrantableTagsAndOrgs(pageId),
                 getPageRoleAccess(pageId),
             ]);
             setGrantableTags(grantableTags);

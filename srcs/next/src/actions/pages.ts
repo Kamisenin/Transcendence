@@ -13,8 +13,9 @@ import { getUserById } from '@/app/lib/prisma/prisma-utils';
 import { PageData } from '@/components/ForumCard';
 import { PagePermissionError } from "%/lib/errors";
 import { revalidatePath } from "next/cache";
-import { getTagCapabilities, getUserTags } from '%/lib/tag_permissions';
+import { getTagCapabilities } from '%/lib/tag_permissions';
 import { userHasOrgPermission } from '@/actions/orgs';
+import { requestTagPageAccess } from '@/actions/tags';
 
 function findPreviewImageFromContent(content: any): string | null {
     try {
@@ -343,21 +344,24 @@ export async function savePage(
         },
     });
 
-    for (const tagId of tagIds) {
+    await prisma.tagPageRequest.deleteMany({
+        where: {
+            pageId,
+            status: 'PENDING',
+            ...(tagIds.length > 0 ? { tagId: { notIn: tagIds } } : {}),
+        },
+    });
 
-        await prisma.tagPage.upsert({
-            where: {
-                tagId_pageId: {
-                    tagId,
-                    pageId
-                }
-            },
-            update: {},
-            create: {
-                tagId,
-                pageId
-            }
-        });
+    const existingTagPages = await prisma.tagPage.findMany({
+        where: { pageId, tagId: { in: tagIds } },
+        select: { tagId: true },
+    });
+    const existingTagIds = new Set(existingTagPages.map(({ tagId }) => tagId));
+
+    for (const tagId of tagIds) {
+        if (!existingTagIds.has(tagId)) {
+            await requestTagPageAccess(tagId, pageId);
+        }
     }
 
     await syncUserSlugs(
@@ -499,6 +503,42 @@ async function hasPageAccess(
               AND tpa.permissions = ANY(${levels}::"PermissionLevel"[])
               AND ota.permissions = ANY(${levels}::"PermissionLevel"[])
               AND member_role.hierarchy_level >= min_role.hierarchy_level
+                ),
+
+                tag_request_reviewer_access AS (
+                        SELECT 1 AS ok
+                        FROM tag_page_requests tpr
+                        JOIN tags t ON t.id = tpr.tag_id
+                        WHERE tpr.page_id = ${pageId}
+                            AND tpr.status = 'PENDING'
+                            AND (
+                                t.owner_token = ${userToken}
+                                OR EXISTS (
+                                        SELECT 1
+                                        FROM tag_permissions tp
+                                        WHERE tp.tag_id = tpr.tag_id
+                                            AND tp.user_token = ${userToken}
+                                            AND tp.can_review_requests = true
+                                )
+                                OR EXISTS (
+                                        SELECT 1
+                                        FROM tag_members tm
+                                        JOIN tag_roles tr ON tr.id = tm.role_id
+                                        WHERE tm.tag_id = tpr.tag_id
+                                            AND tm.user_token = ${userToken}
+                                            AND tr.can_review_requests = true
+                                )
+                                OR EXISTS (
+                                        SELECT 1
+                                        FROM org_tag_capability otc
+                                        JOIN organization_members om
+                                            ON om.organization_id = otc.org_id
+                                         AND om.role_id = otc.role_id
+                                         AND om.user_token = ${userToken}
+                                        WHERE otc.tag_id = tpr.tag_id
+                                            AND otc.can_review_requests = true
+                                )
+                            )
         )
 
         SELECT EXISTS (
@@ -509,6 +549,7 @@ async function hasPageAccess(
             UNION ALL SELECT 1 FROM org_owner_access
             UNION ALL SELECT 1 FROM org_member_access
             UNION ALL SELECT 1 FROM org_tag_chain_access
+            UNION ALL SELECT 1 FROM tag_request_reviewer_access
         ) AS has_access;
     `;
 
@@ -652,13 +693,19 @@ export async function removePagePermission(pageId: number, userToken: string) {
     revalidatePath(`/pages`);
 }
 
-export async function getGrantableTagsAndOrgs() {
+export async function getGrantableTagsAndOrgs(pageId: number) {
     const user = await requireUser();
 
-    const [tags, orgs] = await Promise.all([
-        getUserTags(user.user_id),
+    const [page, orgs] = await Promise.all([
+        prisma.page.findUnique({
+            where: { pageId },
+            select: { ownerId: true, tagPages: { select: { tag: true } } },
+        }),
         prisma.organization.findMany({ include: { roles: true } }),
     ]);
+    if (!page || page.ownerId !== user.user_id) throw new PagePermissionError("Forbidden");
+
+    const tags = page.tagPages.map(({ tag }) => tag);
 
     const grantableTags = [];
     for (const tag of tags) {
@@ -672,17 +719,7 @@ export async function getGrantableTagsAndOrgs() {
         }
     }
 
-    const grantableOrgs = [];
-    for (const org of orgs) {
-        const can = await userHasOrgPermission(org.id, 'canManageOrgPageGrants', user);
-        if (can) {
-            const roles = await prisma.organizationRole.findMany({
-                where: { organizationId: org.id },
-                orderBy: { hierarchyLevel: 'desc' },
-            });
-            grantableOrgs.push({ id: org.id, name: org.name, roles });
-        }
-    }
+    const grantableOrgs = orgs.map(({ id, name, roles }) => ({ id, name, roles }));
 
     return { grantableTags, grantableOrgs };
 }
@@ -705,6 +742,9 @@ export async function addTagRolePageAccess(pageId: number, tagId: number, minRol
     const user = await requireUser();
     const can = await hasPageManagePermission(pageId, user.user_id);
     if (!can) throw new PagePermissionError("Forbidden");
+
+    const pageTag = await prisma.tagPage.findUnique({ where: { tagId_pageId: { tagId, pageId } } });
+    if (!pageTag) throw new PagePermissionError("Tag is not attached to this page");
 
     const result = await prisma.tagPageAccess.upsert({
         where: { pageId_tagId: { pageId, tagId } },

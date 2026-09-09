@@ -63,11 +63,13 @@ export default async function WikiViewPage({ params }: Params) {
                 />
             </main>
 
-            <FooterRecommendations
-                userId={user?.user_id}
-                currentPageId={page.pageId}
-                hasTags={hasTags}
-            />
+            {user && (
+                <FooterRecommendations
+                    userId={user?.user_id}
+                    currentPageId={page.pageId}
+                    hasTags={hasTags}
+                />
+            )}
         </div>
     );
 }

@@ -309,6 +309,31 @@ export async function reviewTagPageRequest(requestId: number, accept: boolean) {
     revalidatePath(`/tags/${request.tagId}`);
 }
 
+export async function requestTagPageAccess(tagId: number, pageId: number) {
+    const user = await requireUser();
+    const [tag, page, existing, pending] = await Promise.all([
+        prisma.tag.findUnique({ where: { id: tagId }, select: { id: true } }),
+        prisma.page.findUnique({
+            where: { pageId },
+            select: {
+                pageId: true,
+                ownerId: true,
+                permissions: { where: { userToken: user.user_id }, select: { permissions: true } },
+            },
+        }),
+        prisma.tagPage.findUnique({ where: { tagId_pageId: { tagId, pageId } } }),
+        prisma.tagPageRequest.findFirst({ where: { tagId, pageId, status: "PENDING" } }),
+    ]);
+    if (!tag || !page) throw new Error("Tag or page not found");
+    const canEdit = page.ownerId === user.user_id || page.permissions.some(({ permissions }) => permissions !== "READ");
+    if (!canEdit) throw new Error("Forbidden");
+    if (existing || pending) return pending ?? existing;
+
+    return prisma.tagPageRequest.create({
+        data: { tagId, pageId, requestedBy: user.user_id },
+    });
+}
+
 // ───────────── TAG INFOS ─────────────
 
 export async function updateTagInfo(tagId: number, data: {
@@ -590,4 +615,83 @@ export async function deleteTag(tagId: number): Promise<void> {
     revalidatePath('/wiki/[namespace]/[slug]', 'page');
     revalidatePath(`/tags/${tag.namespace}`);
     redirect("/");
+}
+
+type TagManagePermissionKey =
+  | "canManageMembers"
+  | "canManageRoles"
+  | "canEditInfo"
+  | "canDeleteTag"
+  | "canAddPage"
+  | "canRevokePage"
+  | "canManagePageGrants"
+  | "canReviewRequests";
+
+export async function userHasTagPermission(
+  tagId: number,
+  permissionKey: TagManagePermissionKey,
+  user: User | null = null,
+): Promise<boolean> {
+  if (!user) user = await getSessionUser(await getSessionCookie());
+  if (!user) return false;
+
+  const userId = user.user_id;
+
+  const tag = await prisma.tag.findUnique({
+    where: { id: tagId },
+    include: {
+      members: {
+        where: { userToken: userId },
+        include: { role: true },
+      },
+    },
+  });
+
+  if (!tag) return false;
+
+  if (tag.ownerToken === userId) return true;
+
+  const directMembership = tag.members[0];
+  if (directMembership?.role) {
+    const directPermission = directMembership.role[permissionKey];
+    if (typeof directPermission === "boolean" && directPermission) {
+      return true;
+    }
+  }
+
+  const orgCapabilities = await prisma.orgTagCapability.findMany({
+    where: { tagId },
+    include: {
+      role: true,
+      organization: {
+        include: {
+          members: {
+            where: { userToken: userId },
+            include: { role: true },
+          },
+        },
+      },
+    },
+  });
+
+  for (const capability of orgCapabilities) {
+    const capPermission = capability[permissionKey as keyof typeof capability];
+    const isCapAllowed = typeof capPermission === "boolean" ? capPermission : true;
+
+    if (!isCapAllowed) continue;
+
+    const orgMembership = capability.organization.members[0];
+    if (!orgMembership?.role) continue;
+
+    if (capability.organization.ownerToken === userId) return true;
+
+    const userRole = orgMembership.role;
+    const requiredRole = capability.role;
+
+    if (userRole.hierarchyLevel <= requiredRole.hierarchyLevel) {
+      return true;
+    }
+  }
+
+  return false;
 }

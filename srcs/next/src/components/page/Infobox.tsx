@@ -119,17 +119,15 @@ export default function Infobox({ accountId, id, pageId, data, onChange, onDelet
                     onChange={onChange}
                     onOpenModal={() => setIsCreateModalOpen(true)}
                 />
-            </div>
 
-            {isOwner && ownerAccountId && (
-                <div className="min-h-0 min-w-0 flex-1 overflow-y-auto">
+                {isOwner && ownerAccountId && (
                     <PagePermissions
                         pageId={pageId}
                         ownerAccountId={ownerAccountId}
                         initialPermissions={initialPermissions}
                     />
-                </div>
                 )}
+            </div>
 
             <CreateTagModal
                 isOpen={isCreateModalOpen}
