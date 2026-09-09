@@ -215,6 +215,9 @@ Most of the communication happened on Discord, through a dedicated project serve
 - [x] Secure session and account lifecycle — nrolland  
   User sessions are tracked with expiration and IP metadata, and account-related actions are enforced with verification and validation.
 
+- [x] Organization System — csenelle
+  A multi Organization system, allowing users to easily manage pages and tags
+
 ---
 
 # Technical stack
