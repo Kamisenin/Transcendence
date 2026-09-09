@@ -101,6 +101,7 @@
 		}
 	},
 	"UserMenu": {
+		"profil": "Profile",
 		"signIn": "Sign in",
 		"signUp": "Sign up",
 		"hello": "Hello, {username}",
