@@ -30,6 +30,8 @@ services:
     restart: unless-stopped
     environment:
       - ADDRESS=${ADDRESS}
+    depends_on:
+      - next
     extra_hosts:
       - "host.parent:host-gateway"
     networks :
@@ -39,13 +41,14 @@ services:
     container_name: next
     build: srcs/next/
     restart: unless-stopped
+    volumes:
+      - uploads:/upload
     secrets:
       - db_website_pwd
       - gmail_app_pwd
       - gmail_user
     depends_on:
       - postgres
-    profiles: ["prod"]
     networks:
       - 42chan
 
@@ -82,6 +85,12 @@ secrets:
     file : secrets/gmail_user.txt
 
 volumes:
+  uploads:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ${NEXT_UPLOADS_PATH}
   pgdata:
     driver: local
     driver_opts:
