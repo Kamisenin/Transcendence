@@ -1,60 +1,50 @@
 *This project has been created as a part of the 42 curriculum by [csenelle](https://github.com/Kamisenin), [nrolland](https://github.com/nrollandd), [jmassavi](https://github.com/Djo-msv), [humontas](https://github.com/Diremii) and [thcaquet](https://github.com/Jainek0)*
 
-<span style="font-size: 40px;">**42chan (ft_transcendence)**
-</span>
+<span style="font-size: 40px;">**42chan (ft_transcendence)**</span>
 
 # Description
 
-ft_transcendence is the last project of the 42 main curriculum before entering specialties. Its goal is to familiarize
-student to group project and management as well as introduce web development and concrete use of dockers.
-The subjects ask 4 to 5 students to create a Website how they want, from a game to something like a Wikipedia it is
-possible as long as the students respect they module base of the project. There is a selection of multiple modules
-that can be done and gives points, some are bigger than other so they are separate as Minor modules which gives 1 point
-and Major modules that gives 2 points. The goal is to reach 14 points to validate the project and 19 for bonus points.
+42chan is a collaborative wiki platform inspired by fandom-style knowledge bases, but with a stronger emphasis on structured organization, permission management, and editorial control. The project was designed to solve a common wiki problem: a page may contain valuable information, but without a proper taxonomy, classification system, and access control, content becomes hard to discover, maintain, and govern.
+
+The platform combines a rich content editor, customizable permissions, tag and organization hierarchies, notifications, authentication, and search/recommendation systems. It is built as a full-stack application with a modern Next.js frontend, PostgreSQL database, and supporting Python microservices for search and recommendation.
+
+A central idea of the project is that pages are not standalone documents: they belong to tag ecosystems, organization structures, and editorial flows. That is why the architecture heavily focuses on permission propagation, role-based governance, and content discoverability.
+
+---
 
 ## Overview
 
-> *This ft_transcendence was named as a reference to 4chan, as we don't have any web designer in the team so the Website
-doesn't really have any real Artistic Direction. If it were not for some help with AI it would resemble a 2006 blog
-like 4chan.*
+42chan sits between a fandom wiki and a traditional encyclopedia: users can create pages, tag them, request access to new classifications, delegate responsibilities to tags and organizations, and manage the editorial lifecycle of their content.
 
-42chan is a Website that aims to be a middle site between Fandom and Wikipedia, while giving easier and better
-page customization and an easy way to reference your pages in the site.
-The main features are the Tag and Organization system. <br/>
-You can create Pages, Tags and Organization as much as you want, the goal being to organize everything organically
-to understand how the system works, we would first create a page about the Federschwert [^1] per example. Now we have our page, 
-but it is not referenced properly. So we create the **Federschwert** tag and add it to the page so that when people search for
-a specific Federschwert sword, we can give the **Federschwert** tag to other page and the user can go through them and 
-find it easily. <br/>
-Now we really want to add the **Longsword** tag but it is already owned by someone.
-We can request them to review our page and add the **Longsword** tag to the page.
-Once it is done you may want to allow a friend to edit the page with you, so give them the direct right on the page.
-But there is a problem, you don't think you and your friend can maintain the page properly and that maybe the Longsword
-team can maintain it for you, you could give them seperately the rights on your page, but you can also give the rights
-to a specific role inside the tag, which will allow the people with this role and above to edit you page and maintain it for you. <br/>
+The project revolves around a few core concepts:
 
-Now there is a last situation you can be in. Maybe the person with th **Longsword** tag has a lot of tags, Like the **Sword** tag,
-the **saber** tag, the *One Handed sword* tag and would want to centralize all the permissions of those tags inside one role. <br/>
-Introducing **Organizations** <br/>
-Organizations allows you to add tags to them and associate roles inside the organization to role inside the managed Tags ! 
+- Pages: writable, richly structured wiki entries.
+- Tags: thematic categories used to classify pages and grant access through roles.
+- Organizations: umbrella groups that centralize permission rules across multiple tags and pages.
+- Roles: hierarchical permission systems for users, tags, and organizations.
+- Requests: workflows for tag/page approval and grants.
+- Notifications: event-driven updates for edits, requests, and friendships.
 
-[^1]: Federschwert are a type of Longsword that was made in germany during the 16th century with no cutting edge to use it for sports
+This creates a strong wiki governance model: a user may own a page, a friend may be granted write access, a tag maintainer may be able to manage certain permissions, and an organization may enforce consistent rules across multiple communities.
+
+The system is designed to match real-world knowledge management problems rather than simple static article publishing.
 
 ---
-# Instructions
+
+# Installation and Setup
 
 ## Prerequisites
 
 The following tools must be installed on the host machine before working on the project:
 
-| Tool                                       | Minimum Tested Version | Purpose                                        |
-|--------------------------------------------|------------------------|------------------------------------------------|
-| **Docker Engine**                          | 20.10+                 | Container runtime.                             |
-| **GNU Make**                               | 3.81+                  | Build automation through the project Makefile. |
-| [**NPM**](/npm-installation)               | 11.13.0+               | Allows you to install the dependencies         |
-| Next (dev mode only)                       | 16.2.9                 | allows you to run the app for the dev mode     |
-| Prisma                                     | 7.8.0                  | allows you to setup the db for the first time  |
-| **Git**                                    | —                      | Source control.                                |
+| Tool | Minimum Tested Version | Purpose |
+|------|------------------------|---------|
+| Docker Engine | 20.10+ | Container runtime |
+| GNU Make | 3.81+ | Build automation through the project Makefile |
+| NPM | 11.13.0+ | Dependency installation for the Node.js app |
+| Next.js | 16.2.9+ | Development and runtime for the frontend |
+| Prisma | 7.8.0+ | Database schema management and client generation |
+| Git | — | Version control |
 
 Ensure the Docker daemon is running before executing any command:
 
@@ -64,12 +54,10 @@ sudo systemctl start docker
 
 ---
 
-## SETUP
+## NPM installation
 
+Install Node.js and npm using nvm:
 
-### NPM installation
-
-First install Node Package Manager (npm)
 ```bash
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 
@@ -80,224 +68,386 @@ nvm install --lts
 nvm use --lts
 ```
 
-You can check your installation with
-``node -v`` or ``npm -v``
+Verify the installation:
 
-Then once npm is installed go inside `srcs/next` folder and run ``npm install``
-this will install all the dependencies of the project that are listed in the package.json 
-
----
-
-### Secrets
-
-All the following files **ABSOLUTELY** have to be placed inside the `/secrets/` folder
-at the root of the project
-
-#### DATABASE SECRETS
-
-This category is about database passwords, create them wisely as they are at the root of the website,
-if they are not strong enough someone could break through the password and have access to the entirety of the Website
 ```bash
-db_root_pwd.txt # is the password of the root user of the database
-db_website_pwd.txt # is the password of the WEBSITE database admin
-gmail_app_pwd.txt # Your gmail application password for sending automated mail
-gmail_user # The associated google account
+node -v
+npm -v
 ```
 
-### Gmail Configuration
+Then inside the project, install dependencies:
 
-To get a **Gmail App Password**:
-
-1. Go to your Google Account → **Security**.
-2. Enable **2-Step Verification** if it is not already enabled.
-3. Search for **App passwords**.
-4. Create a new app password for the project, for example `Transcendence`.
-5. Copy the generated password into `GMAIL_APP_PASSWORD`.
-
----
-
-## HOW TO RUN
-
-*for this step be sure to have makefile installed on your computer*
-
-### MAKEFILE
-
-To run the Web application you will have to use the make command at the root of the repository.
-The makefile has 6 rules in total that you can use to manage the application
-
-| Target    | Command                       | Description                                                                                                                                                                |
-|-----------|-------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `upb`     | `make upb `<br/>or<br/>`make` | builds all Docker images and starts every container (`docker compose up --build`). This is the standard first-run command.                                                 |
-| `build`   | `make build`                  | builds all images without starting containers. Useful when you only want to verify that all Dockerfiles compile correctly.                                                 |
-| `up`      | `make up`                     | Starts all services in the foreground using the existing images. Does not rebuild. Container logs are printed directly to the terminal. Press `Ctrl+C` to stop.            |
-| `down`    | `make down`                   | Stops and removes all running containers. Images and volumes remain on disk, making the next `make up` fast.                                                               |
-| `clean`   | `make clean`                  | Calls `make down`, then runs `docker system prune -af` to remove all unused images, stopped containers and dangling networks. Volumes are **not** deleted.                 |
-| `fclean`  | `make fclean`                 | Stops all containers, removes volumes and orphans (`docker compose down -v --remove-orphans`), prunes the entire Docker system including volumes. This is **irreversible** |
-| `re`      | `make re`                     | Runs `make clean` followed by `make upb`. Equivalent to a full teardown and rebuild.                                                                                       |
-
-Lastly for developers there is an option to the makefile to run the NextJs application in development mode and allows
-its hot reload option to be used. Simply add ``MODE=dev`` to any command to activate this mode and detach the containers
-from your daemon using `d` after all the services are started and healthy to start Nextjs
-
-### Database Setup
-
-if it is the first time you are running this application (in dev mode or production), or you have made a modification to the schema prisma,
-you may need to synchronize the database to the schema prisma. There are two ways of doing so.
-
-First the database container must be started for the following actions. Secondly you will have to export the right DATABASE_URL
-environment variable set.
-
-For that you can either check the prisma documentation for URL's or just copy the first two line inside the
 ```bash
-dev_start.sh
+cd srcs/next
+npm install
 ```
-file while on the root folder of the project
-Which will create the environment url and add it to your environment. </br>
-Then go to the `srcs/next` folder. </br>
-For this next section you have two choices of commands to proceed, which will depend on your situation
-
-### 1. ``npx prisma db push``
-this is the easiest way of setting up the db, this will add all the tables from the schema prisma into your database.
-**🚨 Beware !!! THIS WILL DESTROY ALL THE DATA STORED IN YOUR CURRENT DB, USE WITH PRECAUTION 🚨**
-
-### 2. ``npx prisma migrate deploy``
-for this one to work you will first need to create migration files in the prisma project
-using the following command : `npx prisma migrate dev --name init`
-
 
 ---
 
-# Team Organization
+## Required secrets
 
-**Product Owner :** csenelle, whose role was to organize the feature management and work with the two other roles to
-give a global direction of the project and the Team.
+All of the following files must be placed inside the `/secrets/` directory at the root of the project:
 
-**Project Manager :** jmassavi, had to organize the team, plan reunions and communications between team members
+```bash
+db_root_pwd.txt        # password of the PostgreSQL root user
+db_website_pwd.txt    # password of the project database user
+gmail_app_pwd.txt     # Gmail application password for automated emails
+gmail_user           # Google account associated with the project
+```
 
-**Technical lead :** humontas, decided on the technical stack, the technologies that were used and Database organization
+### Gmail configuration
 
-**Developers :** jmassavi, humontas, csenelle, nrolland, thcaquet
+To obtain a Gmail App Password:
 
-## Project Management
-
-### Tools
-
-While we tried using Github projects in the beginning, we found it not really user-friendly and preferred using
-**Google Docs** to organize the Module that were going to be used and the Technical Stack
-
----
-### Communication
-
-Most, or pretty much all the communication was made on discord, either in private or on the server made for the project
-
-## Features
-
-[x] Customizable Editor : csenelle, jmassavi
-> Multiple SlateJs editor combined with React Grid Layout placement to offer a dynamic and customizable page editor
-
-[x] Image Uploads and Management : jmassavi
-> A way to upload image inside the website to use for the page editor, manage the images and compress them
-
-[x] Page, Tags and Organizations management : csenelle
-> Pages permissions system, that was explained in the overview, allows for role creation and permission edition of said
-> roles
-
-[x] AI search software : humontas
-> A search service using an AI (non generative) algorithm to find nearest tag, title an description keywords in a specific
-> page search
-
-[x] Tester : humontas
-> A tester for the website's features
-
-[x] User Management, Authentification and GRDP compliance : nrolland
-> 2 factor authentification, registering, login and account management (password change etc.), account suppression and
-> GRDP compliance via email confirmation. Management of account suppressions of pages owner
-
-[x] AI page recommendation : thcaquet
-> A machine learning based AI that can create profile for users and recommend the next page that the user may want to
-> see
-
-[x] Localization and langage Managment : humontas
-> A system to change the langage used insied the website, does not apply to the users
-
-[x] Notifications system : humontas
-> A notification system for any modifications made inside pages to all the admin users
-
----
-## Modules
-
-#### Web (6pts) :
-- Major: Use a framework for both the frontend and backend. (Here NextJS) 
-- Minor: A complete notification system for all creation, update, and deletion actions. 
-- Minor: Server-Side Rendering (SSR) for improved performance and SEO. 
-- Minor: File upload and management system.                         
-- Minor: Use an ORM for the database.
-
-#### Accessibility and Internationalization (2pts) :
-- Minor: Support for multiple languages (at least 3 languages). 
-- Minor: Support for additional browsers. 
-
-#### User Management (7pts) :
-- Major: Standard user management and authentication. 
-- Major: Advanced permissions system 
-- Minor: Implement a complete 2FA (Two-Factor Authentication) system for the users.
-
-#### Artificial Intelligence(1pts) :
-- Major: Recommendation system using machine learning. 
-
-
-#### Custom (3pts):
-
-- Minor : Custom Website editor, manage multiple editor at the same time, have
-
-- Major : Multilingual Real-Time Search Engine
-  A Fandom-style wiki relies entirely on fast content discovery; this module provides instant, accurate article search across multiple languages with typo tolerance.
-
-  It combines FastAPI endpoints for low-latency queries, PostgreSQL fuzzy matching, and custom NLP preprocessing (stemming and stop-word filtering).
-
-  it integrates database optimization, natural language processing, and a custom ranking algorithm into a single full-stack search engine.
-
-
-### Total : 19
+1. Open your Google Account.
+2. Go to Security.
+3. Enable 2-Step Verification if not already enabled.
+4. Create an App Password for the project.
+5. Copy the generated password into the `gmail_app_pwd.txt` secret.
 
 ---
 
-### Technical Stack
+## How to run the project
 
+From the repository root, the project is managed with the Makefile:
 
-- Framework : 
-  - NextJs 
+| Target | Command | Description |
+|--------|---------|-------------|
+| `upb` | `make upb` or `make` | Build all Docker images and start every service |
+| `build` | `make build` | Build all images without starting containers |
+| `up` | `make up` | Start services in the foreground |
+| `down` | `make down` | Stop the running services |
+| `clean` | `make clean` | Stop services and prune unused Docker images |
+| `fclean` | `make fclean` | Full teardown including volumes and orphaned resources |
+| `re` | `make re` | Full clean + rebuild |
 
-- Frontend :
-    - React
-    - TailwindCSS
-    - UI component libraries : shadcn, lucide-react
-    - Rich text Editor : SlateJs
-    - ReactGridLayout
+For local development with hot reload, use:
 
-- Backend : 
-  - NodeJs
-  - Prisma ORM
-  - PostgreSQL
-  - bcrypt (password encrypting)
-  - nodemailer, resend (mailing libraries and API)
+```bash
+make MODE=dev upb
+```
 
-- Microservices :
-  - FastApi and Uvicorn (python API creation)
-  - rapidfuzz, ntlk (librairies for fuzzy searching)
+This will activate the development configuration and allow the Next.js app to run with live reload.
 
-- Languages :
-  - Typescript (Next)
-  - Shell (docker services)
-  - Python (AI scripts)
-  - Docker (services)
+---
 
-### Database Schema
-*beware, it is fat !*
+### Database initialization
 
+If this is the first time the application is started, or if Prisma schema changes were made, the database must be synchronized.
 
+First, start the database container, then export the correct `DATABASE_URL` environment variable. The simplest option is to copy the relevant lines from `dev_start.sh` at the repository root.
+
+Then run one of the following commands from `srcs/next`:
+
+```bash
+npx prisma db push
+```
+
+or, for migration-based setup:
+
+```bash
+npx prisma migrate dev --name init
+```
+
+> Warning: `db push` destroys current data in the database if it already exists. Use it only on a fresh or disposable database.
+
+---
+
+# Team organization
+
+**Product Owner:** csenelle  
+**Project Manager:** jmassavi  
+**Technical Lead:** humontas  
+**Developers:** csenelle, nrolland, jmassavi, humontas, thcaquet
+
+## Project management
+
+The team initially tried GitHub Projects, but the workflow was too rigid for the needs of the project. We then moved to a lighter planning approach using Google Docs for roadmap tracking, architecture decisions, module planning, and task coordination.
+
+## Communication
+
+Most of the communication happened on Discord, through a dedicated project server and private team channels.
+
+---
+
+# Features list
+
+### Core platform features
+
+- [x] Customizable wiki editor — csenelle, jmassavi  
+  Rich text editing built with Slate.js combined with a grid-like layout system. Users can structure page content into multiple blocks and rearrange editorial components dynamically.
+
+- [x] Image upload and media management — jmassavi  
+  Users can upload images for page content, view uploaded assets, and manage their media library in the platform.
+
+- [x] Page, tag, and organization management — csenelle  
+  Each object supports ownership, request flows, permissions, and granular role-based governance.
+
+- [x] Search engine — humontas  
+  A dedicated fuzzy search service indexes page metadata and ranks results using tag relevance, title similarity, and language-aware preprocessing.
+
+- [x] Automated testing — humontas  
+  Test coverage for core functionality such as authentication, permissions, and page behavior.
+
+- [x] User management, authentication, GDPR compliance — nrolland  
+  Registration, login, session handling, password management, email verification, account deletion, and security features such as 2FA.
+
+- [x] Recommendation system — thcaquet  
+  A machine learning-inspired recommendation API based on tag vectors and cosine similarity to suggest relevant pages.
+
+- [x] Localization and language management — humontas  
+  The application supports multiple interfaces and translations for a more accessible user experience.
+
+- [x] Notifications system — humontas  
+  Real-time structured updates for page edits, friendship requests, and administrative activities.
+
+- [x] Friendship and social connectivity — nrolland, humontas  
+  Users can send, accept, reject, and manage friendship requests, with notification integration and account-level activity awareness.
+
+- [x] Role and permission governance — csenelle  
+  Complex access control with per-page, per-tag, and per-organization permission propagation.
+
+- [x] Secure session and account lifecycle — nrolland  
+  User sessions are tracked with expiration and IP metadata, and account-related actions are enforced with verification and validation.
+
+---
+
+# Technical stack
+
+## Frontend
+
+- Next.js 16
+- React 19
+- TypeScript
+- Tailwind CSS
+- shadcn UI primitives
+- lucide-react icon set
+- Slate.js for rich-text editing
+- Yjs for collaborative content synchronization concepts
+- React Grid Layout for dynamic page block composition
+
+### Why these choices were made
+
+The frontend uses Next.js because the project required a single full-stack framework with SSR capabilities, structured routing, and server-side integration. React and TypeScript made the permission-heavy UI safer and easier to maintain. Slate.js was chosen because the editor needed structured rich text, not a simple textarea. React Grid Layout was necessary to support dynamic page composition and reusable editorial blocks.
+
+## Backend
+
+- Node.js and Next.js server actions
+- Prisma ORM
+- PostgreSQL database
+- bcrypt for password hashing
+- nodemailer / Resend for automated emails
+- FastAPI for the custom search service
+- Python for recommendation generation
+- Docker Compose for orchestration
+
+### Why these choices were made
+
+The backend is centered around the idea that the application is not just a simple CRUD site: it needs permission logic, role hierarchies, request workflows, notifications, and user management in a structured and predictable way. Prisma allowed fast schema evolution and type-safe database access in TypeScript. PostgreSQL was chosen because it supports relational modeling for complex permissions and tag relationships. FastAPI was used for the search engine because low latency, structured JSON APIs, and Python-based NLP processing were a natural fit.
+
+## Database system and design rationale
+
+PostgreSQL was selected because the product is fundamentally relational:
+
+- users own pages, tags, and organizations;
+- pages are linked to many tags;
+- roles and permissions are hierarchical;
+- requests and approvals must be tracked as records;
+- notifications and friendships depend on consistent relational integrity.
+
+A NoSQL database would not fit this permission graph nearly as cleanly as a relational system with foreign keys and transactional updates.
+
+---
+
+# Database schema
+
+The database is centered on users, pages, tags, organizations, permissions, requests, notifications, and social relationships.
+
+```mermaid
+erDiagram
+    USER ||--o{ SESSION : has
+    USER ||--o{ FRIENDSHIP : sends_or_receives
+    USER ||--o{ PAGE : owns
+    USER ||--o{ PAGE_PERMISSION : receives
+    USER ||--o{ TAG : owns
+    USER ||--o{ TAG_MEMBER : belongs_to
+    USER ||--o{ TAG_PERMISSION : has
+    USER ||--o{ ORGANIZATION : owns
+    USER ||--o{ ORGANIZATION_MEMBER : belongs_to
+    USER ||--o{ NOTIFICATION : receives
+    USER ||--o{ USER_TAG_INTEREST : tracks
+
+    PAGE ||--o{ TAG_PAGE : tagged_as
+    PAGE ||--o{ PAGE_PERMISSION : has_access
+    PAGE ||--o{ PAGE_REACTION : receives
+    PAGE ||--o{ PAGE_SLUG : has
+    PAGE ||--o{ TAG_PAGE_REQUEST : requests
+    PAGE ||--o{ ORG_PAGE_REQUEST : requests
+    PAGE ||--o{ NOTIFICATION : triggers
+
+    TAG ||--o{ TAG_ROLE : defines
+    TAG ||--o{ TAG_MEMBER : members
+    TAG ||--o{ TAG_PAGE : contains
+    TAG ||--o{ TAG_PERMISSION : grants
+    TAG ||--o{ TAG_PAGE_REQUEST : requests
+    TAG ||--o{ TAG_STATISTIC : tracks
+    TAG ||--o{ ORG_TAG_REQUEST : requests
+
+    ORGANIZATION ||--o{ ORGANIZATION_ROLE : defines
+    ORGANIZATION ||--o{ ORGANIZATION_MEMBER : has_members
+    ORGANIZATION ||--o{ ORG_TAG_ACCESS : manages
+    ORGANIZATION ||--o{ ORG_PAGE_ACCESS : manages
+    ORGANIZATION ||--o{ ORG_TAG_REQUEST : reviews
+    ORGANIZATION ||--o{ ORG_PAGE_REQUEST : reviews
+
+    TAG_ROLE ||--o{ TAG_PAGE_ACCESS : minimum_role
+    TAG_ROLE ||--o{ TAG_PAGE_CAPABILITY : capability
+    ORGANIZATION_ROLE ||--o{ ORG_PAGE_ACCESS : minimum_role
+    ORGANIZATION_ROLE ||--o{ ORG_TAG_ACCESS : minimum_role
+```
+
+## Key entities and relationships
+
+### Users
+Users are the central identity model. They own pages, tags, and organizations, manage sessions, verify emails, and hold permissions directly or through group memberships.
+
+### Pages
+Pages store the content, metadata, owner, last editor, visibility, and slug information. They support permission control and reactions.
+
+### Tags
+Tags classify pages and act as a governance unit. They can have multiple roles, permission sets, and membership relationships. Tags are designed to represent communities or subject-specific editorial groups.
+
+### Organizations
+Organizations aggregate multiple tags and roles into a single governance layer. Their purpose is to avoid duplicated permission management across different tag clusters.
+
+### Permission and request models
+The application contains explicit permission tables for:
+
+- page permissions;
+- tag permissions;
+- tag-role-to-page access;
+- organization-to-tag access;
+- organization-to-page access;
+- request review workflows for tags and pages.
+
+These tables are crucial because the app is built around delegated editing, approval chains, and multi-level access control.
+
+### Notifications and reactions
+The notification system tracks events such as page edits and friendship events. Reactions allow users to favorite or dislike a page and contribute to recommendation learning.
+
+### User tag interests
+This table stores the user profile vector used by the recommendation engine. It allows the system to match users with pages based on historical tag affinities.
+
+---
+
+# Modules
+
+## Chosen modules and score
+
+| Module | Type | Points | Team member(s) |
+|--------|------|--------|----------------|
+| Full-stack framework (Next.js) | Major | 2 | csenelle, humontas, jmassavi |
+| Notification system | Minor | 1 | humontas |
+| SSR / SEO friendly rendering | Minor | 1 | humontas, csenelle |
+| File upload and media management | Minor | 1 | jmassavi |
+| ORM usage | Minor | 1 | humontas, jmassavi |
+| Multi-language support | Minor | 1 | humontas |
+| Support for additional browsers / compatibility | Minor | 1 | humontas, jmassavi |
+| Standard user management and authentication | Major | 2 | nrolland |
+| Advanced permissions system | Major | 2 | csenelle |
+| 2FA | Minor | 1 | nrolland |
+| Recommendation system using machine learning | Major | 2 | thcaquet |
+| Multilingual real-time search engine | Major | 2 | humontas |
+| Custom collaborative wiki editor | Minor | 1 | csenelle, jmassavi |
+
+Total: 19 points
+
+---
+
+## Module justifications
+
+### Major: Multilingual Real-Time Search Engine
+
+This module was chosen because a wiki platform is only as useful as its ability to surface the right content quickly. In a knowledge base where pages are categorized with tags, titles, and descriptions, naive substring matching is not enough. Users expect search to tolerate spelling errors, language variations, and imperfect tag names while still returning relevant results with low latency.
+
+#### Why we chose it
+
+The project is built around a community-driven taxonomy. Users create pages, tags, and cross-links without a central editorial team. That makes discoverability a core design challenge. A static search-only on page titles would be too weak for the project, especially with multilingual content and fuzzy tag names.
+
+#### Technical challenges it addresses
+
+- Query normalization across multiple languages.
+- Stemming and stop-word filtering for better matching quality.
+- Relevance scoring combining title similarity and tag similarity.
+- Fuzzy search over tag names and metadata.
+- Fast response time from a dedicated Python microservice.
+- Ranking logic that suppresses weak matches while preserving relevant ones.
+
+#### How it was implemented
+
+The search engine is implemented as a dedicated FastAPI service. It receives user queries and page metadata, preprocesses the text, computes per-page scores, and returns ranked results. The custom scoring pipeline combines:
+
+- tag relevance evaluation;
+- title similarity scoring;
+- language-aware preprocessing;
+- threshold filtering;
+- top-N result selection.
+
+The service runs independently from the web app, which keeps the frontend responsive and prevents search logic from becoming a bottleneck.
+
+#### Why it deserves Major module status
+
+This is not a trivial keyword filter. It requires NLP preprocessing, ranking heuristics, microservice integration, and performance tuning. It directly improves the usability of the wiki at scale and is a substantial technical subsystem that adds real value to the product. For that reason, it qualifies as a major custom module.
+
+---
+
+### Minor: Custom collaborative wiki editor
+
+This module was selected because the platform is fundamentally a wiki, and a wiki becomes genuinely useful only when writing and structuring content is efficient. We did not want a static page editor with a single plain text field; this project needed a richer, more modular editing experience.
+
+#### Why we chose it
+
+The project deals with structured pages that may include headings, blocks, images, descriptive metadata, and editorial organization. A simple text editor would not be enough for collaborative and customizable pages. We needed a writing system that supports content composition, visual layout, and future extensibility.
+
+#### Technical challenges it addresses
+
+- Rich-text editing within a complex interface.
+- Multiple editable blocks on a single page.
+- Dynamic layout composition and rearrangement.
+- Maintaining clean content structure while allowing flexible page design.
+- Managing a visual editor in a framework designed for data-heavy interfaces.
+
+#### How it was implemented
+
+The editor is built using Slate.js and React Grid Layout, with a dynamic content model designed for page composition. The system supports multi-section page editing and allows users to construct a more flexible editorial experience than a standard Markdown or plain-text field.
+
+This matches the project’s nature: pages are not only documents, they are structured knowledge surfaces that need visual organization and maintainability.
+
+#### Why it deserves minor module status
+
+This feature is smaller in scope than the full search engine, but it still demonstrates real technical skill. It adds meaningful value by making content creation more powerful and more expressive than a basic wiki form. It is not simply a cosmetic editor; it is a concrete editorial system aligned with the project’s purpose.
+
+---
+
+## Additional notes on module design
+
+The custom modules were not added arbitrarily. They address specific pain points in a wiki platform:
+
+- search ensures discoverability;
+- the editor ensures content creation quality;
+- permissions ensure editorial safety and governance;
+- notifications keep the community synchronized.
+
+This combination makes the project more than a simple page database. It becomes a working knowledge-management system with editorial workflows, social interaction, and scalable relevance.
+
+---
 
 # Resources
 
-- NextJs [documentation](https://nextjs.org/docs)
-- 
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Prisma Documentation](https://www.prisma.io/docs)
+- [PostgreSQL Documentation](https://www.postgresql.org/docs/)
+- [FastAPI Documentation](https://fastapi.tiangolo.com/)
+- [Slate.js Documentation](https://docs.slatejs.org/)
+
+- AI usage : For this project AI was used as documentation purposes as well as a major help with the front-end and creating this readme
