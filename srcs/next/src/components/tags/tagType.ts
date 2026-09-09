@@ -3,4 +3,5 @@ export type Tag = {
     name: string;
     color: string;
     namespace?: string | null;
+    pending?: boolean;
 };

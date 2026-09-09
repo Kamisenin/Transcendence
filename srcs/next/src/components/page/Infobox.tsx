@@ -30,7 +30,6 @@ type Props = {
     pageId: number;
     data: InfoboxData;
     onChange?: (data: InfoboxData) => void;
-    onDelete?: (id: string) => void;
     isReadOnly?: boolean;
     availableTagsPool?: Tag[];
     canonicalNamespace?: string | null;
@@ -39,7 +38,7 @@ type Props = {
     isOwner?: boolean;
 };
 
-export default function Infobox({ accountId, id, pageId, data, onChange, onDelete, isReadOnly = false, canonicalNamespace, ownerAccountId, initialPermissions = [], isOwner = false }: Props) {
+export default function Infobox({ accountId, id, pageId, data, onChange, isReadOnly = false, canonicalNamespace, ownerAccountId, initialPermissions = [], isOwner = false }: Props) {
     const t = useTranslations("Page");
     const [isPreview, setIsPreview] = useState(isReadOnly);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -66,19 +65,6 @@ export default function Infobox({ accountId, id, pageId, data, onChange, onDelet
                 >
                     <GripVertical size={14} />
                 </button>
-                {onDelete && (
-                    <button
-                        type="button"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onDelete(id);
-                        }}
-                        className="p-1 rounded hover:bg-[#fff1ef] text-[#c26b5f] hover:text-[#a33a2b] transition"
-                        title={t("editor.deleteBlock")}
-                    >
-                        <Trash2 size={14} />
-                    </button>
-                )}
             </div>
 
             {/* En-tête */}

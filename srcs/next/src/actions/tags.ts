@@ -695,3 +695,17 @@ export async function userHasTagPermission(
 
   return false;
 }
+
+export async function removeTagFromPageAction(tagId: number, pageId: number) {
+    await prisma.$transaction([
+      prisma.tagPage.deleteMany({ where: { tagId, pageId }}),
+
+      prisma.tagPageAccess.deleteMany({ where: { tagId, pageId }}),
+
+      prisma.tagPageCapability.deleteMany({ where: { tagId, pageId } }),
+
+      prisma.tagPageRequest.deleteMany({ where: { tagId, pageId } })
+    ]);
+
+    revalidatePath(`/pages/${pageId}`);
+}

@@ -244,6 +244,7 @@
 		"noPageFound": "Aucune page trouvée",
 		"noPagesFound": "Aucune page trouvée",
 		"tagNameRequired": "Le nom du tag est obligatoire.",
+		"tagPendingApproval": "En attente d'approbation",
 		"confirmDeletion": "Confirmer la suppression",
 		"lastConfirmation": "Dernière confirmation",
 		"deletingInProgress": "Suppression en cours...",

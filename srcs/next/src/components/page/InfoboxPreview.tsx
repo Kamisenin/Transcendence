@@ -17,7 +17,7 @@ export default function InfoboxPreview({ data, isReadOnly, onEdit }: InfoboxPrev
     const t = useTranslations("Page");
     const [showAllTags, setShowAllTags] = useState(false);
     const maxVisible = 4;
-    const tags = data.tags || [];
+    const tags = (data.tags || []).filter((tag) => !tag.pending);
     const visibleTags = showAllTags ? tags : tags.slice(0, maxVisible);
 
     return (

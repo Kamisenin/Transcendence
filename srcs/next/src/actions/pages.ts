@@ -818,3 +818,14 @@ export async function deletePage(pageId: number) {
     revalidatePath(`/pages`);
     return { success: true };
 }
+
+export async function getPageTagStatus(pageId: number) {
+    const [pending, accepted] = await Promise.all([
+        prisma.tagPageRequest.findMany({ where: { pageId, status: 'PENDING' }, select: { tagId: true } }),
+        prisma.tagPage.findMany({ where: { pageId }, select: { tagId: true } }),
+    ]);
+    return {
+        pendingTagIds: new Set(pending.map(p => p.tagId)),
+        acceptedTagIds: new Set(accepted.map(a => a.tagId)),
+    };
+}

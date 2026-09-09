@@ -8,6 +8,7 @@ import TagBadge from "./TagBadge";
 import { Tag } from "./tagType";
 import { InfoboxData } from "../page/Infobox"
 import { useTranslations } from "next-intl";
+import { removeTagFromPageAction } from "@/actions/tags";
 
 type TagManagerProps = {
     accountId: string;
@@ -94,9 +95,13 @@ export default function TagManager({ accountId, pageId, data, onChange, onOpenMo
         }
     };
 
-    const removeTag = (id: string) => {
+    const removeTag = async (id: string) => {
+        // const numId = parseInt(id, 10);
         if (onChange)
             onChange({ ...data, tags: tags.filter((t) => t.id !== id) });
+        // if (!isNaN(numId) && pageId)
+        //     await removeTagFromPageAction(numId, pageId);
+        
     };
 
     return (

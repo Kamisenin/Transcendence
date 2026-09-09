@@ -29,18 +29,23 @@ export default async function WikiViewPage({ params }: Params) {
         notFound();
 
     const pageTags = await prisma.tagPage.findMany({
-        where: {
-            pageId: page.pageId
-        },
-        select: {
-            tagId: true
-        }
+        where: { pageId: page.pageId },
+        select: { tagId: true }
     });
 
     const hasTags = pageTags.length > 0;
-
+    const acceptedTagIds = new Set(pageTags.map(t => t.tagId));
     const content = page.content as { blocks: any[] } | null;
-    const blocks = content?.blocks ?? [];
+    const blocks = (content?.blocks ?? []).map((block: any) =>
+        block.type === 'infobox' && block.infoboxData
+            ? {
+                 ...block,
+                infoboxData: {
+                    ...block.infoboxData,
+                    tags: (block.infoboxData.tags ?? []).filter((tag: any) => acceptedTagIds.has(Number(tag.id))),
+                },
+            } : block
+    );
 
     const user = await getCurrentUser();
     if (!page.public)

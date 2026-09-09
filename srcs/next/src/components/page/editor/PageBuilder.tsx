@@ -248,7 +248,6 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
                                     pageId={pageId}
                                     data={block.infoboxData || DEFAULT_INFOBOX}
                                     onChange={(newData) => handleInfoboxChange(block.id, newData)}
-                                    onDelete={handleDeleteBlock}
                                     canonicalNamespace={canonicalNamespace}
                                     isOwner={isOwner}
                                     ownerAccountId={ownerAccountId}

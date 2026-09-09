@@ -4,12 +4,20 @@ import { useTransition, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { reviewTagPageRequest } from '@/actions/tags';
 import { isDefaultTitle } from '@/app/lib/page/title';
+import Link from 'next/link';
 
 type PendingRequest = {
     id: number;
+    tagId: number;
     pageId: number;
+    requestedBy: string;
     createdAt: Date;
-    page: { pageId: number; title: string };
+    page: {
+        pageId: number;
+        title: string;
+        owner: { accountId: string };
+        slugs: { namespace: string; slug: string }[];
+    };
     requester: { user_id: string; username: string };
 };
 
@@ -17,6 +25,14 @@ type Props = {
     tagId: number;
     requests: PendingRequest[];
 };
+
+
+function getPageHref(page: PendingRequest['page']) {
+    const canonical = page.slugs?.[0];
+    return canonical
+        ? `/wiki/${canonical.namespace}/${canonical.slug}`
+        : `/wiki/${page.owner.accountId}/${page.pageId}`;
+}
 
 export default function TagRequestsPanel({ requests }: Props) {
     const [isPending, startTransition] = useTransition();
@@ -52,7 +68,7 @@ export default function TagRequestsPanel({ requests }: Props) {
                 <div className="divide-y border rounded-lg overflow-hidden">
                     {visible.map(req => (
                         <div key={req.id} className="flex items-center justify-between p-3">
-                            <div>
+                             <Link href={getPageHref(req.page)} className="min-w-0 flex-1 hover:underline">
                                 <p className="text-sm">
                                     <span className="font-medium">{req.requester.username}</span>
                                     {' '}{t('requestText', { username: req.requester.username, title: isDefaultTitle(req.page.title) ? t('untitled') : req.page.title })}
@@ -60,7 +76,7 @@ export default function TagRequestsPanel({ requests }: Props) {
                                 <p className="text-xs text-[#a89088]">
                                     {new Date(req.createdAt).toLocaleDateString()}
                                 </p>
-                            </div>
+                            </Link>
                             <div className="flex gap-2">
                                 <button
                                     onClick={() => handleReview(req.id, true)}

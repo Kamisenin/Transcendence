@@ -42,7 +42,12 @@ type PendingRequest = {
     pageId: number;
     requestedBy: string;
     createdAt: Date;
-    page: { pageId: number; title: string };
+    page: {
+        pageId: number;
+        title: string;
+        owner: { accountId: string };
+        slugs: { namespace: string; slug: string }[];
+    };
     requester: { user_id: string; username: string };
 };
 

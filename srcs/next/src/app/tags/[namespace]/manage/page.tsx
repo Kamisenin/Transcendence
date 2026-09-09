@@ -31,7 +31,14 @@ export default async function TagManagementPage({ params }: Params) {
             ? prisma.tagPageRequest.findMany({
                 where: { tagId: tag.id, status: 'PENDING' },
                 include: {
-                    page: { select: { pageId: true, title: true } },
+                    page: {
+                        select: {
+                            pageId: true,
+                            title: true,
+                            owner: { select: { accountId: true } },
+                            slugs: { where: { isCanonical: true }, select: { namespace: true, slug: true } },
+                        },
+                    },
                     requester: { select: { user_id: true, username: true } },
                 },
             })
