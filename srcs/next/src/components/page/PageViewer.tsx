@@ -14,39 +14,13 @@ type SavedBlock = {
     h: number;
 };
 
-type PositionedBlock = SavedBlock & {
-    _px: {
-        left: number;
-        top: number;
-        width: number;
-        height: number;
-    };
-};
-
 export default async function PageViewer({ title, blocks, accountId, canEdit, editHref }: { title?: string; blocks: SavedBlock[]; accountId : string | undefined; canEdit?: boolean; editHref?: string; }) {
     const COLS = 12;
     const ROW_HEIGHT = 150;
-    const MARGIN_X = 5;
-    const MARGIN_Y = 5;
-    const CONTAINER_WIDTH = 1156;
-    const COL_WIDTH = (CONTAINER_WIDTH - (COLS - 1) * MARGIN_X) / COLS;
-
-    const positioned: PositionedBlock[] = blocks.map((b) => {
-        const left = b.x * (COL_WIDTH + MARGIN_X);
-        const top = b.y * (ROW_HEIGHT + MARGIN_Y);
-        const width = b.w * COL_WIDTH + (b.w - 1) * MARGIN_X;
-        const height = b.h * ROW_HEIGHT + (b.h - 1) * MARGIN_Y
-
-        return {
-            ...b,
-            _px: { left, top, width, height }
-        };
-    });
-
-    const totalHeight =
-        positioned.length === 0
-            ? 500
-            : Math.max(...positioned.map((b) => b._px.top + b._px.height)) + MARGIN_Y;
+    const maxRow = blocks.length === 0
+        ? 0
+        : Math.max(...blocks.map((block) => block.y + block.h));
+    const totalHeight = Math.max(500, maxRow * ROW_HEIGHT + Math.max(0, maxRow - 1) * 5);
 
     const user = await requireUser();
 
@@ -69,22 +43,25 @@ export default async function PageViewer({ title, blocks, accountId, canEdit, ed
             )}
 
             <div
-                className="max-w-6xl mx-auto bg-transparent relative"
-                style={{ minHeight: `${totalHeight}px` }}
+                className="max-w-6xl mx-auto bg-transparent grid"
+                style={{
+                    minHeight: `${totalHeight}px`,
+                    gridTemplateColumns: `repeat(${COLS}, minmax(0, 1fr))`,
+                    gridAutoRows: `${ROW_HEIGHT}px`,
+                    gap: '5px'
+                }}
             >
-                {positioned.map((block) => (
+                {blocks.map((block) => (
                     <div
                         key={block.id}
                         className={
                             block.type === 'infobox'
-                                ? "absolute overflow-hidden"
-                                : "absolute bg-white border border-gray-100 shadow-sm rounded overflow-hidden"
+                                ? "overflow-hidden"
+                                : "bg-white border border-gray-100 shadow-sm rounded overflow-hidden"
                         }
                         style={{
-                            left: `${block._px.left}px`,
-                            top: `${block._px.top}px`,
-                            width: `${block._px.width}px`,
-                            height: `${block._px.height}px`
+                            gridColumn: `${block.x + 1} / span ${block.w}`,
+                            gridRow: `${block.y + 1} / span ${block.h}`
                         }}
                     >
                         {block.type === 'infobox' ? (

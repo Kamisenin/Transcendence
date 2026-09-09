@@ -8,7 +8,7 @@ export default function Home() {
   return (
     <div className="flex min-h-dvh flex-col items-center justify-start bg-[#f0e0d6] font-sans">
       <main className="flex w-full flex-1 flex-col items-center justify-center bg-[#f0e0d6] px-6 sm:items-start sm:px-16">
-          <div className="flex flex-col items-start gap-2 text-left w-full">
+          <div className="flex flex-col items-start gap-2 text-left w-full pt-16">
             <p className="text-sm text-[#8a6b63]">
               {t("tagline")}
             </p>
