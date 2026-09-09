@@ -19,8 +19,8 @@ upb:
 	@echo "ADDRESS vaut : $(ADDRESS)"
 	@echo "running 42chan in $(MODE) mode"
 	@mkdir -p data/db $(NEXT_UPLOADS_PATH)
-	$(NEXT_RUN)
 	$(DOCKER_COMPOSE) $(PROFILE_FLAG) up --build
+	$(NEXT_RUN)
 
 up:
 	@echo "running 42chan in $(MODE) mode"
