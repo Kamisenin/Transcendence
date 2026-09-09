@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import TagMembersPanel from './TagMembersPanel';
 import TagRolesPanel from './TagRolesPanel';
 import TagRequestsPanel from './TagRequestsPanel';
@@ -10,7 +11,6 @@ import TagOrganizationPermissionsPanel from './TagOrganizationPermissionsPanel';
 import type { TagCapabilities } from '%/lib/tag_permissions';
 import { type Member } from "./TagMembersPanel"
 import { useTranslations } from 'next-intl';
-
 
 export type Tag = {
     id: number;
@@ -65,8 +65,10 @@ type Props = {
 type TabKey = 'members' | 'roles' | 'requests' | 'organization' | 'settings';
 
 export default function TagManagement({tag, capabilities, roles, members, pendingRequests, currentUserToken, organizationMappings, organizationLinked}: Props) {
+    const router = useRouter();
     const [activeTab, setActiveTab] = useState<TabKey>('members');
     const t = useTranslations('Tags');
+    const tCommon = useTranslations('Common');
 
     const TABS = [
         { key: 'members', label: t('tabMembers') },
@@ -85,6 +87,13 @@ export default function TagManagement({tag, capabilities, roles, members, pendin
     return (
         <div className="min-h-screen bg-[#f0e0d6] px-4 pb-16 pt-20 text-[#3f2924] sm:px-6">
             <div className="mx-auto max-w-5xl">
+            <button
+                onClick={() => router.back()}
+                className="mb-4 inline-flex items-center text-sm font-semibold text-[#8a6b63] transition-colors hover:text-[#800000]"
+            >
+                ← {tCommon('back')}
+            </button>
+
             <div className="mb-8 border-b-2 border-[#800000] pb-5">
                 <div className="flex flex-wrap items-center gap-3">
                 <span
