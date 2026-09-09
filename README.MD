@@ -135,7 +135,12 @@ This will activate the development configuration and allow the Next.js app to ru
 
 If this is the first time the application is started, or if Prisma schema changes were made, the database must be synchronized.
 
-First, start the database container, then export the correct `DATABASE_URL` environment variable. The simplest option is to copy the relevant lines from `dev_start.sh` at the repository root.
+First, start the **database container**, then export the correct `DATABASE_URL` environment variable. The simplest option is to copy the relevant lines from `dev_start.sh` at the repository root.
+
+Execute
+```bash
+npx prisma generate
+```
 
 Then run one of the following commands from `srcs/next`:
 
@@ -209,6 +214,9 @@ Most of the communication happened on Discord, through a dedicated project serve
 
 - [x] Secure session and account lifecycle — nrolland  
   User sessions are tracked with expiration and IP metadata, and account-related actions are enforced with verification and validation.
+
+- [x] Organization System — csenelle
+  A multi Organization system, allowing users to easily manage pages and tags
 
 ---
 
@@ -355,12 +363,13 @@ This table stores the user profile vector used by the recommendation engine. It 
 | Support for additional browsers / compatibility | Minor | 1 | humontas, jmassavi |
 | Standard user management and authentication | Major | 2 | nrolland |
 | Advanced permissions system | Major | 2 | csenelle |
+| Organization system | Major | 2 | csenelle |
 | 2FA | Minor | 1 | nrolland |
 | Recommendation system using machine learning | Major | 2 | thcaquet |
 | Multilingual real-time search engine | Major | 2 | humontas |
 | Custom collaborative wiki editor | Minor | 1 | csenelle, jmassavi |
 
-Total: 19 points
+Total: 20 points
 
 ---
 
