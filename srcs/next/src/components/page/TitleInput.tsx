@@ -42,7 +42,7 @@ export default function TitleInput({ pageId, title, onChange }: TitleInputProps)
                 value={title}
                 onChange={(e) => onChange(e.target.value)}
                 placeholder={t("titlePlaceholder")}
-                className="w-full text-sm font-semibold border border-gray-200 rounded-lg px-3 py-1.5 outline-none focus:border-blue-500 bg-white"
+                className="w-full text-sm font-semibold border border-[#d9bfb7] rounded-lg px-3 py-1.5 outline-none focus:border-[#800000] bg-[#fffaf7]"
             />
             {title?.trim() !== "" && (
                 <div className="mt-1 text-xs flex items-center gap-1.5">

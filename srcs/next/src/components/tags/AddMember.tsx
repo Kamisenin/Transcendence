@@ -78,16 +78,16 @@ export default function AddMember({ tagId, assignableRoles, existingMemberTokens
 
     if (assignableRoles.length === 0) {
         return (
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-[#8a6b63]">
                 {tTags("noRoleAvailable")}
             </p>
         );
     }
 
     return (
-        <div className="border rounded-lg p-3 bg-gray-50">
+        <div className="rounded-lg border border-[#d9bfb7] bg-[#f7e9e2] p-3">
             {error && (
-                <div className="mb-2 p-2 bg-red-50 border border-red-200 text-red-600 text-xs rounded">
+                <div className="mb-2 rounded-md border border-[#e6b8b0] bg-[#fff1ef] p-2 text-xs text-[#a33a2b]">
                     {error}
                 </div>
             )}
@@ -98,12 +98,12 @@ export default function AddMember({ tagId, assignableRoles, existingMemberTokens
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder={t("searchPlaceholder")}
-                    className="flex-1 border rounded px-2 py-1.5 text-sm bg-white"
+                    className="flex-1 rounded-md border border-[#d9bfb7] bg-[#fffaf7] px-2 py-1.5 text-sm outline-none focus:border-[#800000]"
                 />
                 <select
                     value={selectedRoleId ?? ''}
                     onChange={(e) => setSelectedRoleId(Number(e.target.value))}
-                    className="border rounded px-2 py-1.5 text-sm bg-white"
+                    className="rounded-md border border-[#d9bfb7] bg-[#fffaf7] px-2 py-1.5 text-sm outline-none focus:border-[#800000]"
                 >
                     {assignableRoles.map(r => (
                         <option key={r.id} value={r.id}>{r.roleName}</option>
@@ -111,10 +111,10 @@ export default function AddMember({ tagId, assignableRoles, existingMemberTokens
                 </select>
             </div>
 
-            {loading && <p className="text-xs text-gray-400 px-1">{tCommon("searching")}</p>}
+            {loading && <p className="px-1 text-xs text-[#a89088]">{tCommon("searching")}</p>}
 
             {results.length > 0 && (
-                <div className="divide-y border rounded bg-white">
+                <div className="divide-y divide-[#ead7d0] overflow-hidden rounded-md border border-[#d9bfb7] bg-[#fffaf7]">
                     {results.map(u => {
                         const alreadyMember = existingMemberTokens.includes(u.user_id);
                         return (
@@ -123,13 +123,13 @@ export default function AddMember({ tagId, assignableRoles, existingMemberTokens
                                     <UserAvatar accountId={u.accountId} imgLink={u.imgLink} alt={u.username || u.accountId} size={24} className="h-6 w-6" />
                                     <div>
                                         <p className="text-sm font-medium leading-tight">{u.username}</p>
-                                        <p className="text-xs text-gray-400 leading-tight">@{u.accountId}</p>
+                                        <p className="text-xs leading-tight text-[#a89088]">@{u.accountId}</p>
                                     </div>
                                 </div>
                                 <button
                                     onClick={() => handleAdd(u.user_id)}
                                     disabled={isPending || alreadyMember}
-                                    className="text-xs bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed text-white px-2.5 py-1 rounded"
+                                    className="rounded-md bg-[#800000] px-2.5 py-1 text-xs font-semibold text-[#fffaf7] transition hover:bg-[#5f0000] disabled:cursor-not-allowed disabled:opacity-40"
                                 >
                                     {alreadyMember ? t("alreadyMember") : t("add")}
                                 </button>
@@ -140,7 +140,7 @@ export default function AddMember({ tagId, assignableRoles, existingMemberTokens
             )}
 
             {!loading && query.trim().length >= 2 && results.length === 0 && (
-                <p className="text-xs text-gray-400 px-1">{t("noMemberFound")}</p>
+                <p className="px-1 text-xs text-[#a89088]">{t("noMemberFound")}</p>
             )}
         </div>
     );

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/app/lib/session";
 import { prisma } from "%/lib/prisma/prisma"
+import { isValidAccountId } from "@/app/lib/account-id";
 
 export async function POST(req: NextRequest) {
     const user = await getCurrentUser();
@@ -17,6 +18,9 @@ export async function POST(req: NextRequest) {
 
     if (!accountId || !username || !email)
         return NextResponse.json({error: "Account name, username and email are required"}, {status: 400});
+
+    if (!isValidAccountId(accountId))
+        return NextResponse.json({error: "INVALID_ACCOUNT_ID"}, {status: 400});
 
     const accountIdChanged = body.accountId !== user.accountId;
     const emailChanged = body.email !== user.email;

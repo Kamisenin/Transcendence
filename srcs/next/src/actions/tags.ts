@@ -8,6 +8,7 @@ import { getTagCapabilities, canManageRoleRank, canAssignRoleRank } from '%/lib/
 import { revalidatePath } from 'next/cache';
 import { redirect } from "next/navigation";
 import { TagPermissionError } from '%/lib/errors';
+import { userHasOrgPermission } from '@/actions/orgs';
 
 export async function requireUser() {
     const user = await getSessionUser(await getSessionCookie());
@@ -65,6 +66,105 @@ export async function createTagRole(tagId: number, data: {
 
     await prisma.tagRole.create({ data: { tagId, ...data } });
     revalidatePath(`/tags/${tagId}`);
+}
+
+export async function getTagOrganizationMappings(tagId: number) {
+    const user = await requireUser();
+    const capabilities = await getTagCapabilities(tagId, user.user_id);
+
+    const [tag, organizations] = await Promise.all([
+        prisma.tag.findUnique({ where: { id: tagId }, include: { roles: true } }),
+        prisma.organization.findMany({
+            where: {
+                AND: [
+                    {
+                        OR: [
+                            { orgTagAccess: { some: { tagId } } },
+                            { orgTagCapability: { some: { tagId } } },
+                        ],
+                    },
+                    ...(capabilities.canManageRoles ? [] : [{
+                        OR: [
+                            { ownerToken: user.user_id },
+                            {
+                                members: {
+                                    some: {
+                                        userToken: user.user_id,
+                                        role: { canManageOrgTagGrants: true },
+                                    },
+                                },
+                            },
+                        ],
+                    }]),
+                ],
+            },
+            orderBy: { name: "asc" },
+            include: {
+                roles: { orderBy: { hierarchyLevel: "asc" } },
+                orgTagCapability: { where: { tagId }, include: { role: true, tagRole: true } },
+            },
+        }),
+    ]);
+    if (!tag) throw new Error("Tag not found");
+    return { tagRoles: tag.roles, organizations };
+}
+
+export async function setTagOrganizationRole(
+    tagId: number,
+    orgId: number,
+    organizationRoleId: number,
+    tagRoleId: number,
+) {
+    const user = await requireUser();
+    const capabilities = await getTagCapabilities(tagId, user.user_id);
+    const canManageOrganizationGrants = await userHasOrgPermission(orgId, "canManageOrgTagGrants", user);
+    if (!capabilities.canManageRoles && !canManageOrganizationGrants) throw new Error("Permission denied");
+
+    const [organizationRole, tagRole, access] = await Promise.all([
+        prisma.organizationRole.findUnique({ where: { id: organizationRoleId } }),
+        prisma.tagRole.findUnique({ where: { id: tagRoleId } }),
+        prisma.orgTagAccess.findUnique({ where: { orgId_tagId: { orgId, tagId } } }),
+    ]);
+    if (!organizationRole || organizationRole.organizationId !== orgId) throw new Error("Invalid organization role");
+    if (!tagRole || tagRole.tagId !== tagId) throw new Error("Invalid tag role");
+    if (!access && !(await prisma.orgTagCapability.findFirst({ where: { orgId, tagId } }))) {
+        throw new Error("The organization does not manage this tag");
+    }
+
+    return prisma.orgTagCapability.upsert({
+        where: { orgId_tagId_roleId: { orgId, tagId, roleId: organizationRoleId } },
+        update: {
+            tagRoleId,
+            canManageTagMembers: tagRole.canManageMembers,
+            canManageTagRoles: tagRole.canManageRoles,
+            canEditInfo: tagRole.canEditInfo,
+            canDeleteTag: tagRole.canDeleteTag,
+            canAddPage: tagRole.canAddPage,
+            canRevokePage: tagRole.canRevokePage,
+            canManagePageGrants: tagRole.canManagePageGrants,
+            canReviewRequests: tagRole.canReviewRequests,
+        },
+        create: {
+            orgId, tagId, roleId: organizationRoleId, tagRoleId,
+            canManageTagMembers: tagRole.canManageMembers,
+            canManageTagRoles: tagRole.canManageRoles,
+            canEditInfo: tagRole.canEditInfo,
+            canDeleteTag: tagRole.canDeleteTag,
+            canAddPage: tagRole.canAddPage,
+            canRevokePage: tagRole.canRevokePage,
+            canManagePageGrants: tagRole.canManagePageGrants,
+            canReviewRequests: tagRole.canReviewRequests,
+        },
+        include: { role: true, tagRole: true },
+    });
+}
+
+export async function removeTagOrganizationRole(tagId: number, orgId: number, organizationRoleId: number) {
+    const user = await requireUser();
+    const capabilities = await getTagCapabilities(tagId, user.user_id);
+    const canManageOrganizationGrants = await userHasOrgPermission(orgId, "canManageOrgTagGrants", user);
+    if (!capabilities.canManageRoles && !canManageOrganizationGrants) throw new Error("Permission denied");
+    await prisma.orgTagCapability.deleteMany({ where: { tagId, orgId, roleId: organizationRoleId } });
 }
 
 export async function updateTagRole(tagId: number, roleId: number, data: Partial<{
@@ -191,22 +291,26 @@ export async function updateTagInfo(tagId: number, data: {
     name?: string;
     description?: string;
     color?: number;
-    namespace?: string | "";
+    namespace: string;
 }) {
     const user = await requireUser();
     const caps = await getTagCapabilities(tagId, user.user_id);
     if (!caps.canEditInfo) throw new Error("Permission Denied");
 
-    if (data.namespace && data.namespace?.length > 0 && data.namespace.trim()) {
-        const trimmed = data.namespace.trim();
-        const existing = await prisma.tag.findFirst({
-            where: { namespace: trimmed, id: { not: tagId } },
-        });
-        if (existing) throw new Error("This namespace is already in use by another tag or user");
-        data.namespace = trimmed;
-    } else {
-        data.namespace = "";
+    const cleanNamespace = slugify(data.namespace.trim());
+    if (!cleanNamespace) {
+        throw new Error("Tag namespace is required.");
     }
+
+    const existingUser = await prisma.user.findUnique({ where: { accountId: cleanNamespace } });
+    if (existingUser) throw new Error("This namespace is already in use by another tag or user");
+
+    const existingTag = await prisma.tag.findFirst({
+        where: { namespace: cleanNamespace, id: { not: tagId } },
+    });
+    if (existingTag) throw new Error("This namespace is already in use by another tag or user");
+
+    data.namespace = cleanNamespace;
 
     await prisma.tag.update({ where: { id: tagId }, data });
     revalidatePath(`/tags/${tagId}`);
@@ -214,8 +318,8 @@ export async function updateTagInfo(tagId: number, data: {
 
 
 export async function checkTagNamespaceAvailability(namespace: string): Promise<{ available: boolean; message?: string }> {
-    const cleanNamespace = namespace.trim();
-    if (!cleanNamespace) return { available: true };
+    const cleanNamespace = slugify(namespace.trim());
+    if (!cleanNamespace) return { available: false, message: "Namespace is required." };
 
     const existingUser = await prisma.user.findUnique({
         where: { accountId: cleanNamespace }
@@ -259,12 +363,15 @@ export async function createTagAction(data: { name: string; namespace?: string; 
         throw new Error("This tag name is taken.");
     }
 
-    const cleanNamespace = data.namespace?.trim() || null;
-    if (cleanNamespace) {
-        const check = await checkTagNamespaceAvailability(cleanNamespace);
-        if (!check.available) {
-            throw new Error(check.message || "Namespace already in use.");
-        }
+    const rawNamespace = data.namespace?.trim() ?? "";
+    const cleanNamespace = slugify(rawNamespace);
+    if (!cleanNamespace) {
+        throw new Error("Tag namespace is required.");
+    }
+
+    const check = await checkTagNamespaceAvailability(cleanNamespace);
+    if (!check.available) {
+        throw new Error(check.message || "Namespace already in use.");
     }
 
     const colorInt = data.colorHex ? hexToInt(data.colorHex) : hexToInt("#3b82f6");
@@ -274,7 +381,7 @@ export async function createTagAction(data: { name: string; namespace?: string; 
             name,
             namespace: cleanNamespace,
             color: colorInt,
-            ownerToken: user.user_id,
+            owner: { connect: { user_id: user.user_id } },
         }
     });
 

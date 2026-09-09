@@ -1,8 +1,9 @@
 import { getUser } from "%/lib/prisma/prisma-utils";
+import { prisma } from "%/lib/prisma/prisma";
 import { getCurrentUser } from "%/lib/session";
 import { getRelation } from "@/actions/friendship";
 import { FriendshipStatus } from "@prisma/client";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import PagesList from "@/components/user/PagesList";
 import OrgsList from "@/components/user/OrgsList";
 import FriendList from "@/components/user/friends/FriendList";
@@ -19,6 +20,11 @@ type Params = {
  
 export default async function UserWikiPage({ params }: Params) {
 	const { namespace } = await params;
+
+	const tag = await prisma.tag.findUnique({ where: { namespace } });
+	if (tag) {
+		redirect(`/tags/${tag.namespace}`);
+	}
 
 	const target = await getUser(namespace);
 
@@ -38,7 +44,6 @@ export default async function UserWikiPage({ params }: Params) {
 		<div className="min-h-screen bg-[#f0e0d6] px-4 pb-12 pt-20 text-[#3f2924]">
 			<div className="mx-auto max-w-7xl">
 				<div className="mb-6 border-b-2 border-[#800000] pb-3">
-					<p className="font-mono text-xs uppercase tracking-[0.2em] text-[#8a6b63]">User profile</p>
 					<h1 className="mt-1 text-2xl font-bold text-[#800000]">{target.username}</h1>
 				</div>
 				<div className="flex flex-col items-center justify-center gap-6 md:flex-row md:items-stretch">
@@ -65,7 +70,7 @@ export default async function UserWikiPage({ params }: Params) {
 						</h2>
 
 						<p className="mt-1 text-sm text-[#8a6b63]">
-							@{target.username}
+							@{target.accountId}
 						</p>
 					</div>
 				</div>

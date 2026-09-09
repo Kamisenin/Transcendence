@@ -14,7 +14,7 @@ import { PageData } from '@/components/ForumCard';
 import { PagePermissionError } from "%/lib/errors";
 import { revalidatePath } from "next/cache";
 import { getTagCapabilities, getUserTags } from '%/lib/tag_permissions';
-import { userHasOrgPermission, getUserOrgs } from '@/actions/orgs';
+import { userHasOrgPermission } from '@/actions/orgs';
 
 function findPreviewImageFromContent(content: any): string | null {
     try {
@@ -649,7 +649,7 @@ export async function getGrantableTagsAndOrgs() {
 
     const [tags, orgs] = await Promise.all([
         getUserTags(user.user_id),
-        getUserOrgs(),
+        prisma.organization.findMany({ include: { roles: true } }),
     ]);
 
     const grantableTags = [];
@@ -725,6 +725,15 @@ export async function addOrgRolePageAccess(pageId: number, orgId: number, minRol
     const user = await requireUser();
     const can = await hasPageManagePermission(pageId, user.user_id);
     if (!can) throw new PagePermissionError("Forbidden");
+
+    const role = await prisma.organizationRole.findUnique({ where: { id: minRoleId } });
+    if (!role || role.organizationId !== orgId) throw new PagePermissionError("Invalid organization role");
+
+    if (!(await userHasOrgPermission(orgId, "canManageOrgPageGrants", user))) {
+        const { requestOrganizationPageAccess } = await import("@/actions/orgs");
+        await requestOrganizationPageAccess(orgId, pageId, minRoleId, level);
+        return { request: true as const };
+    }
 
     const result = await prisma.orgPageAccess.upsert({
         where: { orgId_pageId: { orgId, pageId } },

@@ -4,8 +4,10 @@ import { prisma } from "%/lib/prisma/prisma";
 import { getSessionUser, getSessionCookie } from "%/lib/session";
 import { requireUser } from "@/actions/tags";
 import { Organization, OrganizationRole, User } from "@prisma/client";
+import { PermissionLevel } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { OrgPermissionError } from "%/lib/errors";
+import { revalidatePath } from "next/cache";
 
 type RolePermissionsInput = {
   roleName?: string;
@@ -47,6 +49,39 @@ export async function getUserOrgs(user : User | null = null): Promise<Organizati
   return Array.from(map.values());
 }
 
+export async function createOrganization(name: string) {
+  const user = await requireUser();
+  const normalizedName = name.trim();
+  if (!normalizedName) throw new Error("Organization name is required");
+
+  return prisma.$transaction(async (transaction) => {
+    const organization = await transaction.organization.create({
+      data: { ownerToken: user.user_id, name: normalizedName },
+    });
+    const ownerRole = await transaction.organizationRole.create({
+      data: {
+        organizationId: organization.id,
+        roleName: "Owner",
+        hierarchyLevel: 200,
+        canManageMembers: true,
+        canManageRoles: true,
+        canEditInfo: true,
+        canDeleteOrg: true,
+        canManageOrgPageGrants: true,
+        canManageOrgTagGrants: true,
+      },
+    });
+    await transaction.organizationMember.create({
+      data: {
+        organizationId: organization.id,
+        userToken: user.user_id,
+        roleId: ownerRole.id,
+      },
+    });
+    return organization;
+  });
+}
+
 export async function getOrganization(name: string) {
   const org = await prisma.organization.findUnique({
     where: { name },
@@ -58,9 +93,20 @@ export async function getOrganization(name: string) {
       owner: true,
       orgTagAccess: {
         include: {
-          tag: true,
+          tag: { include: { roles: true } },
           minRole: true,
         },
+      },
+      orgTagCapability: {
+        include: {
+          tag: { include: { roles: true } },
+          role: true,
+          tagRole: true,
+        },
+      },
+      orgTagRequests: {
+        where: { status: "PENDING" },
+        include: { tag: true, minRole: true, tagRole: true, requester: { select: { accountId: true, username: true } } },
       },
       orgPageAccess: {
         include: {
@@ -72,6 +118,10 @@ export async function getOrganization(name: string) {
           minRole: true,
         },
       },
+      orgPageRequests: {
+        where: { status: "PENDING" },
+        include: { page: true, minRole: true, requester: { select: { accountId: true, username: true } } },
+      },
     },
   });
   return org;
@@ -80,111 +130,27 @@ export async function getOrganization(name: string) {
 export async function userHasOrgPermission(
     orgId: number,
     permissionKey: keyof OrganizationRole,
-    user: User | null = null
+    user: User | null = null,
 ): Promise<boolean> {
   if (!user) user = await getSessionUser(await getSessionCookie());
   if (!user) return false;
 
   const org = await prisma.organization.findUnique({ where: { id: orgId } });
   if (!org) return false;
-
   if (org.ownerToken === user.user_id) return true;
 
   const membership = await prisma.organizationMember.findUnique({
-    where: {
-      organizationId_userToken: { organizationId: orgId, userToken: user.user_id },
-    },
+    where: { organizationId_userToken: { organizationId: orgId, userToken: user.user_id } },
     include: { role: true },
   });
+  if (!membership?.role) return false;
 
-  if (!membership || !membership.role) return false;
-
-  return Boolean((membership.role as any)[permissionKey]);
-}
-
-async function resolveUserIdFromIdentifier(identifier: string): Promise<string> {
-  const value = identifier.trim();
-  if (!value) throw new Error("User identifier is required");
-
-  const byAccountId = await prisma.user.findUnique({
-    where: { accountId: value },
-    select: { user_id: true },
-  });
-  if (byAccountId) return byAccountId.user_id;
-
-  throw new Error("User not found. Please select a user from suggestions.");
-}
-
-export async function searchUsersForOrgMemberAdd(query: string): Promise<MemberUserOption[]> {
-  const user = await requireUser();
-  if (!user) return [];
-
-  const q = query.trim();
-  if (!q) return [];
-
-  const users = await prisma.user.findMany({
-    where: {
-      OR: [
-        { accountId: { contains: q, mode: "insensitive" } },
-        { username: { contains: q, mode: "insensitive" } },
-      ],
-    },
-    select: {
-      user_id: true,
-      username: true,
-      accountId: true,
-      imgLink: true,
-    },
-    orderBy: { accountId: "asc" },
-    take: 20,
-  });
-
-  return users;
-}
-
-export async function createOrganization(name: string) {
-  const user = await requireUser();
-  const org = await prisma.organization.create({
-    data: {
-      name,
-      ownerToken: user.user_id,
-      roles: {
-        create: [
-          {
-            roleName: "Owner",
-            hierarchyLevel: 0,
-            canManageMembers: true,
-            canManageRoles: true,
-            canEditInfo: true,
-            canDeleteOrg: true,
-            canManageOrgPageGrants: true,
-            canManageOrgTagGrants: true,
-          },
-        ],
-      },
-    },
-  });
-
-  const ownerRole = await prisma.organizationRole.findFirst({
-    where: { organizationId: org.id, roleName: "Owner" },
-  });
-
-  if (ownerRole) {
-    await prisma.organizationMember.create({
-      data: { organizationId: org.id, userToken: user.user_id, roleId: ownerRole.id },
-    });
-  }
-
-  return org;
-}
-
-export async function updateOrganization(orgId: number, data: { name?: string }) {
-  return prisma.organization.update({ where: { id: orgId }, data });
+  const permission = membership.role[permissionKey];
+  return typeof permission === "boolean" && permission;
 }
 
 export async function deleteOrganization(orgId: number) {
   const user = await requireUser();
-
   const org = await prisma.organization.findUnique({ where: { id: orgId } });
   if (!org) redirect("/");
 
@@ -292,6 +258,87 @@ export async function deleteOrganizationRole(roleId: number) {
   }
 
   return prisma.organizationRole.delete({ where: { id: roleId } });
+}
+
+async function resolveUserIdFromIdentifier(identifier: string): Promise<string> {
+  const value = identifier.trim();
+  if (!value) throw new Error("User identifier is required");
+
+  const user = await prisma.user.findUnique({
+    where: { accountId: value },
+    select: { user_id: true },
+  });
+  if (!user) throw new Error("User not found. Please select a user from suggestions.");
+  return user.user_id;
+}
+
+async function grantOrganizationTagRole(
+  orgId: number,
+  tagId: number,
+  organizationRoleId: number,
+  tagRole: {
+    id: number;
+    canManageMembers: boolean;
+    canManageRoles: boolean;
+    canEditInfo: boolean;
+    canDeleteTag: boolean;
+    canAddPage: boolean;
+    canRevokePage: boolean;
+    canManagePageGrants: boolean;
+    canReviewRequests: boolean;
+  },
+) {
+  return prisma.orgTagCapability.upsert({
+    where: { orgId_tagId_roleId: { orgId, tagId, roleId: organizationRoleId } },
+    update: {
+      tagRoleId: tagRole.id,
+      canManageTagMembers: tagRole.canManageMembers,
+      canManageTagRoles: tagRole.canManageRoles,
+      canEditInfo: tagRole.canEditInfo,
+      canDeleteTag: tagRole.canDeleteTag,
+      canAddPage: tagRole.canAddPage,
+      canRevokePage: tagRole.canRevokePage,
+      canManagePageGrants: tagRole.canManagePageGrants,
+      canReviewRequests: tagRole.canReviewRequests,
+    },
+    create: {
+      orgId,
+      tagId,
+      roleId: organizationRoleId,
+      tagRoleId: tagRole.id,
+      canManageTagMembers: tagRole.canManageMembers,
+      canManageTagRoles: tagRole.canManageRoles,
+      canEditInfo: tagRole.canEditInfo,
+      canDeleteTag: tagRole.canDeleteTag,
+      canAddPage: tagRole.canAddPage,
+      canRevokePage: tagRole.canRevokePage,
+      canManagePageGrants: tagRole.canManagePageGrants,
+      canReviewRequests: tagRole.canReviewRequests,
+    },
+  });
+}
+
+export async function searchUsersForOrgMemberAdd(query: string): Promise<MemberUserOption[]> {
+  await requireUser();
+  const value = query.trim();
+  if (!value) return [];
+
+  return prisma.user.findMany({
+    where: {
+      OR: [
+        { accountId: { contains: value, mode: "insensitive" } },
+        { username: { contains: value, mode: "insensitive" } },
+      ],
+    },
+    select: {
+      user_id: true,
+      username: true,
+      accountId: true,
+      imgLink: true,
+    },
+    orderBy: { accountId: "asc" },
+    take: 20,
+  });
 }
 
 export async function addOrganizationMember(orgId: number, userIdentifier: string, roleId: number) {
@@ -416,4 +463,164 @@ export async function updateOrganizationMemberRole(orgId: number, userToken: str
     where: { organizationId_userToken: { organizationId: orgId, userToken } },
     data: { roleId },
   });
+}
+
+export async function requestOrganizationTagAccess(
+  orgId: number,
+  tagId: number,
+  orgRoleId: number,
+  tagRoleId: number,
+) {
+  const user = await requireUser();
+  const [tag, organizationRole, tagRole, pending] = await Promise.all([
+    prisma.tag.findUnique({ where: { id: tagId }, select: { id: true } }),
+    prisma.organizationRole.findUnique({ where: { id: orgRoleId } }),
+    prisma.tagRole.findUnique({ where: { id: tagRoleId } }),
+    prisma.orgTagRequest.findFirst({
+      where: { orgId, tagId, status: "PENDING" },
+      select: { id: true },
+    }),
+  ]);
+  if (!tag) throw new Error("Tag not found");
+  if (!organizationRole || organizationRole.organizationId !== orgId) throw new Error("Invalid organization role");
+  if (!tagRole || tagRole.tagId !== tagId) throw new Error("Invalid tag role");
+
+  const [otherAccess, otherCapability, otherRequest] = await Promise.all([
+    prisma.orgTagAccess.findFirst({ where: { tagId, orgId: { not: orgId } }, select: { orgId: true } }),
+    prisma.orgTagCapability.findFirst({ where: { tagId, orgId: { not: orgId } }, select: { orgId: true } }),
+    prisma.orgTagRequest.findFirst({ where: { tagId, orgId: { not: orgId }, status: "PENDING" }, select: { orgId: true } }),
+  ]);
+  if (otherAccess || otherCapability || otherRequest) {
+    throw new Error("This tag is already assigned to another organization");
+  }
+
+  const canManageTagGrants = await userHasOrgPermission(orgId, "canManageOrgTagGrants", user);
+  if (canManageTagGrants) {
+    if (pending) {
+      await prisma.orgTagRequest.update({
+        where: { id: pending.id },
+        data: { status: "APPROVED", reviewedBy: user.user_id },
+      });
+    }
+    await prisma.orgTagAccess.upsert({
+      where: { orgId_tagId: { orgId, tagId } },
+      update: { minRoleId: orgRoleId, permissions: "READ" },
+      create: { orgId, tagId, minRoleId: orgRoleId, permissions: "READ" },
+    });
+    await grantOrganizationTagRole(orgId, tagId, orgRoleId, tagRole);
+    revalidatePath(`/tags/${tagId}/manage`);
+    revalidatePath("/orgs");
+    return { requested: false as const, accepted: true as const };
+  }
+
+  if (pending) throw new Error("A request for this tag is already pending");
+
+  await prisma.orgTagRequest.create({
+    data: { orgId, tagId, minRoleId: orgRoleId, tagRoleId, requestedBy: user.user_id },
+  });
+  return { requested: true as const, accepted: false as const };
+}
+
+export async function getOrganizationsForTagRequest(tagId: number) {
+  const user = await requireUser();
+  const [organizations, tagRoles] = await Promise.all([
+    prisma.organization.findMany({
+    orderBy: { name: "asc" },
+    select: {
+      id: true,
+      name: true,
+      roles: {
+        orderBy: { hierarchyLevel: "asc" },
+        select: { id: true, roleName: true, hierarchyLevel: true },
+      },
+    },
+    }),
+    prisma.tagRole.findMany({
+      where: { tagId },
+      orderBy: { hierarchyLevel: "asc" },
+      select: { id: true, roleName: true, hierarchyLevel: true },
+    }),
+  ]);
+
+  return {
+    organizations: await Promise.all(
+      organizations.map(async (organization) => ({
+      ...organization,
+      canManageTagGrants: await userHasOrgPermission(organization.id, "canManageOrgTagGrants", user),
+      })),
+    ),
+    tagRoles,
+  };
+}
+
+export async function requestOrganizationPageAccess(
+  orgId: number,
+  pageId: number,
+  minRoleId: number,
+  permissions: PermissionLevel,
+) {
+  const user = await requireUser();
+  const role = await prisma.organizationRole.findUnique({ where: { id: minRoleId } });
+  if (!role || role.organizationId !== orgId) throw new Error("Invalid organization role");
+
+  return prisma.orgPageRequest.create({
+    data: { orgId, pageId, minRoleId, permissions, requestedBy: user.user_id },
+  });
+}
+
+export async function reviewOrganizationTagRequest(requestId: number, accept: boolean) {
+  const user = await requireUser();
+  const request = await prisma.orgTagRequest.findUnique({ where: { id: requestId }, include: { tagRole: true } });
+  if (!request) throw new Error("Request not found");
+  if (!(await userHasOrgPermission(request.orgId, "canManageOrgTagGrants", user))) {
+    throw new OrgPermissionError("Forbidden");
+  }
+
+  if (accept) {
+    const [otherAccess, otherCapability] = await Promise.all([
+      prisma.orgTagAccess.findFirst({ where: { tagId: request.tagId, orgId: { not: request.orgId } }, select: { orgId: true } }),
+      prisma.orgTagCapability.findFirst({ where: { tagId: request.tagId, orgId: { not: request.orgId } }, select: { orgId: true } }),
+    ]);
+    if (otherAccess || otherCapability) {
+      throw new Error("This tag is already assigned to another organization");
+    }
+  }
+
+  await prisma.orgTagRequest.update({
+    where: { id: requestId },
+    data: { status: accept ? "APPROVED" : "REJECTED", reviewedBy: user.user_id },
+  });
+  if (accept) {
+    await prisma.orgTagAccess.upsert({
+      where: { orgId_tagId: { orgId: request.orgId, tagId: request.tagId } },
+      update: { minRoleId: request.minRoleId, permissions: "READ" },
+      create: { orgId: request.orgId, tagId: request.tagId, minRoleId: request.minRoleId, permissions: "READ" },
+    });
+    if (request.tagRole) {
+      await grantOrganizationTagRole(request.orgId, request.tagId, request.minRoleId, request.tagRole);
+    }
+  }
+  revalidatePath("/orgs");
+}
+
+export async function reviewOrganizationPageRequest(requestId: number, accept: boolean) {
+  const user = await requireUser();
+  const request = await prisma.orgPageRequest.findUnique({ where: { id: requestId } });
+  if (!request) throw new Error("Request not found");
+  if (!(await userHasOrgPermission(request.orgId, "canManageOrgPageGrants", user))) {
+    throw new OrgPermissionError("Forbidden");
+  }
+
+  await prisma.orgPageRequest.update({
+    where: { id: requestId },
+    data: { status: accept ? "APPROVED" : "REJECTED", reviewedBy: user.user_id },
+  });
+  if (accept) {
+    await prisma.orgPageAccess.upsert({
+      where: { orgId_pageId: { orgId: request.orgId, pageId: request.pageId } },
+      update: { minRoleId: request.minRoleId, permissions: request.permissions },
+      create: { orgId: request.orgId, pageId: request.pageId, minRoleId: request.minRoleId, permissions: request.permissions },
+    });
+  }
+  revalidatePath("/orgs");
 }

@@ -41,13 +41,13 @@ export default function TagRequestsPanel({ requests }: Props) {
     return (
         <div>
             {error && (
-                <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded">
+                <div className="mb-4 rounded-md border border-[#e6b8b0] bg-[#fff1ef] p-3 text-sm text-[#a33a2b]">
                     {error}
                 </div>
             )}
 
             {visible.length === 0 ? (
-                <p className="text-sm text-gray-400">{t('noPendingRequests')}</p>
+                <p className="text-sm text-[#8a6b63]">{t('noPendingRequests')}</p>
             ) : (
                 <div className="divide-y border rounded-lg overflow-hidden">
                     {visible.map(req => (
@@ -57,7 +57,7 @@ export default function TagRequestsPanel({ requests }: Props) {
                                     <span className="font-medium">{req.requester.username}</span>
                                     {' '}{t('requestText', { username: req.requester.username, title: isDefaultTitle(req.page.title) ? t('untitled') : req.page.title })}
                                 </p>
-                                <p className="text-xs text-gray-400">
+                                <p className="text-xs text-[#a89088]">
                                     {new Date(req.createdAt).toLocaleDateString()}
                                 </p>
                             </div>
@@ -65,14 +65,14 @@ export default function TagRequestsPanel({ requests }: Props) {
                                 <button
                                     onClick={() => handleReview(req.id, true)}
                                     disabled={isPending}
-                                    className="text-xs bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded"
+                                    className="rounded-md bg-[#800000] px-3 py-1.5 text-xs font-semibold text-[#fffaf7] transition hover:bg-[#5f0000]"
                                 >
                                     {t('accept')}
                                 </button>
                                 <button
                                     onClick={() => handleReview(req.id, false)}
                                     disabled={isPending}
-                                    className="text-xs bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded"
+                                    className="rounded-md border border-[#d9bfb7] bg-[#f7e9e2] px-3 py-1.5 text-xs font-semibold text-[#3f2924] transition hover:bg-[#ead7d0]"
                                 >
                                     {t('reject')}
                                 </button>

@@ -57,14 +57,14 @@ export default function Infobox({ accountId, id, pageId, data, onChange, onDelet
     }
 
     return (
-        <div className="group relative h-full w-full bg-white rounded-xl border border-blue-200 ring-1 ring-blue-50 p-4 shadow-sm flex flex-col overflow-hidden">
+        <div className="group relative h-full w-full bg-[#fffaf7] rounded-xl border border-[#d9bfb7] ring-1 ring-[#ead7d0] p-4 shadow-sm flex flex-col overflow-hidden">
             {/* En-tête */}
             <div className="pl-7 flex items-center justify-between border-b pb-2 mb-3 shrink-0">
                 <span className="text-xs font-bold uppercase tracking-wider text-gray-400">{t('options')}</span>
                 <button
                     type="button"
                     onClick={() => setIsPreview(true)}
-                    className="flex items-center gap-1 text-xs bg-blue-50 text-blue-600 hover:bg-blue-100 font-medium px-2 py-1 rounded-md transition cursor-pointer"
+                    className="flex items-center gap-1 text-xs bg-[#f7e9e2] text-[#800000] hover:bg-[#ead7d0] font-medium px-2 py-1 rounded-md transition cursor-pointer"
                 >
                     <Eye size={13} /> {t('preview')}
                 </button>
@@ -83,7 +83,7 @@ export default function Infobox({ accountId, id, pageId, data, onChange, onDelet
                         value={data.imageUrl}
                         onChange={(e) => updateField("imageUrl", e.target.value)}
                         placeholder="https://..."
-                        className="w-full text-xs border border-gray-200 rounded-lg px-3 py-1.5 outline-none focus:border-blue-500 bg-white"
+                        className="w-full text-xs border border-[#d9bfb7] rounded-lg px-3 py-1.5 outline-none focus:border-[#800000] bg-[#fffaf7]"
                     />
                 </div>
 

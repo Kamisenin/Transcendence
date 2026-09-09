@@ -28,7 +28,7 @@ export default function VisibilityToggler({ isPublic, onChange }: Props) {
                     onChange={(e) => onChange(e.target.checked)}
                     className="sr-only peer"
                 />
-                <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                <div className="w-9 h-5 bg-[#ead7d0] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-[#fffaf7] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[#fffaf7] after:border-[#d9bfb7] after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#800000]"></div>
             </label>
         </div>
     );

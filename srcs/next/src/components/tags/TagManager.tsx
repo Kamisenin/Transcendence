@@ -69,7 +69,7 @@ export default function TagManager({ accountId, pageId, data, onChange, onOpenMo
 
     return (
         <div className="pt-1">
-            <label className="block text-xs font-medium text-gray-600 mb-1.5">{tCommon('tags')}</label>
+            <label className="mb-1.5 block text-xs font-medium text-[#3f2924]">{tCommon('tags')}</label>
             <div className="flex flex-wrap gap-1.5 items-center">
                 {tags.map((tag) => (
                     <TagBadge key={tag.id} tag={tag} onRemove={() => removeTag(tag.id)} />
@@ -79,13 +79,13 @@ export default function TagManager({ accountId, pageId, data, onChange, onOpenMo
                     <button
                         type="button"
                         onClick={() => setIsOpen(!isOpen)}
-                        className="inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 border border-dashed border-gray-300 rounded-full cursor-pointer"
+                        className="inline-flex cursor-pointer items-center gap-1 rounded-full border border-dashed border-[#c9aaa1] bg-[#f7e9e2] px-2.5 py-0.5 text-xs font-medium text-[#800000] hover:bg-[#ead7d0]"
                     >
                         <Plus size={12} /> {tCommon("tags")}
                     </button>
 
                     {isOpen && (
-                        <div className="absolute left-0 top-full mt-1 w-60 bg-white rounded-xl shadow-xl border border-gray-100 z-50 p-2 text-xs">
+                        <div className="absolute left-0 top-full z-50 mt-1 w-60 rounded-xl border border-[#d9bfb7] bg-[#fffaf7] p-2 text-xs shadow-xl">
                             <div className="relative mb-1.5">
                                 <input
                                     type="text"
@@ -93,9 +93,9 @@ export default function TagManager({ accountId, pageId, data, onChange, onOpenMo
                                     value={input}
                                     onChange={(e) => setInput(e.target.value)}
                                     placeholder={tCommon("search")}
-                                    className="w-full px-2.5 py-1.5 border border-gray-200 rounded-lg outline-none focus:border-blue-500 pr-7"
+                                    className="w-full rounded-lg border border-[#d9bfb7] px-2.5 py-1.5 pr-7 outline-none focus:border-[#800000]"
                                 />
-                                {searching && <Loader2 size={13} className="absolute right-2 top-2 animate-spin text-gray-400" />}
+                                {searching && <Loader2 size={13} className="absolute right-2 top-2 animate-spin text-[#a89088]" />}
                             </div>
 
                             <div className="max-h-40 overflow-y-auto space-y-0.5">
@@ -105,17 +105,17 @@ export default function TagManager({ accountId, pageId, data, onChange, onOpenMo
                                             key={tag.id}
                                             type="button"
                                             onClick={() => { addTag(tag); setIsOpen(false); setInput(""); }}
-                                            className="w-full text-left px-2 py-1.5 rounded-lg hover:bg-gray-50 flex items-center justify-between cursor-pointer"
+                                            className="flex w-full cursor-pointer items-center justify-between rounded-lg px-2 py-1.5 text-left hover:bg-[#f7e9e2]"
                                         >
                                             <div className="flex items-center gap-1.5">
                                                 <span className="w-2 h-2 rounded-full" style={{ backgroundColor: tag.color }} />
-                                                <span className="font-medium text-gray-700">{tag.name}</span>
+                                                <span className="font-medium text-[#3f2924]">{tag.name}</span>
                                             </div>
-                                            {tag.namespace && <span className="text-[10px] text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded font-mono">{tag.namespace}</span>}
+                                            {tag.namespace && <span className="rounded bg-[#f7e9e2] px-1.5 py-0.5 font-mono text-[10px] text-[#8a6b63]">{tag.namespace}</span>}
                                         </button>
                                     ))
                                 ) : (
-                                    <p className="p-2 text-center text-gray-400 italic text-[11px]">
+                                    <p className="p-2 text-center text-[11px] italic text-[#a89088]">
                                         {searching ? tCommon("searching") : t("noTagFound")}
                                     </p>
                                 )}
@@ -124,7 +124,7 @@ export default function TagManager({ accountId, pageId, data, onChange, onOpenMo
                             <button
                                 type="button"
                                 onClick={() => { setIsOpen(false); onOpenModal(); }}
-                                className="w-full mt-1.5 pt-1.5 border-t border-gray-100 text-left px-2 py-1 rounded text-blue-600 hover:bg-blue-50 font-semibold flex items-center gap-1 cursor-pointer"
+                                className="mt-1.5 flex w-full cursor-pointer items-center gap-1 rounded border-t border-[#ead7d0] px-2 py-1 pt-1.5 text-left font-semibold text-[#800000] hover:bg-[#f7e9e2]"
                             >
                                 <Plus size={13} /> {t("createModal.title")}
                             </button>
@@ -134,15 +134,15 @@ export default function TagManager({ accountId, pageId, data, onChange, onOpenMo
             </div>
 
             {namespaces.length > 0 && (
-                <div className="mt-3 pt-2 border-t border-gray-100">
-                    <label className="flex items-center gap-1.5 text-xs font-semibold text-gray-600 mb-1.5">
-                        <Globe size={13} className="text-gray-400" />
+                <div className="mt-3 border-t border-[#ead7d0] pt-2">
+                    <label className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-[#3f2924]">
+                        <Globe size={13} className="text-[#a89088]" />
                         {t("slugNamespace")}
                     </label>
                     <select
                         value={namespace}
                         onChange={(e) => onChange?.({ ...data, canonicalNamespace: e.target.value || null })}
-                        className="w-full text-xs px-2.5 py-1.5 border border-gray-200 rounded-lg bg-gray-50/50 focus:bg-white focus:border-blue-500 outline-none"
+                        className="w-full rounded-lg border border-[#d9bfb7] bg-[#f7e9e2] px-2.5 py-1.5 text-xs outline-none focus:border-[#800000] focus:bg-[#fffaf7]"
                     >
                         <option value="">{t("noneUseAccountOnly")}</option>
                         {namespaces.map((ns) => (

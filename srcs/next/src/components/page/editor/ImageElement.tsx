@@ -184,7 +184,7 @@ export default function ImageElement({ attributes, children, element }: any) {
             <div style={{ width: `${width}px`, maxWidth: "100%", boxSizing: "border-box" }}>
                 {savedUrl && !hasError && !isEditing ? (
                     /* Vue Édition : Image chargée avec contrôles */
-                    <div className={`relative group border-2 rounded-lg overflow-hidden ${selected && focused ? "border-blue-500 shadow-md" : "border-transparent"}`}>
+                    <div className={`relative group border-2 rounded-lg overflow-hidden ${selected && focused ? "border-[#800000] shadow-md" : "border-transparent"}`}>
                         <img
                             src={savedUrl}
                             alt={alt}
@@ -194,43 +194,43 @@ export default function ImageElement({ attributes, children, element }: any) {
 
                         {/* Toolbar d'édition sur l'image */}
                         <div className="absolute top-2 right-2 bg-white/90 backdrop-blur border rounded-lg shadow p-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                            <button type="button" onClick={moveUp} className="p-1 hover:bg-gray-100 text-gray-600 rounded" title={t("moveImageUp")}>
+                            <button type="button" onClick={moveUp} className="p-1 hover:bg-[#f7e9e2] text-[#6f4d44] rounded" title={t("moveImageUp")}>
                                 <ArrowUp size={14} />
                             </button>
-                            <button type="button" onClick={moveDown} className="p-1 hover:bg-gray-100 text-gray-600 rounded" title={t("moveImageDown")}>
+                            <button type="button" onClick={moveDown} className="p-1 hover:bg-[#f7e9e2] text-[#6f4d44] rounded" title={t("moveImageDown")}>
                                 <ArrowDown size={14} />
                             </button>
-                            <button type="button" onClick={() => { setTempUrl(savedUrl); setIsEditing(true); }} className="p-1 hover:bg-gray-100 text-gray-600 rounded" title={t("editUrl")}>
+                            <button type="button" onClick={() => { setTempUrl(savedUrl); setIsEditing(true); }} className="p-1 hover:bg-[#f7e9e2] text-[#6f4d44] rounded" title={t("editUrl")}>
                                 <Pencil size={14} />
                             </button>
 
-                            <div className="w-[1px] h-4 bg-gray-200 mx-0.5" />
+                            <div className="w-[1px] h-4 bg-[#ead7d0] mx-0.5" />
 
-                            <button type="button" onClick={() => updateElement({ align: "left" })} className={`p-1 rounded ${align === "left" ? "bg-blue-100 text-blue-600" : "hover:bg-gray-100 text-gray-600"}`} title={t("alignLeft")}>
+                            <button type="button" onClick={() => updateElement({ align: "left" })} className={`p-1 rounded ${align === "left" ? "bg-[#f7e9e2] text-[#800000]" : "hover:bg-[#f7e9e2] text-[#6f4d44]"}`} title={t("alignLeft")}>
                                 <AlignLeft size={14} />
                             </button>
-                            <button type="button" onClick={() => updateElement({ align: "center" })} className={`p-1 rounded ${align === "center" ? "bg-blue-100 text-blue-600" : "hover:bg-gray-100 text-gray-600"}`} title={t("center")}>
+                            <button type="button" onClick={() => updateElement({ align: "center" })} className={`p-1 rounded ${align === "center" ? "bg-[#f7e9e2] text-[#800000]" : "hover:bg-[#f7e9e2] text-[#6f4d44]"}`} title={t("center")}>
                                 <AlignCenter size={14} />
                             </button>
-                            <button type="button" onClick={() => updateElement({ align: "right" })} className={`p-1 rounded ${align === "right" ? "bg-blue-100 text-blue-600" : "hover:bg-gray-100 text-gray-600"}`} title={t("alignRight")}>
+                            <button type="button" onClick={() => updateElement({ align: "right" })} className={`p-1 rounded ${align === "right" ? "bg-[#f7e9e2] text-[#800000]" : "hover:bg-[#f7e9e2] text-[#6f4d44]"}`} title={t("alignRight")}>
                                 <AlignRight size={14} />
                             </button>
 
-                            <div className="w-[1px] h-4 bg-gray-200 mx-0.5" />
+                            <div className="w-[1px] h-4 bg-[#ead7d0] mx-0.5" />
 
                             {SIZE_PRESETS.map((preset) => (
                                 <button
                                     key={preset.label}
                                     type="button"
                                     onClick={() => applyPresetWidth(preset.value)}
-                                    className={`px-1.5 py-0.5 rounded text-[10px] font-semibold ${Math.abs(width - preset.value) < 10 ? "bg-blue-100 text-blue-600" : "hover:bg-gray-100 text-gray-600"}`}
+                                    className={`px-1.5 py-0.5 rounded text-[10px] font-semibold ${Math.abs(width - preset.value) < 10 ? "bg-[#f7e9e2] text-[#800000]" : "hover:bg-[#f7e9e2] text-[#6f4d44]"}`}
                                     title={`${t("sizeLabel")} ${preset.label} (${preset.value}px)`}
                                 >
                                     {preset.label}
                                 </button>
                             ))}
 
-                            <div className="w-[1px] h-4 bg-gray-200 mx-0.5" />
+                            <div className="w-[1px] h-4 bg-[#ead7d0] mx-0.5" />
 
                             <button type="button" onClick={deleteImage} className="p-1 hover:bg-red-50 text-red-500 rounded" title={t("deleteBlock")}>
                                 <Trash2 size={14} />
@@ -240,7 +240,7 @@ export default function ImageElement({ attributes, children, element }: any) {
                         {/* Poignée de redimensionnement */}
                         <div
                             onMouseDown={handleResizeStart}
-                            className="absolute bottom-1 right-1 w-4 h-4 rounded-sm bg-blue-500 border-2 border-white shadow cursor-nwse-resize opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-20"
+                            className="absolute bottom-1 right-1 w-4 h-4 rounded-sm bg-[#800000] border-2 border-[#fffaf7] shadow cursor-nwse-resize opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-20"
                             title={t("dragToResize")}
                         >
                             <Move size={9} className="text-white" />
@@ -255,7 +255,7 @@ export default function ImageElement({ attributes, children, element }: any) {
                     </div>
                 ) : (
                     /* Vue Édition : Formulaire de saisie d'URL */
-                    <div className={`p-4 border-2 border-dashed rounded-xl bg-gray-50 flex flex-col gap-3 min-w-[300px] ${selected && focused ? "border-blue-500 ring-2 ring-blue-100" : "border-gray-300"}`}>
+                    <div className={`p-4 border-2 border-dashed rounded-xl bg-[#f7e9e2] flex flex-col gap-3 min-w-[300px] ${selected && focused ? "border-[#800000] ring-2 ring-[#ead7d0]" : "border-[#d9bfb7]"}`}>
                         <div className="flex items-center justify-between text-xs font-semibold text-gray-500">
                             <span className="flex items-center gap-1.5"><ImageIcon size={14} /> {isEditing ? t("editImage") : t("addImage")}</span>
                             <button type="button" onClick={deleteImage} className="text-red-500 hover:text-red-700">{t("delete")}</button>
@@ -277,12 +277,12 @@ export default function ImageElement({ attributes, children, element }: any) {
                                             handleConfirmUrl();
                                         }
                                     }}
-                                    className={`text-xs p-2 bg-white border rounded-lg outline-none flex-1 ${hasError ? "border-red-400 focus:border-red-500" : "focus:border-blue-500"}`}
+                                    className={`text-xs p-2 bg-[#fffaf7] border border-[#d9bfb7] rounded-lg outline-none flex-1 ${hasError ? "border-red-400 focus:border-red-500" : "focus:border-[#800000]"}`}
                                 />
                                 <button
                                     type="button"
                                     onClick={handleConfirmUrl}
-                                    className="px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium flex items-center justify-center transition"
+                                    className="px-3 bg-[#800000] hover:bg-[#5f0000] text-[#fffaf7] rounded-lg text-xs font-medium flex items-center justify-center transition"
                                 >
                                     <Check size={14} />
                                 </button>
@@ -300,7 +300,7 @@ export default function ImageElement({ attributes, children, element }: any) {
                             placeholder={t("altTextPlaceholder")}
                             value={alt}
                             onChange={(e) => updateElement({ alt: e.target.value })}
-                            className="text-xs p-2 bg-white border rounded-lg outline-none focus:border-blue-500"
+                            className="text-xs p-2 bg-[#fffaf7] border border-[#d9bfb7] rounded-lg outline-none focus:border-[#800000]"
                         />
 						<UploadButton
 							onUploadSuccess={(path) => {
@@ -401,8 +401,8 @@ export function UploadButton({ onUploadSuccess }: { onUploadSuccess: (path: stri
 				transition-colors duration-200
 				${
 					isDragging
-						? "border-blue-500 bg-blue-50"
-						: "border-gray-200 bg-white"
+                        ? "border-[#800000] bg-[#f7e9e2]"
+                        : "border-[#d9bfb7] bg-[#fffaf7]"
 				}
 			`}
 		>

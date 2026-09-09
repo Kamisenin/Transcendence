@@ -65,6 +65,8 @@ export default function PagePermissions({ pageId, ownerAccountId, initialPermiss
     const [selectedOrgRoleId, setSelectedOrgRoleId] = useState<number | null>(null);
     const [tagAccess, setTagAccess] = useState<TagAccessEntry[]>([]);
     const [orgAccess, setOrgAccess] = useState<OrgAccessEntry[]>([]);
+    const [tagQuery, setTagQuery] = useState('');
+    const [orgQuery, setOrgQuery] = useState('');
 
     useEffect(() => {
         (async () => {
@@ -162,6 +164,10 @@ export default function PagePermissions({ pageId, ownerAccountId, initialPermiss
         startTransition(async () => {
             try {
                 const result = await addOrgRolePageAccess(pageId, selectedOrgId, selectedOrgRoleId, level);
+                if ('request' in result && result.request) {
+                    setError(t("requestSent"));
+                    return;
+                }
                 setOrgAccess((prev) => [...prev.filter(a => a.orgId !== selectedOrgId), result as any]);
             } catch (e: any) {
                 setError(e.message || t("addFailed"));
@@ -183,6 +189,8 @@ export default function PagePermissions({ pageId, ownerAccountId, initialPermiss
 
     const currentTagRoles = grantableTags.find(tag => tag.id === selectedTagId)?.roles ?? [];
     const currentOrgRoles = grantableOrgs.find(org => org.id === selectedOrgId)?.roles ?? [];
+    const filteredTags = grantableTags.filter(tag => tag.name.toLowerCase().includes(tagQuery.trim().toLowerCase()));
+    const filteredOrgs = grantableOrgs.filter(org => org.name.toLowerCase().includes(orgQuery.trim().toLowerCase()));
 
     return (
         <div className="border rounded-lg p-3 bg-gray-50">
@@ -243,7 +251,7 @@ export default function PagePermissions({ pageId, ownerAccountId, initialPermiss
                                     <button
                                         onClick={() => handleAdd(u.accountId)}
                                         disabled={isPending}
-                                        className="text-xs bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed text-white px-2.5 py-1 rounded"
+                                        className="text-xs bg-[#800000] hover:bg-[#5f0000] disabled:opacity-40 disabled:cursor-not-allowed text-[#fffaf7] px-2.5 py-1 rounded"
                                     >
                                         {t("add")}
                                     </button>
@@ -256,16 +264,10 @@ export default function PagePermissions({ pageId, ownerAccountId, initialPermiss
 
             {mode === 'tagRole' && (
                 <div className="grid grid-cols-2 gap-2 mb-2">
-                    <select
-                        value={selectedTagId ?? ''}
-                        onChange={(e) => { setSelectedTagId(Number(e.target.value) || null); setSelectedTagRoleId(null); }}
-                        className="w-full min-w-0 border rounded px-2 py-1.5 text-sm bg-white truncate"
-                    >
-                        <option value="">{grantableTags.length ? t("selectTag") : t("noTagsAvailable")}</option>
-                        {grantableTags.map(tag => (
-                            <option key={tag.id} value={tag.id}>{tag.name}</option>
-                        ))}
-                    </select>
+                    <div className="relative">
+                        <input value={selectedTagId ? grantableTags.find(tag => tag.id === selectedTagId)?.name ?? '' : tagQuery} onChange={(e) => { setSelectedTagId(null); setSelectedTagRoleId(null); setTagQuery(e.target.value); }} placeholder={t("searchTag")} className="w-full min-w-0 border rounded px-2 py-1.5 text-sm bg-white" />
+                        {!selectedTagId && tagQuery.trim() && <div className="absolute z-20 mt-1 max-h-48 w-full overflow-y-auto border rounded bg-white shadow">{filteredTags.map(tag => <button type="button" key={tag.id} onClick={() => { setSelectedTagId(tag.id); setTagQuery(''); setSelectedTagRoleId(null); }} className="block w-full px-2 py-1.5 text-left text-sm hover:bg-gray-100">#{tag.name}</button>)}</div>}
+                    </div>
                     <select
                         value={selectedTagRoleId ?? ''}
                         onChange={(e) => setSelectedTagRoleId(Number(e.target.value) || null)}
@@ -280,7 +282,7 @@ export default function PagePermissions({ pageId, ownerAccountId, initialPermiss
                     <button
                         onClick={handleAddTagRole}
                         disabled={isPending || !selectedTagId || !selectedTagRoleId}
-                        className="col-span-2 text-xs bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed text-white px-2.5 py-1.5 rounded"
+                        className="col-span-2 text-xs bg-[#800000] hover:bg-[#5f0000] disabled:opacity-40 disabled:cursor-not-allowed text-[#fffaf7] px-2.5 py-1.5 rounded"
                     >
                         {t("add")}
                     </button>
@@ -289,16 +291,10 @@ export default function PagePermissions({ pageId, ownerAccountId, initialPermiss
 
             {mode === 'orgRole' && (
                 <div className="grid grid-cols-2 gap-2 mb-2">
-                    <select
-                        value={selectedOrgId ?? ''}
-                        onChange={(e) => { setSelectedOrgId(Number(e.target.value) || null); setSelectedOrgRoleId(null); }}
-                        className="w-full min-w-0 border rounded px-2 py-1.5 text-sm bg-white truncate"
-                    >
-                        <option value="">{grantableOrgs.length ? t("selectOrgLabel") : t("noOrgsAvailable")}</option>
-                        {grantableOrgs.map(org => (
-                            <option key={org.id} value={org.id}>{org.name}</option>
-                        ))}
-                    </select>
+                    <div className="relative">
+                        <input value={selectedOrgId ? grantableOrgs.find(org => org.id === selectedOrgId)?.name ?? '' : orgQuery} onChange={(e) => { setSelectedOrgId(null); setSelectedOrgRoleId(null); setOrgQuery(e.target.value); }} placeholder={t("searchOrganization")} className="w-full min-w-0 border rounded px-2 py-1.5 text-sm bg-white" />
+                        {!selectedOrgId && orgQuery.trim() && <div className="absolute z-20 mt-1 max-h-48 w-full overflow-y-auto border rounded bg-white shadow">{filteredOrgs.map(org => <button type="button" key={org.id} onClick={() => { setSelectedOrgId(org.id); setOrgQuery(''); setSelectedOrgRoleId(null); }} className="block w-full px-2 py-1.5 text-left text-sm hover:bg-gray-100">{org.name}</button>)}</div>}
+                    </div>
                     <select
                         value={selectedOrgRoleId ?? ''}
                         onChange={(e) => setSelectedOrgRoleId(Number(e.target.value) || null)}
@@ -313,7 +309,7 @@ export default function PagePermissions({ pageId, ownerAccountId, initialPermiss
                     <button
                         onClick={handleAddOrgRole}
                         disabled={isPending || !selectedOrgId || !selectedOrgRoleId}
-                        className="col-span-2 text-xs bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed text-white px-2.5 py-1.5 rounded"
+                        className="col-span-2 text-xs bg-[#800000] hover:bg-[#5f0000] disabled:opacity-40 disabled:cursor-not-allowed text-[#fffaf7] px-2.5 py-1.5 rounded"
                     >
                         {t("add")}
                     </button>

@@ -73,6 +73,10 @@ model User {
   tagMemberships          TagMember[]
   tagPageRequestsMade     TagPageRequest[]     @relation("RequestedBy")
   tagPageRequestsReviewed TagPageRequest[]     @relation("ReviewedBy")
+  orgTagRequestsMade      OrgTagRequest[]      @relation("OrgTagRequestedBy")
+  orgTagRequestsReviewed  OrgTagRequest[]      @relation("OrgTagReviewedBy")
+  orgPageRequestsMade     OrgPageRequest[]     @relation("OrgPageRequestedBy")
+  orgPageRequestsReviewed OrgPageRequest[]     @relation("OrgPageReviewedBy")
   tagPermissions          TagPermission[]
   ownedTags               Tag[]                @relation("TagOwner")
   userInterests           UserTagInterest[]
@@ -124,7 +128,7 @@ model Tag {
   name              String              @unique
   description       String?
   createdAt         DateTime            @default(now()) @map("created_at")
-  namespace         String?             @unique
+  namespace         String              @unique
   color             Int?
   orgTagAccess      OrgTagAccess[]
   orgTagCapability  OrgTagCapability[]
@@ -132,6 +136,7 @@ model Tag {
   tagPageAccess     TagPageAccess[]
   tagPageCapability TagPageCapability[]
   tagPageRequests   TagPageRequest[]
+  orgTagRequests    OrgTagRequest[]
   tagPages          TagPage[]
   permissions       TagPermission[]
   roles             TagRole[]
@@ -158,6 +163,8 @@ model TagRole {
   members                    TagMember[]
   minRoleForPageAccess       TagPageAccess[]
   exactRoleForPageCapability TagPageCapability[]
+  orgTagCapabilities         OrgTagCapability[]
+  orgTagRequests             OrgTagRequest[]
   tag                        Tag                 @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   @@unique([tagId, hierarchyLevel])
@@ -216,6 +223,7 @@ model Page {
   tagPageAccess     TagPageAccess[]
   tagPageCapability TagPageCapability[]
   tagPageRequests   TagPageRequest[]
+  orgPageRequests   OrgPageRequest[]
   tagPages          TagPage[]
 
   @@map("pages")
@@ -320,6 +328,46 @@ model OrgPageAccess {
   @@map("org_page_access")
 }
 
+model OrgTagRequest {
+  id          Int           @id @default(autoincrement())
+  orgId       Int           @map("org_id")
+  tagId       Int           @map("tag_id")
+  minRoleId   Int           @map("min_role_id")
+  tagRoleId   Int?          @map("tag_role_id")
+  permissions PermissionLevel?
+  requestedBy String        @map("requested_by")
+  status      RequestStatus @default(PENDING)
+  reviewedBy  String?       @map("reviewed_by")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  organization Organization     @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  tag          Tag              @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  minRole      OrganizationRole @relation(fields: [minRoleId], references: [id])
+  tagRole      TagRole?         @relation(fields: [tagRoleId], references: [id])
+  requester    User             @relation("OrgTagRequestedBy", fields: [requestedBy], references: [user_id])
+  reviewer     User?            @relation("OrgTagReviewedBy", fields: [reviewedBy], references: [user_id])
+
+  @@map("org_tag_requests")
+}
+
+model OrgPageRequest {
+  id          Int           @id @default(autoincrement())
+  orgId       Int           @map("org_id")
+  pageId      Int           @map("page_id")
+  minRoleId   Int           @map("min_role_id")
+  permissions PermissionLevel
+  requestedBy String        @map("requested_by")
+  status      RequestStatus @default(PENDING)
+  reviewedBy  String?       @map("reviewed_by")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  organization Organization     @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  page         Page             @relation(fields: [pageId], references: [pageId], onDelete: Cascade)
+  minRole      OrganizationRole @relation(fields: [minRoleId], references: [id])
+  requester    User             @relation("OrgPageRequestedBy", fields: [requestedBy], references: [user_id])
+  reviewer     User?            @relation("OrgPageReviewedBy", fields: [reviewedBy], references: [user_id])
+
+  @@map("org_page_requests")
+}
+
 model TagPageCapability {
   pageId               Int     @map("page_id")
   tagId                Int     @map("tag_id")
@@ -359,6 +407,8 @@ model Organization {
   orgPageCapability OrgPageCapability[]
   orgTagAccess      OrgTagAccess[]
   orgTagCapability  OrgTagCapability[]
+  orgTagRequests    OrgTagRequest[]
+  orgPageRequests   OrgPageRequest[]
   members           OrganizationMember[]
   roles             OrganizationRole[]
   owner             User                 @relation("OrganizationOwner", fields: [ownerToken], references: [user_id])
@@ -381,6 +431,8 @@ model OrganizationRole {
   roleForOrgPageCapability OrgPageCapability[]
   minRoleForOrgTagAccess   OrgTagAccess[]
   roleForOrgTagCapability  OrgTagCapability[]
+  orgTagRequests            OrgTagRequest[]
+  orgPageRequests           OrgPageRequest[]
   members                  OrganizationMember[]
   organization             Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
@@ -417,14 +469,18 @@ model OrgTagCapability {
   orgId               Int              @map("org_id")
   tagId               Int              @map("tag_id")
   roleId              Int              @map("role_id")
+  tagRoleId           Int?             @map("tag_role_id")
   canManageTagMembers Boolean          @default(false) @map("can_manage_tag_members")
   canManageTagRoles   Boolean          @default(false) @map("can_manage_tag_roles")
+  canEditInfo         Boolean          @default(false) @map("can_edit_info")
+  canDeleteTag        Boolean          @default(false) @map("can_delete_tag")
   canAddPage          Boolean          @default(false) @map("can_add_page")
   canRevokePage       Boolean          @default(false) @map("can_revoke_page")
   canManagePageGrants Boolean          @default(false) @map("can_manage_page_grants")
   canReviewRequests   Boolean          @default(false) @map("can_review_requests")
   organization        Organization     @relation(fields: [orgId], references: [id], onDelete: Cascade)
   role                OrganizationRole @relation(fields: [roleId], references: [id])
+  tagRole             TagRole?         @relation(fields: [tagRoleId], references: [id])
   tag                 Tag              @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   @@id([orgId, tagId, roleId])

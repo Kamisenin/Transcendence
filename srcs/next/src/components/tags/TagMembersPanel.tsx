@@ -64,7 +64,7 @@ export default function TagMembersPanel({ tagId, members, roles, capabilities, c
     return (
         <div>
             {error && (
-                <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded">
+                <div className="mb-4 rounded-md border border-[#e6b8b0] bg-[#fff1ef] p-3 text-sm text-[#a33a2b]">
                     {error}
                 </div>
             )}
@@ -81,7 +81,7 @@ export default function TagMembersPanel({ tagId, members, roles, capabilities, c
 
             <div className="divide-y border rounded-lg overflow-hidden">
                 {members.length === 0 && (
-                    <p className="p-4 text-sm text-gray-400">{t('noMemberYet')}</p>
+                    <p className="p-4 text-sm text-[#8a6b63]">{t('noMemberYet')}</p>
                 )}
 
                 {members.map(member => {
@@ -90,12 +90,12 @@ export default function TagMembersPanel({ tagId, members, roles, capabilities, c
                         (capabilities.isOwner || capabilities.rank > member.role.hierarchyLevel);
 
                     return (
-                        <div key={member.userToken} className="flex items-center justify-between p-3">
+                        <div key={member.userToken} className="flex items-center justify-between gap-4 p-3.5 transition hover:bg-[#fffaf7]">
                             <div className="flex items-center gap-3">
                                 <UserAvatar accountId={member.user.accountId} imgLink={member.user.imgLink} alt={member.user.username} size={32} className="h-8 w-8" />
                                 <span className="text-sm font-medium">{member.user.username}</span>
                                 {member.userToken === currentUserToken && (
-                                    <span className="text-xs text-gray-400">({t('you')})</span>
+                                    <span className="text-xs text-[#a89088]">({t('you')})</span>
                                 )}
                             </div>
 
@@ -106,7 +106,7 @@ export default function TagMembersPanel({ tagId, members, roles, capabilities, c
                                             value={member.roleId}
                                             disabled={isPending}
                                             onChange={(e) => handleRoleChange(member.userToken, Number(e.target.value))}
-                                            className="text-sm border rounded px-2 py-1 bg-white"
+                                            className="rounded-md border border-[#d9bfb7] bg-[#fffaf7] px-2 py-1 text-sm outline-none focus:border-[#800000]"
                                         >
                                             {/* le rôle actuel doit toujours apparaître, même si non "assignable" désormais */}
                                             {!assignableRoles.some(r => r.id === member.roleId) && (
@@ -119,13 +119,13 @@ export default function TagMembersPanel({ tagId, members, roles, capabilities, c
                                         <button
                                             onClick={() => handleRemove(member.userToken)}
                                             disabled={isPending}
-                                            className="text-xs text-red-500 hover:text-red-700 px-2"
+                                            className="rounded-md px-2 py-1 text-xs font-semibold text-[#a33a2b] hover:bg-[#fff1ef]"
                                         >
                                             {t('remove')}
                                         </button>
                                     </>
                                 ) : (
-                                    <span className="text-sm text-gray-500">{member.role.roleName}</span>
+                                    <span className="text-sm text-[#8a6b63]">{member.role.roleName}</span>
                                 )}
                             </div>
                         </div>

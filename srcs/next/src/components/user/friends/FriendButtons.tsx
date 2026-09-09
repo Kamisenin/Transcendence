@@ -14,6 +14,9 @@ type Props = {
 export default async function FriendButtons({ target_id, user_id } : Props)
 {
     const t = await getTranslations("Friend");
+
+    if (user_id === target_id)
+        return null;
     const relation = await getRelation(user_id, target_id);
     if (!relation)
         return (<AddFriendButton sender_id={user_id} receiver_id={target_id}/>)
@@ -31,6 +34,5 @@ export default async function FriendButtons({ target_id, user_id } : Props)
             </button>
         );
     }
-    
     return <RemoveFriendButton friendship_id={relation.id} />;
 }

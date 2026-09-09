@@ -92,16 +92,16 @@ export default function WikiEditor({ id, value, onValueChange, isActive, onFocus
     return (
         <div
             className={[
-                "group relative h-full rounded border bg-white p-3 transition shadow-sm overflow-x-auto max-w-full flex flex-col",
+                "group relative h-full rounded border bg-[#fffaf7] p-3 transition shadow-sm overflow-x-auto max-w-full flex flex-col",
                 isActive
-                    ? "border-blue-500 ring-2 ring-blue-100"
-                    : "border-gray-200 hover:border-gray-300"
+                    ? "border-[#800000] ring-2 ring-[#ead7d0]"
+                    : "border-[#d9bfb7] hover:border-[#a98275]"
             ].join(" ")}
         >
-            <div className="absolute left-2 top-2 z-10 flex flex-col items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 backdrop-blur-sm rounded border border-gray-100 shadow-xs p-0.5">
+            <div className="absolute left-2 top-2 z-10 flex flex-col items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-[#fffaf7]/90 backdrop-blur-sm rounded border border-[#ead7d0] shadow-xs p-0.5">
                 <button
                     type="button"
-                    className="drag-handle cursor-grab active:cursor-grabbing p-1 rounded hover:bg-gray-100 text-gray-400"
+                    className="drag-handle cursor-grab active:cursor-grabbing p-1 rounded hover:bg-[#f7e9e2] text-[#a89088]"
                     title={t("moveBlock")}
                 >
                     <GripVertical size={14} />
@@ -113,7 +113,7 @@ export default function WikiEditor({ id, value, onValueChange, isActive, onFocus
                             e.stopPropagation();
                             onDelete(id);
                         }}
-                        className="p-1 rounded hover:bg-red-50 text-red-400 hover:text-red-600 transition"
+                        className="p-1 rounded hover:bg-[#fff1ef] text-[#c26b5f] hover:text-[#a33a2b] transition"
                         title={t("deleteBlock")}
                     >
                         <Trash2 size={14} />
@@ -130,7 +130,7 @@ export default function WikiEditor({ id, value, onValueChange, isActive, onFocus
                     }}
                 >
                     <Editable
-                        className="slate-editor-content w-full h-full outline-none text-gray-800 leading-normal"
+                        className="slate-editor-content w-full h-full outline-none text-[#3f2924] leading-normal"
                         placeholder={t("typeHere")}
                         onFocus={() => onFocus(id)}
                         renderElement={renderElement}

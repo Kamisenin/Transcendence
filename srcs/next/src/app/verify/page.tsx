@@ -38,30 +38,39 @@ export default function VerifyPage() {
         setMessage(res.ok ? t("codeResent") : (data.error || tCommon("somethingWentWrong")));
     }
 
+    function handleSkip() {
+        router.push("/");
+    }
+
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen">
-            <h1 className="text-2xl font-bold mb-4">{t("title")}</h1>
-            <p className="text-sm text-gray-600 mb-4">{t("subtitle")}</p>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-3 w-80">
+        <main className="flex min-h-screen items-center justify-center bg-[#f0e0d6] px-4 py-20">
+            <div className="w-full max-w-md border border-[#d9bfb7] border-t-4 border-t-[#800000] bg-[#fffaf7] p-6 shadow-[0_2px_10px_rgba(128,0,0,0.08)]">
+                <h1 className="mb-2 text-2xl font-bold text-[#800000]">{t("title")}</h1>
+                <p className="mb-6 text-sm text-[#6f4d44]">{t("subtitle")}</p>
+            <form onSubmit={handleSubmit} className="flex w-full flex-col gap-3">
                 <input
                     type="text"
                     value={code}
                     onChange={(e) => setCode(e.target.value)}
                     placeholder=""
                     maxLength={6}
-                    className="border p-2 rounded text-black text-center tracking widest"
+                    className="border border-[#d9bfb7] bg-white p-2 text-center text-black tracking-[0.35em] outline-none focus:border-[#800000] focus:ring-2 focus:ring-[#e6a817]/40"
                     required/> 
                 <button
                     type="submit"
                     disabled={loading}
-                    className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
+                    className="bg-[#800000] p-2 font-semibold text-white transition-colors hover:bg-[#650000] disabled:cursor-not-allowed disabled:opacity-60">
                         {loading ? t("verifying") : t("verify")}
                     </button>
             </form>
-            <button onClick={handleResend} className="text-sm text-blue-500 underline mt-4">
+            <button onClick={handleResend} className="mt-4 text-sm font-medium text-[#800000] underline underline-offset-2 hover:text-[#650000]">
                 {t("resendCode")}
             </button>
-            {message && <p className="text-sm  mt-4">{message}</p>}
-        </div>
+            <button onClick={handleSkip} className="mt-3 w-full border border-[#a98275] p-2 text-sm font-semibold text-[#3f2924] transition-colors hover:bg-[#f7e9e2]">
+                {t("skip")}
+            </button>
+            {message && <p className="mt-4 text-sm text-[#6f4d44]">{message}</p>}
+            </div>
+        </main>
     );
 }

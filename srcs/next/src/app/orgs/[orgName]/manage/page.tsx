@@ -15,6 +15,8 @@ export default async function OrgManagePage({ params }: Props) {
     const sessionUser = await getSessionUser(await getSessionCookie());
     const canManage =
         (await userHasOrgPermission(org.id, "canManageMembers", sessionUser)) ||
+        (await userHasOrgPermission(org.id, "canManageOrgTagGrants", sessionUser)) ||
+        (await userHasOrgPermission(org.id, "canManageOrgPageGrants", sessionUser)) ||
         org.ownerToken === sessionUser?.user_id;
 
     return (

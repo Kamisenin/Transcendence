@@ -16,7 +16,7 @@ export default function TagsPageClient() {
             <button
                 type="button"
                 onClick={() => setIsOpen(true)}
-                className="inline-flex items-center gap-1.5 rounded-md border border-black/0 bg-[#3b3b3b] px-3 py-[7px] text-sm font-medium text-white shadow-sm hover:bg-[#222222] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0969da] focus-visible:ring-offset-2"
+                className="inline-flex items-center gap-1.5 rounded-md bg-[#800000] px-3 py-[7px] text-sm font-semibold text-[#fffaf7] shadow-sm transition hover:bg-[#5f0000] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#a64b42] focus-visible:ring-offset-2"
             >
                 <Plus size={14} />
                 {t('newTag')}

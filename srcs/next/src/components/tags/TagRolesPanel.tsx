@@ -107,7 +107,7 @@ export default function TagRolesPanel({ tagId, roles, capabilities }: Props) {
     return (
         <div>
             {error && (
-                <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded">
+                <div className="mb-4 rounded-md border border-[#e6b8b0] bg-[#fff1ef] p-3 text-sm text-[#a33a2b]">
                     {error}
                 </div>
             )}
@@ -118,14 +118,14 @@ export default function TagRolesPanel({ tagId, roles, capabilities }: Props) {
                         <div className="flex items-center justify-between">
                             <div>
                                 <span className="font-medium text-sm">{role.roleName}</span>
-                                <span className="ml-2 text-xs text-gray-400">{t('hierarchyLevelPlaceholder')} {role.hierarchyLevel}</span>
+                                <span className="ml-2 text-xs text-[#a89088]">{t('hierarchyLevelPlaceholder')} {role.hierarchyLevel}</span>
                             </div>
                             {canManage(role) && (
                                 <div className="flex gap-2">
-                                    <button onClick={() => startEdit(role)} className="text-xs text-blue-600 hover:underline">
+                                    <button onClick={() => startEdit(role)} className="rounded-md px-2 py-1 text-xs font-semibold text-[#800000] hover:bg-[#f7e9e2]">
                                         {t('editTagInfo')}
                                     </button>
-                                    <button onClick={() => handleDelete(role.id)} className="text-xs text-red-500 hover:underline">
+                                    <button onClick={() => handleDelete(role.id)} className="rounded-md px-2 py-1 text-xs font-semibold text-[#a33a2b] hover:bg-[#fff1ef]">
                                         {t('deleteTag')}
                                     </button>
                                 </div>
@@ -138,14 +138,14 @@ export default function TagRolesPanel({ tagId, roles, capabilities }: Props) {
             {capabilities.canManageRoles && editingId === null && (
                 <button
                     onClick={startCreate}
-                    className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg"
+                    className="rounded-md bg-[#800000] px-3 py-1.5 text-sm font-semibold text-[#fffaf7] transition hover:bg-[#5f0000]"
                 >
                     {t('newRole')}
                 </button>
             )}
 
             {editingId !== null && (
-                <div className="mt-4 border rounded-lg p-4 bg-gray-50">
+                <div className="mt-4 rounded-lg border border-[#d9bfb7] bg-[#f7e9e2] p-4">
                     <div className="grid grid-cols-2 gap-3 mb-3">
                         <input
                             type="text"
@@ -160,7 +160,7 @@ export default function TagRolesPanel({ tagId, roles, capabilities }: Props) {
                             value={form.hierarchyLevel}
                             disabled={!capabilities.isOwner}
                             onChange={(e) => setForm({ ...form, hierarchyLevel: Number(e.target.value) })}
-                            className="border rounded px-2 py-1 text-sm disabled:bg-gray-100"
+                            className="rounded-md border border-[#d9bfb7] bg-[#fffaf7] px-2 py-1 text-sm outline-none focus:border-[#800000] disabled:bg-[#ead7d0]"
                             title={!capabilities.isOwner ? t('hierarchyHint') : ''}
                         />
                     </div>
@@ -182,13 +182,13 @@ export default function TagRolesPanel({ tagId, roles, capabilities }: Props) {
                         <button
                             onClick={handleSubmit}
                             disabled={isPending || !form.roleName.trim()}
-                            className="text-sm bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-3 py-1.5 rounded-lg"
+                            className="rounded-md bg-[#800000] px-3 py-1.5 text-sm font-semibold text-[#fffaf7] transition hover:bg-[#5f0000] disabled:opacity-50"
                         >
                             {tCommon('save')}
                         </button>
                         <button
                             onClick={() => setEditingId(null)}
-                            className="text-sm px-3 py-1.5 rounded-lg hover:bg-gray-100"
+                            className="rounded-md px-3 py-1.5 text-sm font-semibold text-[#8a6b63] hover:bg-[#ead7d0]"
                         >
                             {tCommon('cancel')}
                         </button>

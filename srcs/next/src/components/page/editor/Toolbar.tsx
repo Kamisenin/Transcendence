@@ -123,14 +123,14 @@ const Toolbar = forwardRef<ToolbarRef, Props>(({ editor, disabled, onAddBlock },
     const btnClass = (active: boolean) => [
         "p-1.5 rounded transition",
         active
-            ? "bg-blue-50 text-blue-600 border border-blue-200 font-semibold shadow-inner"
-            : "text-gray-600 hover:bg-gray-100 border border-transparent"
+            ? "bg-[#f7e9e2] text-[#800000] border border-[#d9bfb7] font-semibold shadow-inner"
+            : "text-[#6f4d44] hover:bg-[#f7e9e2] border border-transparent"
     ].join(" ");
 
     return (
         <div
             className={[
-                "sticky top-17 mx-auto my-4 z-40 flex flex-wrap items-center gap-2 bg-white border rounded-xl shadow-md px-4 py-1.5 transition-all max-w-max",
+                "sticky top-17 mx-auto my-4 z-40 flex flex-wrap items-center gap-2 bg-[#fffaf7] border border-[#d9bfb7] rounded-xl shadow-md px-4 py-1.5 transition-all max-w-max",
                 disabled ? "opacity-0 pointer-events-none translate-y-[-10px]" : "opacity-100 translate-y-0"
             ].join(" ")}
         >
@@ -139,13 +139,13 @@ const Toolbar = forwardRef<ToolbarRef, Props>(({ editor, disabled, onAddBlock },
                     <button
                         type="button"
                         onClick={onAddBlock}
-                        className="flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg text-xs font-semibold border border-blue-200 transition"
+                        className="flex items-center gap-1.5 px-2.5 py-1 bg-[#f7e9e2] hover:bg-[#ead7d0] text-[#800000] rounded-lg text-xs font-semibold border border-[#d9bfb7] transition"
                         title={t("addBlock")}
                     >
                         <PlusCircle size={15} />
                         <span>{t("block")}</span>
                     </button>
-                    <div className="h-6 w-[1px] bg-gray-200 mx-0.5" />
+                    <div className="h-6 w-[1px] bg-[#ead7d0] mx-0.5" />
                 </>
             )}
             <button type="button" onClick={() => toggleMark("bold")} className={btnClass(isMarkActive("bold"))} title={t("bold")}>
@@ -161,20 +161,20 @@ const Toolbar = forwardRef<ToolbarRef, Props>(({ editor, disabled, onAddBlock },
                 <Strikethrough size={16} />
             </button>
 
-            <div className="h-6 w-[1px] bg-gray-200 mx-0.5" />
+            <div className="h-6 w-[1px] bg-[#ead7d0] mx-0.5" />
 
             <button
                 type="button"
                 onClick={insertImage}
-                className="p-1.5 rounded text-gray-600 hover:bg-gray-100 border border-transparent transition"
+                className="p-1.5 rounded text-[#6f4d44] hover:bg-[#f7e9e2] border border-transparent transition"
                 title={t("insertImage")}
             >
                 <ImageIcon size={16} />
             </button>
 
-            <div className="h-6 w-[1px] bg-gray-200 mx-0.5" />
+            <div className="h-6 w-[1px] bg-[#ead7d0] mx-0.5" />
 
-            <div className="flex items-center bg-gray-50 border rounded-lg pl-2 p-0.5 relative group/select">
+            <div className="flex items-center bg-[#f7e9e2] border border-[#d9bfb7] rounded-lg pl-2 p-0.5 relative group/select">
                 {/* Input d'écriture */}
                 <input
                     type="text"
@@ -182,12 +182,12 @@ const Toolbar = forwardRef<ToolbarRef, Props>(({ editor, disabled, onAddBlock },
                     onChange={(e) => setCurrentSize(e.target.value.replace(/\D/g, ''))} // Interdit tout sauf les chiffres
                     onBlur={(e) => applyFontSize(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && applyFontSize((e.target as HTMLInputElement).value)}
-                    className="w-7 text-center text-xs bg-transparent border-none outline-none font-semibold text-gray-700 select-all"
+                    className="w-7 text-center text-xs bg-transparent border-none outline-none font-semibold text-[#3f2924] select-all"
                 />
 
-                <span className="text-[10px] text-gray-400 font-medium pr-1 select-none">px</span>
+                <span className="text-[10px] text-[#a89088] font-medium pr-1 select-none">px</span>
 
-                <div className="relative flex items-center pr-1 text-gray-400 hover:text-gray-600 cursor-pointer">
+                <div className="relative flex items-center pr-1 text-[#a89088] hover:text-[#6f4d44] cursor-pointer">
                     <ChevronDown size={12} />
                     <select
                         value={currentSize}
@@ -202,11 +202,11 @@ const Toolbar = forwardRef<ToolbarRef, Props>(({ editor, disabled, onAddBlock },
                 </div>
 
                 {/* Boutons + / - */}
-                <div className="flex flex-col border-l border-gray-200 ml-1">
+                <div className="flex flex-col border-l border-[#d9bfb7] ml-1">
                     <button
                         type="button"
                         onClick={() => changeSizeOffset(1)}
-                        className="p-0.5 hover:bg-gray-200 text-gray-500 rounded-t flex items-center justify-center border-b border-gray-200"
+                        className="p-0.5 hover:bg-[#ead7d0] text-[#6f4d44] rounded-t flex items-center justify-center border-b border-[#d9bfb7]"
                         style={{ fontSize: '8px', lineHeight: '1' }}
                         title={t("increaseBy1px")}
                     >
@@ -215,7 +215,7 @@ const Toolbar = forwardRef<ToolbarRef, Props>(({ editor, disabled, onAddBlock },
                     <button
                         type="button"
                         onClick={() => changeSizeOffset(-1)}
-                        className="p-0.5 hover:bg-gray-200 text-gray-500 rounded-b flex items-center justify-center"
+                        className="p-0.5 hover:bg-[#ead7d0] text-[#6f4d44] rounded-b flex items-center justify-center"
                         style={{ fontSize: '8px', lineHeight: '1' }}
                         title={t("decreaseBy1px")}
                     >
@@ -224,14 +224,14 @@ const Toolbar = forwardRef<ToolbarRef, Props>(({ editor, disabled, onAddBlock },
                 </div>
             </div>
 
-            <div className="h-6 w-[1px] bg-gray-200 mx-0.5" />
+            <div className="h-6 w-[1px] bg-[#ead7d0] mx-0.5" />
 
             <div className="flex items-center gap-1" title={t("textColor")}>
                 <Type size={16} style={{ color: currentColor }} className="drop-shadow-sm ml-1" />
                 <select
                     value={currentColor}
                     onChange={(e) => applyColor(e.target.value)}
-                    className="text-xs bg-gray-50 border rounded-lg px-2 py-1 outline-none cursor-pointer font-medium text-gray-600"
+                    className="text-xs bg-[#f7e9e2] border border-[#d9bfb7] rounded-lg px-2 py-1 outline-none cursor-pointer font-medium text-[#6f4d44]"
                 >
                     {COLORS.map(color => (
                         <option key={color.value} value={color.value}>{color.name}</option>
@@ -239,14 +239,14 @@ const Toolbar = forwardRef<ToolbarRef, Props>(({ editor, disabled, onAddBlock },
                 </select>
             </div>
 
-            <div className="h-6 w-[1px] bg-gray-200 mx-1" />
+            <div className="h-6 w-[1px] bg-[#ead7d0] mx-1" />
 
             <div className="flex items-center gap-1">
                 <button
                     type="button"
                     onClick={handleUndo}
                     disabled={disabled}
-                    className="p-1.5 hover:bg-gray-100 text-gray-600 rounded disabled:opacity-40"
+                    className="p-1.5 hover:bg-[#f7e9e2] text-[#6f4d44] rounded disabled:opacity-40"
                     title={t("undo")}
                 >
                     <Undo size={16} />
@@ -255,7 +255,7 @@ const Toolbar = forwardRef<ToolbarRef, Props>(({ editor, disabled, onAddBlock },
                     type="button"
                     onClick={handleRedo}
                     disabled={disabled}
-                    className="p-1.5 hover:bg-gray-100 text-gray-600 rounded disabled:opacity-40"
+                    className="p-1.5 hover:bg-[#f7e9e2] text-[#6f4d44] rounded disabled:opacity-40"
                     title={t("redo")}
                 >
                     <Redo size={16} />

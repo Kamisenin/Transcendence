@@ -2,17 +2,18 @@ import { notFound } from 'next/navigation';
 import { prisma } from  '%/lib/prisma/prisma';
 import { requireUser } from '@/actions/tags';
 import { getTagCapabilities } from '%/lib/tag_permissions';
+import { getTagOrganizationMappings } from '@/actions/tags';
 import TagManagement from '@/components/tags/TagManagement';
 
 type Params = {
-    params: Promise<{ tagName: string }>;
+    params: Promise<{ namespace: string }>;
 };
 
 export default async function TagManagementPage({ params }: Params) {
-    const { tagName } = await params;
+    const { namespace } = await params;
     const user = await requireUser();
 
-    const tag = await prisma.tag.findUnique({ where: { name: tagName } });
+    const tag = await prisma.tag.findUnique({ where: { namespace } });
     if (!tag) notFound();
 
     const capabilities = await getTagCapabilities(tag.id, user.user_id);
@@ -20,7 +21,7 @@ export default async function TagManagementPage({ params }: Params) {
         notFound();
     }
 
-    const [roles, members, pendingRequests] = await Promise.all([
+    const [roles, members, pendingRequests, organizationMappings, organizationLink] = await Promise.all([
         prisma.tagRole.findMany({ where: { tagId: tag.id }, orderBy: { hierarchyLevel: 'desc' } }),
         prisma.tagMember.findMany({
             where: { tagId: tag.id },
@@ -35,6 +36,16 @@ export default async function TagManagementPage({ params }: Params) {
                 },
             })
             : Promise.resolve([]),
+        getTagOrganizationMappings(tag.id),
+        prisma.organization.findFirst({
+            where: {
+                OR: [
+                    { orgTagAccess: { some: { tagId: tag.id } } },
+                    { orgTagCapability: { some: { tagId: tag.id } } },
+                ],
+            },
+            select: { id: true },
+        }),
     ]);
 
     return (
@@ -45,6 +56,8 @@ export default async function TagManagementPage({ params }: Params) {
             members={members}
             pendingRequests={pendingRequests}
             currentUserToken={user.user_id}
+            organizationMappings={organizationMappings}
+            organizationLinked={organizationLink !== null}
         />
     );
 }

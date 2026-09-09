@@ -9,6 +9,8 @@ import {
     removeOrganizationMember,
     searchUsersForOrgMemberAdd,
     updateOrganizationMemberRole,
+    reviewOrganizationPageRequest,
+    reviewOrganizationTagRequest,
 } from "@/actions/orgs";
 import { OrgPermissionError } from "%/lib/errors";
 import UserAvatar from "@/components/UserAvatar";
@@ -45,6 +47,21 @@ type OrganizationManageData = {
     ownerToken: string;
     roles: Role[];
     members: Member[];
+    orgTagAccess?: Array<{
+        tagId: number;
+        tag: { id: number; name: string; roles: Array<{ id: number; roleName: string; hierarchyLevel: number }> };
+    }>;
+    orgTagCapability?: Array<{
+        orgId: number;
+        tagId: number;
+        roleId: number;
+        tagRoleId: number | null;
+        tag: { id: number; name: string; roles: Array<{ id: number; roleName: string; hierarchyLevel: number }> };
+        role: Role;
+        tagRole?: { id: number; roleName: string; hierarchyLevel: number } | null;
+    }>;
+    orgTagRequests?: Array<{ id: number; tag: { name: string }; minRole: { roleName: string }; tagRole?: { roleName: string } | null; requester: { accountId: string; username: string | null } }>;
+    orgPageRequests?: Array<{ id: number; page: { pageId: number; title: string }; minRole: { roleName: string }; requester: { accountId: string; username: string | null } }>;
 };
 
 export default function OrgManageClient({ org, canManage }: { org: OrganizationManageData; canManage: boolean }) {
@@ -59,6 +76,8 @@ export default function OrgManageClient({ org, canManage }: { org: OrganizationM
     const [toast, setToast] = useState<{ message: string; tone: "error" | "success" } | null>(null);
     const [roles, setRoles] = useState<Role[]>(org.roles ?? []);
     const [members, setMembers] = useState<Member[]>(org.members ?? []);
+    const [tagRequests, setTagRequests] = useState(org.orgTagRequests ?? []);
+    const [pageRequests, setPageRequests] = useState(org.orgPageRequests ?? []);
     const [busyKey, setBusyKey] = useState<string | null>(null);
 
     const [newRole, setNewRole] = useState({
@@ -252,10 +271,60 @@ export default function OrgManageClient({ org, canManage }: { org: OrganizationM
         }
     };
 
+    const handleTagRequest = async (id: number, accept: boolean) => {
+        setBusyKey(`tag-request-${id}`);
+        try {
+            await reviewOrganizationTagRequest(id, accept);
+            setTagRequests((prev) => prev.filter((request) => request.id !== id));
+        } catch (e) {
+            showToast(e instanceof Error ? e.message : t("permissionDenied"));
+        } finally {
+            setBusyKey(null);
+        }
+    };
+
+    const handlePageRequest = async (id: number, accept: boolean) => {
+        setBusyKey(`page-request-${id}`);
+        try {
+            await reviewOrganizationPageRequest(id, accept);
+            setPageRequests((prev) => prev.filter((request) => request.id !== id));
+        } catch (e) {
+            showToast(e instanceof Error ? e.message : t("permissionDenied"));
+        } finally {
+            setBusyKey(null);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-[#f0e0d6]">
             <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
                 <h1 className="mb-6 border-b-2 border-[#800000] pb-3 text-2xl font-semibold text-[#800000]">{org.name}</h1>
+
+                {(tagRequests.length > 0 || pageRequests.length > 0) && (
+                    <section className="mb-8 border border-[#d9bfb7] border-t-4 border-t-[#800000] bg-[#fffaf7] p-5">
+                        <h2 className="mb-4 text-sm font-semibold text-[#3f2924]">{t("pendingRequests")}</h2>
+                        <div className="space-y-3">
+                            {tagRequests.map((request) => (
+                                <div key={`tag-${request.id}`} className="flex flex-wrap items-center justify-between gap-3 border border-[#ead7d0] p-3">
+                                    <span className="text-sm text-[#3f2924]">{t("tagRequest", { tag: request.tag.name, role: request.minRole.roleName, tagRole: request.tagRole?.roleName || "—", user: request.requester.username || request.requester.accountId })}</span>
+                                    <div className="flex gap-2">
+                                        <button disabled={busyKey === `tag-request-${request.id}`} onClick={() => handleTagRequest(request.id, true)} className="border border-green-700 px-3 py-1 text-xs text-green-800">{t("accept")}</button>
+                                        <button disabled={busyKey === `tag-request-${request.id}`} onClick={() => handleTagRequest(request.id, false)} className="border border-red-700 px-3 py-1 text-xs text-red-800">{t("reject")}</button>
+                                    </div>
+                                </div>
+                            ))}
+                            {pageRequests.map((request) => (
+                                <div key={`page-${request.id}`} className="flex flex-wrap items-center justify-between gap-3 border border-[#ead7d0] p-3">
+                                    <span className="text-sm text-[#3f2924]">{t("pageRequest", { page: request.page.title || `#${request.page.pageId}`, role: request.minRole.roleName, user: request.requester.username || request.requester.accountId })}</span>
+                                    <div className="flex gap-2">
+                                        <button disabled={busyKey === `page-request-${request.id}`} onClick={() => handlePageRequest(request.id, true)} className="border border-green-700 px-3 py-1 text-xs text-green-800">{t("accept")}</button>
+                                        <button disabled={busyKey === `page-request-${request.id}`} onClick={() => handlePageRequest(request.id, false)} className="border border-red-700 px-3 py-1 text-xs text-red-800">{t("reject")}</button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+                )}
 
                 <section className="mb-8 overflow-visible border border-[#d9bfb7] border-t-4 border-t-[#800000] bg-[#fffaf7] shadow-[0_2px_8px_rgba(128,0,0,0.06)]">
                     <div className="border-b border-[#ead7d0] bg-[#f7e9e2] px-5 py-3">
@@ -343,13 +412,13 @@ export default function OrgManageClient({ org, canManage }: { org: OrganizationM
                     <div className="border-b border-[#ead7d0] bg-[#f7e9e2] px-5 py-3">
                         <h2 className="text-sm font-semibold text-[#3f2924]">{tCommon("members")}</h2>
                     </div>
-                    <ul className="divide-y divide-[#ead7d0]">
+                    <ul className="max-h-[32rem] divide-y divide-[#ead7d0] overflow-y-auto">
                         {members.map((m) => (
-                            <li key={m.userToken} className="flex flex-wrap items-center gap-3 px-5 py-3">
-                                <div className="mr-auto flex items-center gap-3">
+                            <li key={m.userToken} className="flex min-w-0 flex-wrap items-center gap-3 px-5 py-3">
+                                <div className="mr-auto flex min-w-0 items-center gap-3">
                                     <UserAvatar accountId={m.user?.accountId || m.userToken} imgLink={m.user?.imgLink} alt={m.user?.username || m.user?.accountId || m.userToken} size={32} className="h-8 w-8" />
-                                    <div>
-                                        <div className="text-sm font-medium text-[#3f2924]">
+                                    <div className="min-w-0">
+                                        <div className="truncate text-sm font-medium text-[#3f2924]">
                                             {m.user?.username || m.user?.accountId || m.userToken}
                                         </div>
                                         <div className="text-xs text-[#8a6b63]">@{m.user?.accountId || m.userToken}</div>
@@ -360,7 +429,7 @@ export default function OrgManageClient({ org, canManage }: { org: OrganizationM
                                     value={m.roleId}
                                     disabled={m.userToken === ownerToken || busyKey === `member-role-${m.userToken}`}
                                     onChange={(e) => handleChangeMemberRole(m, Number(e.target.value))}
-                                    className="border border-[#d9bfb7] bg-[#fffaf7] px-3 py-2 text-sm"
+                                    className="max-w-full min-w-0 border border-[#d9bfb7] bg-[#fffaf7] px-3 py-2 text-sm"
                                 >
                                     {sortedRoles.map((r) => (
                                         <option key={r.id} value={r.id}>
@@ -408,10 +477,10 @@ export default function OrgManageClient({ org, canManage }: { org: OrganizationM
                         </button>
                     </div>
 
-                    <div className="space-y-2 px-5 pb-5">
+                    <div className="max-h-[28rem] space-y-2 overflow-y-auto px-5 pb-5">
                         {sortedRoles.map((r) => (
-                            <div key={r.id} className="flex items-center justify-between border border-[#ead7d0] px-3 py-2">
-                <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset ${colorFor(r.id)}`}>
+                            <div key={r.id} className="flex min-w-0 items-center justify-between gap-3 border border-[#ead7d0] px-3 py-2">
+                <span className={`min-w-0 break-words rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset ${colorFor(r.id)}`}>
                   {r.roleName}
                 </span>
                                 <button

@@ -34,7 +34,7 @@ export default async function MyTagsPage() {
                             {tags.map(tag => (
                                 <li key={tag.name}>
                                     <Link
-                                        href={`/tags/${tag.name}`}
+                                        href={`/tags/${tag.namespace}`}
                                         className="flex items-center justify-between px-4 py-3 transition-colors hover:bg-[#f7e9e2]"
                                     >
                                         <div className="flex items-center gap-3 min-w-0">

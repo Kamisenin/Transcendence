@@ -58,6 +58,7 @@
 			"title": "Create an account",
 			"emailPlaceholder": "Email",
 			"accountNamePlaceholder": "Account name",
+			"accountNameInvalid": "Allowed characters: -, _, 0-9, A-Z, and a-z.",
 			"userNamePlaceholder": "Username (optional)",
 			"passwordPlaceholder": "Password",
 			"submit": "Sign up"
@@ -72,6 +73,7 @@
 			"verify": "Verify",
 			"verifying": "Verifying...",
 			"resendCode": "Resend code",
+			"skip": "Verify later",
 			"codeResent": "Code resent",
 			"emailVerified": "Email verified!"
 		},
@@ -113,6 +115,7 @@
 		"title": "My Account",
 		"manageYourAccount": "Manage your account",
 		"accountName": "Account name",
+		"accountNameInvalid": "Allowed characters: -, _, 0-9, A-Z, and a-z.",
 		"firstName": "First name",
 		"lastName": "Last name",
 		"emailVerified": "✓ Email verified",
@@ -205,6 +208,25 @@
 		,"organizationsOf": "Organizations of {user} ({count})"
 		,"permissionsLabel": "Permissions"
 		,"membersCount": "{count, plural, =0 {No members} one {# member} other {# members}}"
+		,"pendingRequests": "Pending requests"
+		,"tagRequest": "{user} requests tag #{tag}: organization role {role}, tag role {tagRole}"
+		,"pageRequest": "{user} requests access to {page} with role {role}"
+		,"accept": "Accept"
+		,"reject": "Reject"
+		,"tagPermissions": "Tag permissions"
+		,"tagPermissionsDescription": "Map organization roles to tag roles and inherit their capabilities."
+		,"selectManagedTag": "Select a managed tag"
+		,"selectOrganizationRole": "Select an organization role"
+		,"selectTagRole": "Select a tag role"
+		,"saveTagPermission": "Save role mapping"
+		,"noTagPermission": "No tag role mappings yet."
+		,"tagPermissionSaved": "Tag permissions saved"
+		,"membersPermission": "Members"
+		,"rolesPermission": "Roles"
+		,"editPermission": "Edit"
+		,"addPagePermission": "Add pages"
+		,"grantPermission": "Manage grants"
+		,"reviewPermission": "Review requests"
 	},
 	"Tags": {
 		"myTags": "My Tags",
@@ -231,6 +253,7 @@
 		"tabMembers": "Members",
 		"tabRoles": "Roles",
 		"tabRequests": "Requests",
+		"tabOrganization": "Organizations",
 		"tabSettings": "Settings",
 		"ownerBadge": "Owner",
 		"validNamespace": "Valid namespace",
@@ -264,6 +287,7 @@
 			"namespaceUnavailable": "The given namespace is unavailable.",
 			"namespaceAvailable": "Namespace available",
 			"required": "Tag name is required.",
+			"namespaceRequired": "Tag namespace is required.",
 			"nameUnavailable": "This tag name is not available.",
 			"namespaceInvalid": "The given namespace is not valid.",
 			"checkingAvailability": "Checking availability...",
@@ -300,6 +324,40 @@
 			"accept": "Accept",
 			"reject": "Reject",
 			"untitled": "Untitled"
+		},
+		"organizationRequests": {
+			"title": "Request organization access",
+			"description": "Ask an organization to manage this tag with one of its roles.",
+			"selectOrganization": "Select an organization",
+			"searchOrganization": "Search an organization",
+			"changeOrganization": "Change organization",
+			"selectOrganizationRole": "Select an organization role",
+			"selectTagRole": "Select a tag role",
+			"send": "Send request",
+			"addAccess": "Add access",
+			"sending": "Sending...",
+			"requestSent": "Request sent",
+			"accessAdded": "Organization access added",
+			"requestFailed": "Unable to send request",
+			"loadFailed": "Unable to load organizations"
+		},
+		"organizationPermissions": {
+			"title": "Organization tag roles",
+			"description": "Choose which organization roles may act through a tag role. Tag managers control this mapping.",
+			"selectOrganization": "Select an organization",
+			"searchOrganization": "Search organizations",
+			"changeOrganization": "Change organization",
+			"linkedOrganization": "Linked organization",
+			"noOrganization": "No organization linked",
+			"assignedRoles": "assigned roles",
+			"noAssignedRoles": "No roles assigned yet.",
+			"addRole": "Add role mapping",
+			"selectOrganizationRole": "Select an organization role",
+			"selectTagRole": "Select the maximum tag role",
+			"save": "Save mapping",
+			"remove": "Remove",
+			"saveFailed": "Unable to save mapping",
+			"removeFailed": "Unable to remove mapping"
 		},
 		"roles": {
 			"noRoleFound": "No role found",
@@ -357,12 +415,15 @@
 			"byTagRole": "A tag role",
 			"byOrgRole": "An org role",
 			"selectTag": "Select a tag",
+			"searchTag": "Search a tag",
 			"selectOrgLabel": "Select an organization",
+			"searchOrganization": "Search an organization",
 			"selectRole": "Select a role",
 			"noTagsAvailable": "No tag available",
 			"noOrgsAvailable": "No organization available",
 			"tagAccessList": "Tag role access",
 			"orgAccessList": "Org role access"
+			,"requestSent": "Request sent to the organization"
 		},
 		"editor": {
 			"typeHere": "Type your text here...",
@@ -405,6 +466,18 @@
 				"blue": "Blue",
 				"green": "Green",
 				"orange": "Orange"
+			}
+			,"organizationPermissions": {
+				"title": "Organization tag roles",
+				"description": "Choose which organization roles may act through a tag role. Tag managers control this mapping.",
+				"selectOrganization": "Select an organization",
+				"changeOrganization": "Change organization",
+				"selectOrganizationRole": "Select an organization role",
+				"selectTagRole": "Select the maximum tag role",
+				"save": "Save mapping",
+				"remove": "Remove",
+				"saveFailed": "Unable to save mapping",
+				"removeFailed": "Unable to remove mapping"
 			}
 		},
 		"noPagesYet": "You haven't created any page yet",

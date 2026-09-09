@@ -29,7 +29,7 @@ export default function DescriptionInput({ value, onChange }: DescriptionInputPr
                 value={value || ""}
                 onChange={(e) => onChange(e.target.value)}
                 placeholder={t("descriptionPlaceholder")}
-                className="w-full text-xs text-gray-600 border-b border-gray-200 focus:border-blue-400 outline-none resize-none overflow-hidden p-1 block bg-transparent"
+                className="w-full text-xs text-[#6f4d44] border-b border-[#d9bfb7] focus:border-[#800000] outline-none resize-none overflow-hidden p-1 block bg-transparent"
             />
         </div>
     );

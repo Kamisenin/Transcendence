@@ -81,13 +81,13 @@ export default function TagSettingsPanel({ tag, capabilities }: Props) {
     }
 
     if (!capabilities.canEditInfo && !capabilities.canDeleteTag) {
-        return <p className="text-sm text-gray-400">{t('noAccessToPage')}</p>;
+        return <p className="text-sm text-[#8a6b63]">{t('noAccessToPage')}</p>;
     }
 
     return (
         <div className="max-w-md">
             {error && (
-                <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded">
+                <div className="mb-4 rounded-md border border-[#e6b8b0] bg-[#fff1ef] p-3 text-sm text-[#a33a2b]">
                     {error}
                 </div>
             )}
@@ -100,7 +100,7 @@ export default function TagSettingsPanel({ tag, capabilities }: Props) {
                             type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            className="w-full border rounded px-3 py-1.5 text-sm"
+                            className="w-full rounded-md border border-[#d9bfb7] bg-[#fffaf7] px-3 py-2 text-sm outline-none focus:border-[#800000]"
                         />
                     </div>
                     <div>
@@ -109,7 +109,7 @@ export default function TagSettingsPanel({ tag, capabilities }: Props) {
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             rows={3}
-                            className="w-full border rounded px-3 py-1.5 text-sm"
+                            className="w-full rounded-md border border-[#d9bfb7] bg-[#fffaf7] px-3 py-2 text-sm outline-none focus:border-[#800000]"
                         />
                     </div>
                     <div>
@@ -118,30 +118,30 @@ export default function TagSettingsPanel({ tag, capabilities }: Props) {
                             type="color"
                             value={color}
                             onChange={(e) => setColor(e.target.value)}
-                            className="w-16 h-8 border rounded"
+                            className="h-9 w-16 cursor-pointer rounded-md border border-[#d9bfb7] bg-[#fffaf7] p-1"
                         />
                     </div>
                     <div>
                         <label className="block text-sm font-medium mb-1">{t('namespace')}</label>
-                        <div className="flex items-center gap-1 text-sm text-gray-400">
+                        <div className="flex items-center gap-1 text-sm text-[#8a6b63]">
                             <span>/wiki/</span>
                             <input
                                 type="text"
                                 value={namespace}
                                 onChange={(e) => setNamespace(slugify(e.target.value))}
                                 placeholder={t('namespacePlaceholderShort')}
-                                className="flex-1 border rounded px-2 py-1 text-sm text-gray-900"
+                                className="flex-1 rounded-md border border-[#d9bfb7] bg-[#fffaf7] px-2 py-1.5 text-sm text-[#3f2924] outline-none focus:border-[#800000]"
                             />
                             <span>/page-title</span>
                         </div>
-                        <p className="text-xs text-gray-400 mt-1">
+                        <p className="mt-1 text-xs text-[#a89088]">
                             {t('namespaceHint')}
                         </p>
                     </div>
                     <button
                         onClick={handleSave}
                         disabled={isPending || !name.trim()}
-                        className="text-sm bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-4 py-1.5 rounded-lg"
+                        className="rounded-md bg-[#800000] px-4 py-1.5 text-sm font-semibold text-[#fffaf7] transition hover:bg-[#5f0000] disabled:opacity-50"
                     >
                         {t('save')}
                     </button>
@@ -149,18 +149,18 @@ export default function TagSettingsPanel({ tag, capabilities }: Props) {
             )}
 
             {capabilities.canDeleteTag && (
-                <div className="border-t pt-4">
-                    <p className="text-sm text-gray-500 mb-2">{t('dangerousZone')}</p>
+                <div className="border-t border-[#d9bfb7] pt-5">
+                    <p className="mb-2 text-sm font-semibold text-[#8a6b63]">{t('dangerousZone')}</p>
                     <button
                         onClick={handleDelete}
                         disabled={isPending}
-                        className="text-sm bg-red-50 text-red-600 hover:bg-red-100 disabled:opacity-50 px-4 py-1.5 rounded-lg"
+                        className="rounded-md border border-[#e6b8b0] bg-[#fff1ef] px-4 py-1.5 text-sm font-semibold text-[#a33a2b] transition hover:bg-[#f9dcd7] disabled:opacity-50"
                     >
                         {getDeleteButtonText()}
                     </button>
 
                     {deleteStep > 0 && !isPending && (
-                        <p className="text-xs text-red-500 mt-2">
+                        <p className="mt-2 text-xs text-[#a33a2b]">
                             {t('deleteIrreversible')}
                         </p>
                     )}

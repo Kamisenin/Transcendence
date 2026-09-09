@@ -28,6 +28,7 @@ export default function AccountForm({ user }: Props) {
     const [lastName, setLastName] = useState(user.lastName || "");
     const [email, setEmail] = useState(user.email);
     const [message, setMessage] = useState("");
+    const [accountNameError, setAccountNameError] = useState(false);
     const router = useRouter();
 
     async function save() {
@@ -35,6 +36,7 @@ export default function AccountForm({ user }: Props) {
             return ;
         setLoading(true);
         setMessage("");
+        setAccountNameError(false);
         const res = await fetch("/api/auth/update", {
             method: "POST",
             headers: {"Content-Type": "application/json" },
@@ -49,7 +51,11 @@ export default function AccountForm({ user }: Props) {
             }
             router.refresh();
         } else {
-            setMessage(data.error || tCommon("error"));
+            if (data.error === "INVALID_ACCOUNT_ID") {
+                setAccountNameError(true);
+            } else {
+                setMessage(data.error || tCommon("error"));
+            }
         }
         setLoading(false);
     }
@@ -67,7 +73,16 @@ export default function AccountForm({ user }: Props) {
                 <input
                     className="border p-2 w-full"
                     value={account_id}
-                    onChange={(e) => setAccountId(e.target.value)}/>
+                    pattern="[A-Za-z0-9_-]+"
+                    title="Use only letters, numbers, underscores and hyphens"
+                    required
+                    onChange={(e) => {
+                        setAccountId(e.target.value);
+                        setAccountNameError(false);
+                    }}/>
+                {accountNameError && (
+                    <p className="text-red-500 text-sm">{t("accountNameInvalid")}</p>
+                )}
             </label>
             <label>
                 {t("username")}

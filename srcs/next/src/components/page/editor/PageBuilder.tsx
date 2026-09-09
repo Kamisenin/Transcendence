@@ -58,6 +58,7 @@ const DEFAULT_INFOBOX: InfoboxData = {
 export default function PageBuilder({ accountId, pageId, initialTitle, initialBlocks, visibility, canonicalNamespace, isOwner = false, ownerAccountId, initialPermissions = [] }: Props) {
     const t = useTranslations("Page");
     const tCommon = useTranslations("Common");
+    const normalizedInitialTitle = initialTitle ?? "";
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [activeId, setActiveId] = useState<string | null>(null);
@@ -79,7 +80,7 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
                 {
                     id: "block-infobox",
                     type: "infobox",
-                    infoboxData: { ...DEFAULT_INFOBOX, title: isDefaultTitle(initialTitle) ? "" : initialTitle, public: visibility, canonicalNamespace },
+                    infoboxData: { ...DEFAULT_INFOBOX, title: isDefaultTitle(normalizedInitialTitle) ? "" : normalizedInitialTitle, public: visibility, canonicalNamespace },
                     x: 0, y: 0, w: 4, h: 8
                 },
                 ...initialBlocks
@@ -89,7 +90,7 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
             {
                 id: "block-infobox",
                 type: "infobox",
-                infoboxData: { ...DEFAULT_INFOBOX, title: isDefaultTitle(initialTitle) ? "" : initialTitle, public: visibility, canonicalNamespace },
+                infoboxData: { ...DEFAULT_INFOBOX, title: isDefaultTitle(normalizedInitialTitle) ? "" : normalizedInitialTitle, public: visibility, canonicalNamespace },
                 x: 0, y: 0, w: 4, h: 8
             },
             {
@@ -178,7 +179,7 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
         const infoboxData = mainInfobox?.infoboxData || DEFAULT_INFOBOX;
 
         const pageTitle =
-        infoboxData.title || initialTitle;
+        infoboxData.title || normalizedInitialTitle;
 
         const visibility =
         infoboxData.public || false;
@@ -219,18 +220,18 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
 
 
     return (
-        <div className="min-h-screen bg-gray-50/50 p-8 pt-20">
+        <div className="min-h-screen bg-[#f0e0d6] p-8 pt-20">
             <Toolbar ref={toolbarRef} editor={activeEditor} disabled={!activeEditor} onAddBlock={handleAddBlock} />
 
             <button
                 onClick={handleSave}
                 disabled={saving}
-                className="fixed bottom-6 right-6 z-40 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-lg text-sm font-semibold"
+                className="fixed bottom-6 right-6 z-40 bg-[#800000] hover:bg-[#5f0000] text-[#fffaf7] px-4 py-2 rounded-lg shadow-lg text-sm font-semibold"
             >
                 {saving ? tCommon('saving') : tCommon('save')}
             </button>
 
-            <div ref={containerRef} className="max-w-6xl mx-auto border rounded-xl bg-white p-4 min-h-[500px] shadow-sm relative mt-4">
+            <div ref={containerRef} className="max-w-6xl mx-auto border border-[#d9bfb7] rounded-xl bg-[#fffaf7] p-4 min-h-[500px] shadow-sm relative mt-4">
                 <ReactGridLayout
                     className="layout"
                     layout={layout}

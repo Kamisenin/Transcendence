@@ -58,6 +58,7 @@
 			"title": "Créer un compte",
 			"emailPlaceholder": "Email",
 			"accountNamePlaceholder": "Nom de compte",
+			"accountNameInvalid": "Caractères autorisés : -, _, 0-9, A-Z et a-z.",
 			"userNamePlaceholder": "Nom d'utilisateur (optionnel)",
 			"passwordPlaceholder": "Mot de passe",
 			"submit": "S'inscrire"
@@ -72,6 +73,7 @@
 			"verify": "Vérifier",
 			"verifying": "Vérification...",
 			"resendCode": "Renvoyer le code",
+			"skip": "Vérifier plus tard",
 			"codeResent": "Code renvoyé",
 			"emailVerified": "Email vérifié !"
 		},
@@ -113,6 +115,7 @@
 		"title": "Mon compte",
 		"manageYourAccount": "Gérez votre compte",
 		"accountName": "Nom du compte",
+		"accountNameInvalid": "Caractères autorisés : -, _, 0-9, A-Z et a-z.",
 		"firstName": "Prénom",
 		"lastName": "Nom",
 		"emailVerified": "✓ Email vérifié",
@@ -204,6 +207,25 @@
 		"createdLabel": "Créé le"
 		,"organizationsOf": "Organisations de {user} ({count})"
 		,"permissionsLabel": "Permissions"
+		,"pendingRequests": "Demandes en attente"
+		,"tagRequest": "{user} demande le tag #{tag} : rôle d'organisation {role}, rôle du tag {tagRole}"
+		,"pageRequest": "{user} demande l'accès à {page} avec le rôle {role}"
+		,"accept": "Accepter"
+		,"reject": "Refuser"
+		,"tagPermissions": "Permissions des tags"
+		,"tagPermissionsDescription": "Associez les rôles de l'organisation aux rôles du tag pour hériter de leurs capacités."
+		,"selectManagedTag": "Sélectionner un tag géré"
+		,"selectOrganizationRole": "Sélectionner un rôle d'organisation"
+		,"selectTagRole": "Sélectionner un rôle du tag"
+		,"saveTagPermission": "Enregistrer l'association"
+		,"noTagPermission": "Aucune association de rôle de tag."
+		,"tagPermissionSaved": "Permissions du tag enregistrées"
+		,"membersPermission": "Membres"
+		,"rolesPermission": "Rôles"
+		,"editPermission": "Modifier"
+		,"addPagePermission": "Ajouter des pages"
+		,"grantPermission": "Gérer les accès"
+		,"reviewPermission": "Traiter les demandes"
 		,"membersCount": "{count, plural, =0 {Aucun membre} one {# membre} other {# membres}}"
 	},
 	"Tags": {
@@ -236,6 +258,7 @@
 		"noMemberYet": "Aucun membre pour le moment",
 		"noPageWithTag": "Aucune page avec ce tag",
 		"tabRequests": "Demandes",
+		"tabOrganization": "Organisations",
 		"tabSettings": "Paramètres",
 		"ownerBadge": "Propriétaire",
 		"validNamespace": "Namespace valide",
@@ -264,6 +287,7 @@
 			"namespaceUnavailable": "Le namespace indiqué est indisponible.",
 			"namespaceAvailable": "Namespace disponible",
 			"required": "Le nom du tag est obligatoire.",
+			"namespaceRequired": "Le namespace du tag est obligatoire.",
 			"nameUnavailable": "Ce nom de tag n'est pas disponible.",
 			"namespaceInvalid": "Le namespace donné n'est pas valide.",
 			"checkingAvailability": "Vérification...",
@@ -300,6 +324,40 @@
 			"accept": "Accepter",
 			"reject": "Refuser",
 			"untitled": "Sans titre"
+		},
+		"organizationRequests": {
+			"title": "Demander l'accès d'une organisation",
+			"description": "Demandez à une organisation de gérer ce tag avec l'un de ses rôles.",
+			"selectOrganization": "Sélectionner une organisation",
+			"searchOrganization": "Rechercher une organisation",
+			"changeOrganization": "Changer d'organisation",
+			"selectOrganizationRole": "Sélectionner un rôle d'organisation",
+			"selectTagRole": "Sélectionner un rôle du tag",
+			"send": "Envoyer la demande",
+			"addAccess": "Ajouter l'accès",
+			"sending": "Envoi...",
+			"requestSent": "Demande envoyée",
+			"accessAdded": "Accès de l'organisation ajouté",
+			"requestFailed": "Impossible d'envoyer la demande",
+			"loadFailed": "Impossible de charger les organisations"
+		},
+		"organizationPermissions": {
+			"title": "Rôles de tag de l'organisation",
+			"description": "Choisissez quels rôles de l'organisation peuvent agir via un rôle du tag. Les gestionnaires du tag contrôlent cette association.",
+			"selectOrganization": "Sélectionner une organisation",
+			"changeOrganization": "Changer d'organisation",
+			"linkedOrganization": "Organisation liée",
+			"noOrganization": "Aucune organisation liée",
+			"searchOrganization": "Rechercher une organisation",
+			"assignedRoles": "rôles associés",
+			"noAssignedRoles": "Aucun rôle n'est encore associé.",
+			"addRole": "Ajouter une association de rôle",
+			"selectOrganizationRole": "Sélectionner un rôle d'organisation",
+			"selectTagRole": "Sélectionner le rôle maximal du tag",
+			"save": "Enregistrer l'association",
+			"remove": "Retirer",
+			"saveFailed": "Impossible d'enregistrer l'association",
+			"removeFailed": "Impossible de retirer l'association"
 		},
 		"roles": {
 			"noRoleFound": "Aucun rôle trouvé",
@@ -357,12 +415,15 @@
 			"byTagRole": "Un rôle de tag",
 			"byOrgRole": "Un rôle d'org",
 			"selectTag": "Sélectionner un tag",
+			"searchTag": "Rechercher un tag",
 			"selectOrgLabel": "Sélectionner une organisation",
+			"searchOrganization": "Rechercher une organisation",
 			"selectRole": "Sélectionner un rôle",
 			"noTagsAvailable": "Aucun tag disponible",
 			"noOrgsAvailable": "Aucune organisation disponible",
 			"tagAccessList": "Accès par rôle de tag",
 			"orgAccessList": "Accès par rôle d'org"
+			,"requestSent": "Demande envoyée à l'organisation"
 		},
 		"editor": {
 			"typeHere": "Tapez votre texte ici...",
@@ -405,6 +466,17 @@
 				"blue": "Bleu",
 				"green": "Vert",
 				"orange": "Orange"
+			}
+			,"organizationPermissions": {
+				"title": "Rôles de tag de l'organisation",
+				"description": "Choisissez quels rôles de l'organisation peuvent agir via un rôle du tag. Les gestionnaires du tag contrôlent cette association.",
+				"selectOrganization": "Sélectionner une organisation",
+				"selectOrganizationRole": "Sélectionner un rôle d'organisation",
+				"selectTagRole": "Sélectionner le rôle maximal du tag",
+				"save": "Enregistrer l'association",
+				"remove": "Retirer",
+				"saveFailed": "Impossible d'enregistrer l'association",
+				"removeFailed": "Impossible de retirer l'association"
 			}
 		},
 		"noPagesYet": "Vous n'avez pas encore créé de page",

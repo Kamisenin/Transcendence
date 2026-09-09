@@ -86,19 +86,23 @@ export default function MyPages() {
         try {
             const res = await fetch(`/api/pages?tab=${encodeURIComponent(tabName)}`, { cache: "no-store" });
             const json = await res.json();
+            if (res.status === 401 && json?.error === "AUTH_REQUIRED") {
+                router.push("/login");
+                return;
+            }
             if (!res.ok || !json.ok) {
                 setError(json?.error || t("failedToFetch"));
                 setItems([]);
             } else {
                 setItems(json.pages || []);
             }
-        } catch (err: any) {
-            setError(err?.message || t("failedToFetch"));
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : t("failedToFetch"));
             setItems([]);
         } finally {
             setLoading(false);
         }
-    }, [t]);
+    }, [router, t]);
 
     useEffect(() => {
         fetchPages(tab);

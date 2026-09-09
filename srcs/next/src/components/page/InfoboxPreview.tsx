@@ -21,14 +21,14 @@ export default function InfoboxPreview({ data, isReadOnly, onEdit }: InfoboxPrev
     const visibleTags = showAllTags ? tags : tags.slice(0, maxVisible);
 
     return (
-        <div className="h-full w-full bg-white rounded-xl border border-gray-200 shadow-xs p-4 flex flex-col gap-2.5 overflow-y-auto">
+        <div className="h-full w-full bg-[#fffaf7] rounded-xl border border-[#d9bfb7] shadow-xs p-4 flex flex-col gap-2.5 overflow-y-auto">
             {!isReadOnly && onEdit && (
-                <div className="flex items-center justify-between pb-2 border-b border-gray-100 text-xs shrink-0">
-                    <span className="font-semibold text-blue-600 uppercase tracking-wider">{t("previewMode")}</span>
+                <div className="flex items-center justify-between pb-2 border-b border-[#ead7d0] text-xs shrink-0">
+                    <span className="font-semibold text-[#800000] uppercase tracking-wider">{t("previewMode")}</span>
                     <button
                         type="button"
                         onClick={onEdit}
-                        className="flex items-center gap-1 text-gray-600 hover:text-blue-600 bg-gray-100 px-2 py-1 rounded cursor-pointer"
+                        className="flex items-center gap-1 text-[#6f4d44] hover:text-[#800000] bg-[#f7e9e2] px-2 py-1 rounded cursor-pointer"
                     >
                         <Edit3 size={13} /> {t("edit")}
                     </button>
@@ -60,7 +60,7 @@ export default function InfoboxPreview({ data, isReadOnly, onEdit }: InfoboxPrev
                         <button
                             type="button"
                             onClick={() => setShowAllTags(!showAllTags)}
-                            className="text-xs text-gray-500 hover:text-blue-600 font-medium flex items-center gap-0.5 ml-1 cursor-pointer"
+                            className="text-xs text-[#8a6b63] hover:text-[#800000] font-medium flex items-center gap-0.5 ml-1 cursor-pointer"
                         >
                             {showAllTags ? <>{t("less")} <ChevronUp size={12} /></> : <>+{tags.length - maxVisible} {t("more")} <ChevronDown size={12} /></>}
                         </button>

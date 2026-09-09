@@ -10,12 +10,17 @@ import { isDefaultTitle } from '@/app/lib/page/title';
     members?: Array<{ id?: number; user?: { accountId?: string; user_id?: string; username?: string | null; firstName?: string | null; lastName?: string | null; imgLink?: string | null; lastSeen?: Date | null }; role?: { roleName?: string } }>;
     roles?: Array<{ id: number; roleName: string }>;
     orgTagAccess?: Array<{ tag: { id: number; name: string }; minRole?: unknown; permissions?: string }>;
+    orgTagCapability?: Array<{ tag: { id: number; name: string } }>;
     orgPageAccess?: Array<{ page: { pageId: number; title?: string | null; owner?: { accountId?: string; user_id?: string } }; minRole?: unknown; permissions?: string }>;
 };
 
 export default function OrgDetails({ org, canManage, friendIds = [] }: { org: OrgWithAccess; canManage: boolean; friendIds?: string[] }) {
     const t = useTranslations('Orgs');
     const createdDate = org.createdAt ? new Date(org.createdAt).toLocaleDateString() : '—';
+    const organizationTags = Array.from(new Map(
+        [...(org.orgTagAccess ?? []), ...(org.orgTagCapability ?? [])]
+            .map((entry) => [entry.tag.id, entry.tag] as const)
+    ).values());
 
     return (
             <div className="mx-auto max-w-6xl">
@@ -40,11 +45,11 @@ export default function OrgDetails({ org, canManage, friendIds = [] }: { org: Or
                         <div className="col-span-1 md:col-span-2 space-y-6">
                             <div>
                                 <h2 className="mb-2 font-medium text-[#3f2924]">{t('roles')}</h2>
-                                <div className="border border-[#ead7d0] bg-[#f7e9e2] p-3">
+                                <div className="max-h-64 overflow-y-auto border border-[#ead7d0] bg-[#f7e9e2] p-3">
                                     <ul className="space-y-2">
                                         {org.roles && org.roles.length > 0 ? (
                                             org.roles.map((r) => (
-                                                    <li key={r.id} className="text-sm text-[#3f2924]">
+                                                    <li key={r.id} className="break-words text-sm text-[#3f2924]">
                                                             {r.roleName}
                                                         </li>
                                                 ))
@@ -58,7 +63,7 @@ export default function OrgDetails({ org, canManage, friendIds = [] }: { org: Or
                             <div>
                                 <h2 className="mb-2 font-medium text-[#3f2924]">{t('pages')}</h2>
                                 {org.orgPageAccess && org.orgPageAccess.length > 0 ? (
-                                    <ul className="space-y-2">
+                                    <ul className="max-h-96 space-y-2 overflow-y-auto">
                                             {org.orgPageAccess.map((a) => {
                                                 const page = a.page;
                                                 const owner = page?.owner;
@@ -91,10 +96,9 @@ export default function OrgDetails({ org, canManage, friendIds = [] }: { org: Or
                         <aside className="col-span-1 space-y-6">
                             <div>
                                 <h3 className="mb-2 font-medium text-[#3f2924]">{t('tags')}</h3>
-                                {org.orgTagAccess && org.orgTagAccess.length > 0 ? (
+                                {organizationTags.length > 0 ? (
                                     <div className="flex flex-wrap gap-2">
-                                            {org.orgTagAccess.map((a) => {
-                                                const tag = a.tag;
+                                            {organizationTags.map((tag) => {
                                                 return (
                                                         <Link
                                             key={tag.id}
@@ -114,7 +118,7 @@ export default function OrgDetails({ org, canManage, friendIds = [] }: { org: Or
                             <div>
                                 <h3 className="mb-2 font-medium text-[#3f2924]">{t('members')}</h3>
                                 {org.members && org.members.length > 0 ? (
-                                    <ul className="space-y-2">
+                                    <ul className="max-h-96 space-y-2 overflow-y-auto">
                                             {org.members.map((m) => {
                                                 const user = m.user;
                                                 const profileId = user?.accountId || user?.user_id || `member-${m.id}`;
@@ -127,7 +131,7 @@ export default function OrgDetails({ org, canManage, friendIds = [] }: { org: Or
                                                         <li key={profileId}>
                                                             <Link
                                                                 href={`/wiki/${encodeURIComponent(profileId)}`}
-                                                                className="flex items-center gap-3 border border-[#ead7d0] bg-[#fffaf7] p-2 transition-colors hover:border-[#800000] hover:bg-[#f7e9e2]"
+                                                                className="flex min-w-0 items-center gap-3 border border-[#ead7d0] bg-[#fffaf7] p-2 transition-colors hover:border-[#800000] hover:bg-[#f7e9e2]"
                                                             >
                                                                 <div className="relative shrink-0">
                                                                     <UserAvatar

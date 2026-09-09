@@ -56,7 +56,7 @@ export async function getTagCapabilities(
         };
     }
 
-    const [direct, membership] = await Promise.all([
+    const [direct, membership, organizationMemberships] = await Promise.all([
         prisma.tagPermission.findUnique({
             where: { tagId_userToken: { tagId, userToken } },
         }),
@@ -64,24 +64,55 @@ export async function getTagCapabilities(
             where: { tagId_userToken: { tagId, userToken } },
             include: { role: true },
         }),
+            prisma.organizationMember.findMany({
+                where: { userToken },
+                select: { organizationId: true, roleId: true },
+            }),
     ]);
 
-    if (!direct && !membership) {
+        const organizationCapabilities = organizationMemberships.length
+            ? await prisma.orgTagCapability.findMany({
+                where: {
+                    tagId,
+                    orgId: { in: organizationMemberships.map((membership) => membership.organizationId) },
+                },
+                include: { tagRole: true },
+            })
+            : [];
+
+        const effectiveOrganizationCapabilities = organizationCapabilities.filter((capability) =>
+            organizationMemberships.some((membership) =>
+                membership.organizationId === capability.orgId && membership.roleId === capability.roleId
+            )
+        );
+
+        if (!direct && !membership && effectiveOrganizationCapabilities.length === 0) {
         return { ...EMPTY_CAPS, rank: -1, isOwner: false };
     }
 
     const role = membership?.role;
+        const organizationCapability = effectiveOrganizationCapabilities.reduce((result, capability) => ({
+            canManageMembers: result.canManageMembers || capability.canManageTagMembers,
+            canManageRoles: result.canManageRoles || capability.canManageTagRoles,
+            canEditInfo: result.canEditInfo || capability.canEditInfo,
+            canDeleteTag: result.canDeleteTag || capability.canDeleteTag,
+            canAddPage: result.canAddPage || capability.canAddPage,
+            canRevokePage: result.canRevokePage || capability.canRevokePage,
+            canManagePageGrants: result.canManagePageGrants || capability.canManagePageGrants,
+            canReviewRequests: result.canReviewRequests || capability.canReviewRequests,
+            rank: Math.max(result.rank, capability.tagRole?.hierarchyLevel ?? 0),
+        }), { ...EMPTY_CAPS, rank: 0 });
 
     return {
-        canManageMembers: !!direct?.canManageMembers || !!role?.canManageMembers,
-        canManageRoles: !!direct?.canManageRoles || !!role?.canManageRoles,
-        canEditInfo: !!direct?.canEditInfo || !!role?.canEditInfo,
-        canDeleteTag: !!direct?.canDeleteTag || !!role?.canDeleteTag,
-        canAddPage: !!direct?.canAddPage || !!role?.canAddPage,
-        canRevokePage: !!direct?.canRevokePage || !!role?.canRevokePage,
-        canManagePageGrants: !!direct?.canManagePageGrants || !!role?.canManagePageGrants,
-        canReviewRequests: !!direct?.canReviewRequests || !!role?.canReviewRequests,
-        rank: role?.hierarchyLevel ?? 0,
+            canManageMembers: !!direct?.canManageMembers || !!role?.canManageMembers || organizationCapability.canManageMembers,
+            canManageRoles: !!direct?.canManageRoles || !!role?.canManageRoles || organizationCapability.canManageRoles,
+        canEditInfo: !!direct?.canEditInfo || !!role?.canEditInfo || organizationCapability.canEditInfo,
+        canDeleteTag: !!direct?.canDeleteTag || !!role?.canDeleteTag || organizationCapability.canDeleteTag,
+            canAddPage: !!direct?.canAddPage || !!role?.canAddPage || organizationCapability.canAddPage,
+            canRevokePage: !!direct?.canRevokePage || !!role?.canRevokePage || organizationCapability.canRevokePage,
+            canManagePageGrants: !!direct?.canManagePageGrants || !!role?.canManagePageGrants || organizationCapability.canManagePageGrants,
+            canReviewRequests: !!direct?.canReviewRequests || !!role?.canReviewRequests || organizationCapability.canReviewRequests,
+            rank: Math.max(role?.hierarchyLevel ?? 0, organizationCapability.rank),
         isOwner: false,
     };
 }
@@ -98,7 +129,7 @@ export function canAssignRoleRank(actorRank: number, roleToAssignLevel: number):
 
 /** Liste tous les tags où l'utilisateur a un accès (owner, membre, ou permission directe) */
 export async function getUserTags(userToken: string) {
-    const [owned, viaMembership, viaDirect] = await Promise.all([
+    const [owned, viaMembership, viaDirect, organizationMemberships] = await Promise.all([
         prisma.tag.findMany({ where: { ownerToken: userToken } }),
         prisma.tag.findMany({
             where: { members: { some: { userToken } } },
@@ -106,10 +137,29 @@ export async function getUserTags(userToken: string) {
         prisma.tag.findMany({
             where: { permissions: { some: { userToken } } },
         }),
+        prisma.organizationMember.findMany({
+            where: { userToken },
+            select: { organizationId: true, roleId: true },
+        }),
     ]);
 
+    const viaOrganization = organizationMemberships.length
+        ? await prisma.tag.findMany({
+            where: {
+                orgTagCapability: {
+                    some: {
+                        OR: organizationMemberships.map((membership) => ({
+                            orgId: membership.organizationId,
+                            roleId: membership.roleId,
+                        })),
+                    },
+                },
+            },
+        })
+        : [];
+
     const map = new Map<number, typeof owned[number]>();
-    for (const t of [...owned, ...viaMembership, ...viaDirect]) {
+    for (const t of [...owned, ...viaMembership, ...viaDirect, ...viaOrganization]) {
         map.set(t.id, t);
     }
     return Array.from(map.values());

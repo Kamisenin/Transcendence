@@ -60,7 +60,7 @@ export default async function PageViewer({ title, blocks, accountId, canEdit, ed
                     {canEdit && editHref && (
                         <Link
                             href={editHref}
-                            className="shrink-0 px-3 py-1 rounded bg-blue-600 text-white text-sm hover:opacity-95"
+                            className="shrink-0 px-3 py-1 rounded bg-[#800000] text-[#fffaf7] text-sm hover:bg-[#5f0000]"
                         >
                             Edit
                         </Link>
