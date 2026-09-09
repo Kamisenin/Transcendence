@@ -15,7 +15,6 @@ else
 	NEXT_RUN :=
 endif
 
-
 upb:
 	@echo "ADDRESS vaut : $(ADDRESS)"
 	@echo "running 42chan in $(MODE) mode"

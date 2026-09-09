@@ -7,42 +7,6 @@ datasource db {
   provider = "postgresql"
 }
 
-enum PermissionLevel {
-  READ
-  WRITE
-  ADMIN
-}
-
-enum RequestStatus {
-  PENDING
-  APPROVED
-  REJECTED
-}
-
-enum FriendshipStatus {
-  PENDING
-  ACCEPTED
-}
-
-enum SlugType {
-  USER
-  TAG
-}
-
-enum NotificationType {
-  PAGE_EDITED
-  FRIEND_REQUEST
-}
-
-enum PageReactionType {
-  FAVORITE
-  DISLIKE
-}
-
-// ════════════════════════════════════════════
-// USERS
-// ════════════════════════════════════════════
-
 model User {
   user_id                 String               @id @default(uuid())
   accountId               String               @unique @map("account_id")
@@ -96,18 +60,14 @@ model Session {
 }
 
 model Friendship {
-  id          String           @id @default(uuid())
-  status      FriendshipStatus @default(PENDING)
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-
-  senderId    String
-  sender      User             @relation("SentFriendships", fields: [senderId], references: [user_id], onDelete: Cascade)
-
-  receiverId  String
-  receiver    User             @relation("ReceivedFriendships", fields: [receiverId], references: [user_id], onDelete: Cascade)
-
-  notifications Notification[]
+  id         String           @id @default(uuid())
+  status     FriendshipStatus @default(PENDING)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+  senderId   String
+  receiverId String
+  receiver   User             @relation("ReceivedFriendships", fields: [receiverId], references: [user_id], onDelete: Cascade)
+  sender     User             @relation("SentFriendships", fields: [senderId], references: [user_id], onDelete: Cascade)
 
   @@unique([senderId, receiverId])
 }
@@ -268,19 +228,16 @@ model TagPage {
 }
 
 model Notification {
-  id           Int              @id @default(autoincrement())
-  recipientId  String           @map("recipient_id")
-  actorId      String?          @map("actor_id")
-  pageId       Int?             @map("page_id")
-  friendshipId String?          @map("friendship_id")
-  type         NotificationType @default(PAGE_EDITED)
-  read         Boolean          @default(false)
-  createdAt    DateTime         @default(now()) @map("created_at")
-
-  recipient  User        @relation("NotificationRecipient", fields: [recipientId], references: [user_id], onDelete: Cascade)
-  actor      User?       @relation("NotificationActor", fields: [actorId], references: [user_id], onDelete: SetNull)
-  page       Page?       @relation(fields: [pageId], references: [pageId], onDelete: Cascade)
-  friendship Friendship? @relation(fields: [friendshipId], references: [id], onDelete: Cascade)
+  id          Int              @id @default(autoincrement())
+  recipientId String           @map("recipient_id")
+  actorId     String?          @map("actor_id")
+  pageId      Int?             @map("page_id")
+  type        NotificationType @default(PAGE_EDITED)
+  read        Boolean          @default(false)
+  createdAt   DateTime         @default(now()) @map("created_at")
+  actor       User?            @relation("NotificationActor", fields: [actorId], references: [user_id])
+  page        Page?            @relation(fields: [pageId], references: [pageId], onDelete: Cascade)
+  recipient   User             @relation("NotificationRecipient", fields: [recipientId], references: [user_id], onDelete: Cascade)
 
   @@index([recipientId, read])
   @@map("notifications")
@@ -519,4 +476,36 @@ model PageReaction {
   @@id([userId, pageId])
   @@index([userId, type])
   @@map("page_reactions")
+}
+
+enum PermissionLevel {
+  READ
+  WRITE
+  ADMIN
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+  BLOCKED
+}
+
+enum SlugType {
+  USER
+  TAG
+}
+
+enum NotificationType {
+  PAGE_EDITED
+}
+
+enum PageReactionType {
+  FAVORITE
+  DISLIKE
 }

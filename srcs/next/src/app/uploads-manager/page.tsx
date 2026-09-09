@@ -7,7 +7,7 @@ export default async function UploadsPage() {
 	const t = await getTranslations("Common");
 
 	return (
-		<div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 px-6 pt-20 py-10">
+		<div className="min-h-screen bg-[#f0e0d6] px-4 pb-12 pt-20 text-[#3f2924]">
 			<div className="mx-auto max-w-5xl">
 				<div className="mb-8 flex items-center justify-between border-b border-slate-200 pb-4">
 					<h1 className="text-3xl font-semibold tracking-tight text-slate-900">

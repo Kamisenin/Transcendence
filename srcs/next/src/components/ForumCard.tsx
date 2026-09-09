@@ -68,8 +68,9 @@ export default function ForumCard({ page, userId, className = "" }: ForumCardPro
     <Link
       href={`/wiki/${page.namespace}/${page.slug}`}
       onClick={handleClick}
-      className={`group relative bg-card text-card-foreground border border-border rounded-lg overflow-hidden hover:border-ring transition-all duration-300 hover:-translate-y-1 shadow-md flex flex-col justify-between p-4 h-56 ${className}`}
-    >
+      className="group block border border-[#d9bfb7] bg-[#fffaf7] p-3 transition-colors hover:border-[#800000] hover:bg-[#f7e9e2] transition-all duration-300 hover:-translate-y-1 shadow-md flex flex-col justify-between p-4 h-56 ${className}`"
+      style={{ borderLeftColor: "#800000", borderLeftWidth: "4px" }}
+	>
       <div className="flex-1 flex flex-col min-h-0">
         
         <div className="transition-all duration-300 group-hover:h-0 group-hover:opacity-0 group-hover:mb-0 mb-3 h-28 w-full flex-shrink-0 overflow-hidden">
