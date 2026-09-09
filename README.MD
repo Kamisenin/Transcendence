@@ -135,7 +135,12 @@ This will activate the development configuration and allow the Next.js app to ru
 
 If this is the first time the application is started, or if Prisma schema changes were made, the database must be synchronized.
 
-First, start the database container, then export the correct `DATABASE_URL` environment variable. The simplest option is to copy the relevant lines from `dev_start.sh` at the repository root.
+First, start the **database container**, then export the correct `DATABASE_URL` environment variable. The simplest option is to copy the relevant lines from `dev_start.sh` at the repository root.
+
+Execute
+```bash
+npx prisma generate
+```
 
 Then run one of the following commands from `srcs/next`:
 
