@@ -9,6 +9,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from "next/navigation";
 import { TagPermissionError } from '%/lib/errors';
 import { userHasOrgPermission } from '@/actions/orgs';
+import { User } from "@prisma/client";
 
 const MAX_ROLE_NAME_LENGTH = 20;
 const MAX_HIERARCHY_LEVEL = 200;
