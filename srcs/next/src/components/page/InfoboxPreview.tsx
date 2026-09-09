@@ -21,32 +21,32 @@ export default function InfoboxPreview({ data, isReadOnly, onEdit }: InfoboxPrev
     const visibleTags = showAllTags ? tags : tags.slice(0, maxVisible);
 
     return (
-        <div className="h-full w-full bg-[#fffaf7] rounded-xl border border-[#d9bfb7] shadow-xs p-4 flex flex-col gap-2.5 overflow-y-auto">
+        <div className="h-full w-full min-w-0 overflow-x-hidden overflow-y-auto rounded-xl border border-[#d9bfb7] bg-[#fffaf7] p-2 shadow-xs sm:p-4 flex flex-col gap-2.5">
             {!isReadOnly && onEdit && (
-                <div className="flex items-center justify-between pb-2 border-b border-[#ead7d0] text-xs shrink-0">
-                    <span className="font-semibold text-[#800000] uppercase tracking-wider">{t("previewMode")}</span>
+                <div className="flex flex-col items-stretch gap-2 border-b border-[#ead7d0] pb-2 text-xs shrink-0 sm:flex-row sm:items-center sm:justify-between">
+                    <span className="min-w-0 max-w-full break-all font-semibold uppercase tracking-wider text-[#800000]">{t("previewMode")}</span>
                     <button
                         type="button"
                         onClick={onEdit}
-                        className="flex items-center gap-1 text-[#6f4d44] hover:text-[#800000] bg-[#f7e9e2] px-2 py-1 rounded cursor-pointer"
+                        className="flex w-full items-center justify-center gap-1 rounded bg-[#f7e9e2] px-2 py-1 text-[#6f4d44] hover:text-[#800000] cursor-pointer sm:w-auto"
                     >
                         <Edit3 size={13} /> {t("edit")}
                     </button>
                 </div>
             )}
 
-            <h2 className="text-lg font-bold text-gray-900 border-b border-gray-100 pb-1.5 leading-tight shrink-0">
+            <h2 className="min-w-0 break-words border-b border-gray-100 pb-1.5 text-lg font-bold leading-tight text-gray-900 shrink-0">
                 {isDefaultTitle(data.title) ? <span className="text-gray-300 italic">{t("untitled")}</span> : data.title}
             </h2>
 
             {data.imageUrl?.trim() && (
                 <div className="rounded-lg overflow-hidden border border-gray-100 bg-gray-50 max-h-48 flex justify-center items-center shrink-0">
-                    <img src={data.imageUrl} alt={data.title} className="w-full h-full object-cover" />
+                    <img src={data.imageUrl} alt={data.title} className="block w-full max-w-full h-auto max-h-48 object-contain" />
                 </div>
             )}
 
             {data.description?.trim() && (
-                <p className="text-xs text-gray-600 leading-normal whitespace-pre-wrap m-0 p-0">
+                <p className="m-0 min-w-0 break-words whitespace-pre-wrap p-0 text-xs leading-normal text-gray-600">
                     {data.description}
                 </p>
             )}

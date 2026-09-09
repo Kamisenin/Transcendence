@@ -57,6 +57,7 @@ export default function RegisterPage() {
                     type="text"
                     name="account_id"
                     placeholder={t("accountNamePlaceholder")}
+                    maxLength={20}
                     pattern="[A-Za-z0-9_-]+"
                     title="Use only letters, numbers, underscores and hyphens"
                     className="border border-[#d9bfb7] bg-white p-2 text-black outline-none focus:border-[#800000] focus:ring-2 focus:ring-[#e6a817]/40"

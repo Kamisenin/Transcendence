@@ -11,7 +11,7 @@ type Props = {
 export default function VisibilityToggler({ isPublic, onChange }: Props) {
     const t = useTranslations("Common");
     return (
-        <div className="pt-2 border-t border-gray-100 flex items-center justify-between">
+        <div className="flex shrink-0 items-center justify-between border-t border-gray-100 pt-2">
             <label className="text-xs font-medium text-gray-600 flex items-center gap-1.5 cursor-pointer select-none">
                 <span>{t('visibility')}</span>
                 <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${

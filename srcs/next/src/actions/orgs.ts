@@ -20,6 +20,31 @@ type RolePermissionsInput = {
   canManageOrgTagGrants?: boolean;
 };
 
+const MAX_NAME_LENGTH = 20;
+const ROLE_NAME_PATTERN = /^[A-Za-z0-9 _-]+$/;
+const ORGANIZATION_NAME_PATTERN = /^[A-Za-z0-9_-]+$/;
+
+function validateOrganizationName(name: string) {
+  if (!name) throw new Error("ORGANIZATION_NAME_REQUIRED");
+  if (name.length > MAX_NAME_LENGTH) throw new Error("ORGANIZATION_NAME_TOO_LONG");
+  if (!ORGANIZATION_NAME_PATTERN.test(name)) {
+    throw new Error("ORGANIZATION_NAME_INVALID");
+  }
+}
+
+function validateRole(data: { roleName?: string; hierarchyLevel?: number }) {
+  if (data.roleName !== undefined) {
+    if (!data.roleName.trim()) throw new Error("ROLE_NAME_REQUIRED");
+    if (data.roleName.length > MAX_NAME_LENGTH) throw new Error("ROLE_NAME_TOO_LONG");
+    if (!ROLE_NAME_PATTERN.test(data.roleName.trim())) {
+      throw new Error("ROLE_NAME_INVALID");
+    }
+  }
+  if (data.hierarchyLevel !== undefined && (!Number.isInteger(data.hierarchyLevel) || data.hierarchyLevel < 0 || data.hierarchyLevel > 200)) {
+    throw new Error("HIERARCHY_LEVEL_INVALID");
+  }
+}
+
 export type MemberUserOption = {
   user_id: string;
   username: string;
@@ -52,7 +77,7 @@ export async function getUserOrgs(user : User | null = null): Promise<Organizati
 export async function createOrganization(name: string) {
   const user = await requireUser();
   const normalizedName = name.trim();
-  if (!normalizedName) throw new Error("Organization name is required");
+  validateOrganizationName(normalizedName);
 
   return prisma.$transaction(async (transaction) => {
     const organization = await transaction.organization.create({
@@ -172,10 +197,7 @@ export async function createOrganizationRole(
   if (!can) throw new OrgPermissionError("Forbidden");
   
   const hierarchyLevel = data.hierarchyLevel ?? 200;
-
-  if (!Number.isInteger(hierarchyLevel) || hierarchyLevel < 0 || hierarchyLevel > 200) {
-      throw new Error("Hierarchy level must be an integer between 0 and 200");
-  }
+  validateRole({ roleName: data.roleName, hierarchyLevel });
   return prisma.organizationRole.create({
     data: {
       organizationId: orgId,
@@ -215,6 +237,8 @@ export async function updateOrganizationRole(roleId: number, data: RolePermissio
       throw new OrgPermissionError("Owner role permissions cannot be reduced");
     }
   }
+
+  validateRole(data);
 
   return prisma.organizationRole.update({
     where: { id: roleId },

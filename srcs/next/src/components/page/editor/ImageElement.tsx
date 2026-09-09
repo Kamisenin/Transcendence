@@ -165,11 +165,11 @@ export default function ImageElement({ attributes, children, element }: any) {
 
         return (
             <div {...attributes} contentEditable={false} className={`user-select-none ${getLayoutClasses()}`}>
-                <div style={{ width: `${width}px`, maxWidth: "100%", boxSizing: "border-box" }}>
+                <div style={{ width: `min(${width}px, 100%)`, maxWidth: "100%", boxSizing: "border-box" }}>
                     <img
                         src={savedUrl}
                         alt={alt}
-                        className="w-full h-auto object-cover rounded-md"
+                        className="block w-full max-w-full h-auto object-contain rounded-md"
                     />
                 </div>
                 {/* Ne JAMAIS oublier children pour Slate ! */}
@@ -181,7 +181,7 @@ export default function ImageElement({ attributes, children, element }: any) {
     // EDIT MODE
     return (
         <div {...attributes} contentEditable={false} className={`user-select-none ${getLayoutClasses()}`}>
-            <div style={{ width: `${width}px`, maxWidth: "100%", boxSizing: "border-box" }}>
+            <div style={{ width: `min(${width}px, 100%)`, maxWidth: "100%", boxSizing: "border-box" }}>
                 {savedUrl && !hasError && !isEditing ? (
                     /* Vue Édition : Image chargée avec contrôles */
                     <div className={`relative group border-2 rounded-lg overflow-hidden ${selected && focused ? "border-[#800000] shadow-md" : "border-transparent"}`}>
@@ -189,7 +189,7 @@ export default function ImageElement({ attributes, children, element }: any) {
                             src={savedUrl}
                             alt={alt}
                             onError={handleImageError}
-                            className="w-full h-auto object-cover max-h-96 rounded-md pointer-events-none"
+                            className="block w-full max-w-full h-auto object-contain max-h-96 rounded-md pointer-events-none"
                         />
 
                         {/* Toolbar d'édition sur l'image */}
@@ -255,7 +255,7 @@ export default function ImageElement({ attributes, children, element }: any) {
                     </div>
                 ) : (
                     /* Vue Édition : Formulaire de saisie d'URL */
-                    <div className={`p-4 border-2 border-dashed rounded-xl bg-[#f7e9e2] flex flex-col gap-3 min-w-[300px] ${selected && focused ? "border-[#800000] ring-2 ring-[#ead7d0]" : "border-[#d9bfb7]"}`}>
+                    <div className={`w-full min-w-0 p-2 sm:p-4 border-2 border-dashed rounded-xl bg-[#f7e9e2] flex flex-col gap-3 ${selected && focused ? "border-[#800000] ring-2 ring-[#ead7d0]" : "border-[#d9bfb7]"}`}>
                         <div className="flex items-center justify-between text-xs font-semibold text-gray-500">
                             <span className="flex items-center gap-1.5"><ImageIcon size={14} /> {isEditing ? t("editImage") : t("addImage")}</span>
                             <button type="button" onClick={deleteImage} className="text-red-500 hover:text-red-700">{t("delete")}</button>

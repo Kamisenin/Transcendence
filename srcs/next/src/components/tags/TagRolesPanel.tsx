@@ -28,6 +28,17 @@ type Props = {
 };
 
 type PermissionKey = { [K in keyof RoleForm]: RoleForm[K] extends boolean ? K : never; } [keyof RoleForm];
+const ROLE_NAME_PATTERN = /^[A-Za-z0-9 _-]+$/;
+
+function getRoleError(code: string, t: ReturnType<typeof useTranslations>) {
+    switch (code) {
+        case "ROLE_NAME_REQUIRED": return t("roleNameRequired");
+        case "ROLE_NAME_TOO_LONG": return t("roleNameTooLong");
+        case "ROLE_NAME_INVALID": return t("roleNameInvalid");
+        case "HIERARCHY_LEVEL_INVALID": return t("hierarchyLevelInvalid");
+        default: return t("failedToCreateRole");
+    }
+}
 
 const emptyForm = (hierarchyLevel: number) => ({
     roleName: '',
@@ -45,6 +56,7 @@ const emptyForm = (hierarchyLevel: number) => ({
 export default function TagRolesPanel({ tagId, roles, capabilities }: Props) {
     const [isPending, startTransition] = useTransition();
     const [error, setError] = useState<string | null>(null);
+    const [fieldErrors, setFieldErrors] = useState<{ roleName?: string; hierarchyLevel?: string }>({});
     const [editingId, setEditingId] = useState<number | 'new' | null>(null);
     const nextLevel = roles.length > 0 ? Math.max(...roles.map(r => r.hierarchyLevel)) + 1 : 1;
     const [form, setForm] = useState(emptyForm(nextLevel));
@@ -78,6 +90,12 @@ export default function TagRolesPanel({ tagId, roles, capabilities }: Props) {
 
     function handleSubmit() {
         setError(null);
+        const errors = {
+            roleName: !form.roleName.trim() ? 'ROLE_NAME_REQUIRED' : form.roleName.trim().length > 20 ? 'ROLE_NAME_TOO_LONG' : !ROLE_NAME_PATTERN.test(form.roleName.trim()) ? 'ROLE_NAME_INVALID' : undefined,
+            hierarchyLevel: !Number.isInteger(form.hierarchyLevel) || form.hierarchyLevel < 0 || form.hierarchyLevel > 200 ? 'HIERARCHY_LEVEL_INVALID' : undefined,
+        };
+        setFieldErrors(errors);
+        if (errors.roleName || errors.hierarchyLevel) return;
         startTransition(async () => {
             try {
                 if (editingId === 'new') {
@@ -87,7 +105,8 @@ export default function TagRolesPanel({ tagId, roles, capabilities }: Props) {
                 }
                 setEditingId(null);
             } catch (e: any) {
-                setError(e.message);
+                const message = e instanceof Error ? e.message : '';
+                setFieldErrors(message === 'HIERARCHY_LEVEL_INVALID' ? { hierarchyLevel: message } : { roleName: message || 'ROLE_CREATE_FAILED' });
             }
         });
     }
@@ -152,10 +171,14 @@ export default function TagRolesPanel({ tagId, roles, capabilities }: Props) {
                             placeholder={t('roleNamePlaceholder')}
                             value={form.roleName}
                             onChange={(e) => setForm({ ...form, roleName: e.target.value })}
+                            maxLength={20}
                             className="border rounded px-2 py-1 text-sm"
                         />
+                        {fieldErrors.roleName && <p className="col-start-1 text-xs text-[#a33a2b]">{getRoleError(fieldErrors.roleName, t)}</p>}
                         <input
                             type="number"
+                            min={0}
+                            max={200}
                             placeholder={t('hierarchyLevelPlaceholder')}
                             value={form.hierarchyLevel}
                             disabled={!capabilities.isOwner}
@@ -163,6 +186,7 @@ export default function TagRolesPanel({ tagId, roles, capabilities }: Props) {
                             className="rounded-md border border-[#d9bfb7] bg-[#fffaf7] px-2 py-1 text-sm outline-none focus:border-[#800000] disabled:bg-[#ead7d0]"
                             title={!capabilities.isOwner ? t('hierarchyHint') : ''}
                         />
+                        {fieldErrors.hierarchyLevel && <p className="col-start-2 text-xs text-[#a33a2b]">{getRoleError(fieldErrors.hierarchyLevel, t)}</p>}
                     </div>
 
                     <div className="grid grid-cols-2 gap-2 mb-4">

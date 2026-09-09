@@ -1,8 +1,8 @@
 import React from 'react';
 import { getTranslations } from 'next-intl/server';
-import { revalidatePath } from 'next/cache';
 import { getUserOrgs } from '@/actions/orgs';
 import OrgList from '@/components/orgs/OrgList';
+import OrganizationCreateForm from '@/components/orgs/OrganizationCreateForm';
 
 export default async function OrgsPage() {
     const orgs = await getUserOrgs();
@@ -24,31 +24,7 @@ export default async function OrgsPage() {
                         <p className="mt-1 text-sm text-[#8a6b63]">{t('manageDescription')}</p>
                     </div>
 
-                    <div>
-                        <form
-                            action={async (formData: FormData) => {
-                                'use server';
-                                const name = String(formData.get('name') || '');
-                                if (name.trim()) {
-                                    await (await import('@/actions/orgs')).createOrganization(name.trim());
-                                    revalidatePath('/orgs');
-                                }
-                            }}
-                            className="flex items-center gap-2"
-                        >
-                            <input
-                                name="name"
-                                placeholder={t('newOrganizationPlaceholder')}
-                                className="border border-[#d9bfb7] bg-[#fffaf7] px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#d9bfb7]"
-                            />
-                            <button
-                                type="submit"
-                                className="inline-flex items-center bg-[#800000] px-3 py-1.5 text-sm font-medium text-[#fffaf7] hover:bg-[#5f0000]"
-                            >
-                                {t('newOrganization')}
-                            </button>
-                        </form>
-                    </div>
+                    <OrganizationCreateForm />
                 </header>
                 <section>
                     <OrgList orgs={summaries} />

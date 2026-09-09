@@ -10,6 +10,25 @@ import { redirect } from "next/navigation";
 import { TagPermissionError } from '%/lib/errors';
 import { userHasOrgPermission } from '@/actions/orgs';
 
+const MAX_ROLE_NAME_LENGTH = 20;
+const MAX_HIERARCHY_LEVEL = 200;
+const ROLE_NAME_PATTERN = /^[A-Za-z0-9 _-]+$/;
+const TAG_NAME_PATTERN = /^[A-Za-z0-9 _-]+$/;
+
+function validateTagRole(data: { roleName?: string; hierarchyLevel?: number }) {
+    if (data.roleName !== undefined) {
+        const roleName = data.roleName.trim();
+        if (!roleName) throw new Error('ROLE_NAME_REQUIRED');
+        if (roleName.length > MAX_ROLE_NAME_LENGTH) throw new Error('ROLE_NAME_TOO_LONG');
+        if (!ROLE_NAME_PATTERN.test(roleName)) {
+            throw new Error('ROLE_NAME_INVALID');
+        }
+    }
+    if (data.hierarchyLevel !== undefined && (!Number.isInteger(data.hierarchyLevel) || data.hierarchyLevel < 0 || data.hierarchyLevel > MAX_HIERARCHY_LEVEL)) {
+        throw new Error('HIERARCHY_LEVEL_INVALID');
+    }
+}
+
 export async function requireUser() {
     const user = await getSessionUser(await getSessionCookie());
     if (!user) redirect("/login");
@@ -24,7 +43,8 @@ export async function createTag(data: FormData) {
     const rawColor = String(data.get('color') ?? '#3b82f6').trim();
     const rawNamespace = String(data.get('namespace') ?? '').trim();
 
-    if (!rawName) throw new Error('Tag name is required.');
+    if (!rawName) throw new Error('TAG_NAME_REQUIRED');
+    if (rawName.length > 50 || !TAG_NAME_PATTERN.test(rawName)) throw new Error('TAG_NAME_INVALID');
 
     const name = slugify(rawName);
     if (!name) throw new Error('Invalid tag name.');
@@ -59,6 +79,8 @@ export async function createTagRole(tagId: number, data: {
     const user = await requireUser();
     const caps = await getTagCapabilities(tagId, user.user_id);
     if (!caps.canManageRoles) throw new Error("Permission denied");
+
+    validateTagRole(data);
 
     if (!caps.isOwner && data.hierarchyLevel >= caps.rank) {
         throw new Error("Cannot create a role higher or equal to your's");
@@ -183,6 +205,8 @@ export async function updateTagRole(tagId: number, roleId: number, data: Partial
     const caps = await getTagCapabilities(tagId, user.user_id);
     if (!caps.canManageRoles) throw new Error("Permission denied");
 
+    validateTagRole(data);
+
     const target = await prisma.tagRole.findUnique({ where: { id: roleId } });
     if (!target || target.tagId !== tagId) throw new Error("Couldn't find target role");
 
@@ -297,6 +321,14 @@ export async function updateTagInfo(tagId: number, data: {
     const caps = await getTagCapabilities(tagId, user.user_id);
     if (!caps.canEditInfo) throw new Error("Permission Denied");
 
+    if (data.name !== undefined) {
+        const name = data.name.trim();
+        if (!name || name.length > 50 || !TAG_NAME_PATTERN.test(name)) {
+            throw new Error("Tag name must be 50 characters or fewer and may only contain letters, numbers, spaces, hyphens, and underscores.");
+        }
+        data.name = name;
+    }
+
     const cleanNamespace = slugify(data.namespace.trim());
     if (!cleanNamespace) {
         throw new Error("Tag namespace is required.");
@@ -319,14 +351,14 @@ export async function updateTagInfo(tagId: number, data: {
 
 export async function checkTagNamespaceAvailability(namespace: string): Promise<{ available: boolean; message?: string }> {
     const cleanNamespace = slugify(namespace.trim());
-    if (!cleanNamespace) return { available: false, message: "Namespace is required." };
+    if (!cleanNamespace) return { available: false, message: "TAG_NAMESPACE_REQUIRED" };
 
     const existingUser = await prisma.user.findUnique({
         where: { accountId: cleanNamespace }
     });
 
     if (existingUser) {
-        return { available: false, message: "This namespace is already used." };
+        return { available: false, message: "TAG_NAMESPACE_TAKEN" };
     }
 
     const existingTag = await prisma.tag.findUnique({
@@ -334,7 +366,7 @@ export async function checkTagNamespaceAvailability(namespace: string): Promise<
     });
 
     if (existingTag) {
-        return { available: false, message: "This namespace is already used." };
+        return { available: false, message: "TAG_NAMESPACE_TAKEN" };
     }
 
     return { available: true };
@@ -345,7 +377,7 @@ export async function checkTagNameAvailability(name: string) {
     if (!trimmed) return { available: null as boolean | null };
 
     const taken = await tagNameExists(trimmed);
-    return { available: !taken, message: taken ? "This name is already taken" : undefined };
+    return { available: !taken, message: taken ? "TAG_NAME_TAKEN" : undefined };
 }
 
 async function tagNameExists(name: string): Promise<boolean> {
@@ -357,21 +389,22 @@ async function tagNameExists(name: string): Promise<boolean> {
 export async function createTagAction(data: { name: string; namespace?: string; colorHex?: string }) {
     const user = await requireUser();
     const name = data.name.trim();
-    if (!name) throw new Error("Tag name is required.");
+    if (!name) throw new Error("TAG_NAME_REQUIRED");
+    if (name.length > 50 || !TAG_NAME_PATTERN.test(name)) throw new Error("TAG_NAME_INVALID");
 
     if (await tagNameExists(name)) {
-        throw new Error("This tag name is taken.");
+        throw new Error("TAG_NAME_TAKEN");
     }
 
     const rawNamespace = data.namespace?.trim() ?? "";
     const cleanNamespace = slugify(rawNamespace);
     if (!cleanNamespace) {
-        throw new Error("Tag namespace is required.");
+        throw new Error("TAG_NAMESPACE_REQUIRED");
     }
 
     const check = await checkTagNamespaceAvailability(cleanNamespace);
     if (!check.available) {
-        throw new Error(check.message || "Namespace already in use.");
+        throw new Error("TAG_NAMESPACE_TAKEN");
     }
 
     const colorInt = data.colorHex ? hexToInt(data.colorHex) : hexToInt("#3b82f6");

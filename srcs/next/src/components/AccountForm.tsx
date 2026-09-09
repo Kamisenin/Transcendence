@@ -74,6 +74,7 @@ export default function AccountForm({ user }: Props) {
                     className="border p-2 w-full"
                     value={account_id}
                     pattern="[A-Za-z0-9_-]+"
+                    maxLength={20}
                     title="Use only letters, numbers, underscores and hyphens"
                     required
                     onChange={(e) => {

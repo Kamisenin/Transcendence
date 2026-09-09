@@ -57,9 +57,9 @@ export default function Infobox({ accountId, id, pageId, data, onChange, onDelet
     }
 
     return (
-        <div className="group relative h-full w-full bg-[#fffaf7] rounded-xl border border-[#d9bfb7] ring-1 ring-[#ead7d0] p-4 shadow-sm flex flex-col overflow-hidden">
+        <div className="group relative h-full w-full min-w-0 bg-[#fffaf7] rounded-xl border border-[#d9bfb7] ring-1 ring-[#ead7d0] p-2 sm:p-4 shadow-sm flex flex-col overflow-hidden">
             {/* En-tête */}
-            <div className="pl-7 flex items-center justify-between border-b pb-2 mb-3 shrink-0">
+            <div className="pl-0 sm:pl-7 flex flex-wrap items-center justify-between gap-2 border-b pb-2 mb-3 shrink-0">
                 <span className="text-xs font-bold uppercase tracking-wider text-gray-400">{t('options')}</span>
                 <button
                     type="button"
@@ -71,7 +71,7 @@ export default function Infobox({ accountId, id, pageId, data, onChange, onDelet
             </div>
 
             {/* Formulaire défilant si redimensionné petit en hauteur */}
-            <div className="pl-7 pr-1 space-y-3 flex-1 overflow-y-auto">
+            <div className="pl-0 sm:pl-7 pr-0 sm:pr-1 space-y-3 flex-1 min-h-0 overflow-y-auto">
                 <TitleInput pageId={pageId} title={data.title} onChange={(val) => updateField("title", val)} />
 
                 <div>
@@ -83,7 +83,7 @@ export default function Infobox({ accountId, id, pageId, data, onChange, onDelet
                         value={data.imageUrl}
                         onChange={(e) => updateField("imageUrl", e.target.value)}
                         placeholder="https://..."
-                        className="w-full text-xs border border-[#d9bfb7] rounded-lg px-3 py-1.5 outline-none focus:border-[#800000] bg-[#fffaf7]"
+                        className="w-full min-w-0 text-xs border border-[#d9bfb7] rounded-lg px-3 py-1.5 outline-none focus:border-[#800000] bg-[#fffaf7]"
                     />
                 </div>
 
@@ -98,12 +98,14 @@ export default function Infobox({ accountId, id, pageId, data, onChange, onDelet
                 />
             </div>
 
-                {isOwner && ownerAccountId && (
+            {isOwner && ownerAccountId && (
+                <div className="min-h-0 min-w-0 flex-1 overflow-y-auto">
                     <PagePermissions
                         pageId={pageId}
                         ownerAccountId={ownerAccountId}
                         initialPermissions={initialPermissions}
                     />
+                </div>
                 )}
 
             <CreateTagModal

@@ -193,7 +193,7 @@ export default function PagePermissions({ pageId, ownerAccountId, initialPermiss
     const filteredOrgs = grantableOrgs.filter(org => org.name.toLowerCase().includes(orgQuery.trim().toLowerCase()));
 
     return (
-        <div className="border rounded-lg p-3 bg-gray-50">
+        <div className="w-full min-w-0 overflow-hidden rounded-lg border bg-gray-50 p-3">
             <div className="text-xs font-semibold text-gray-500 mb-2">{t("title")}</div>
 
             {error && (
@@ -202,11 +202,11 @@ export default function PagePermissions({ pageId, ownerAccountId, initialPermiss
                 </div>
             )}
 
-            <div className="flex gap-2 mb-2">
+            <div className="mb-2 flex min-w-0 flex-col gap-2 sm:flex-row">
                 <select
                     value={mode}
                     onChange={(e) => setMode(e.target.value as GrantMode)}
-                    className="border rounded px-2 py-1.5 text-sm bg-white"
+                    className="w-full min-w-0 border rounded px-2 py-1.5 text-sm bg-white sm:w-auto"
                 >
                     <option value="user">{t("byUser")}</option>
                     <option value="tagRole">{t("byTagRole")}</option>
@@ -215,7 +215,7 @@ export default function PagePermissions({ pageId, ownerAccountId, initialPermiss
                 <select
                     value={level}
                     onChange={(e) => setLevel(e.target.value as 'READ' | 'WRITE' | 'ADMIN')}
-                    className="border rounded px-2 py-1.5 text-sm bg-white"
+                    className="w-full min-w-0 border rounded px-2 py-1.5 text-sm bg-white sm:w-auto"
                 >
                     <option value="READ">{t("levelRead")}</option>
                     <option value="WRITE">{t("levelWrite")}</option>
@@ -238,14 +238,14 @@ export default function PagePermissions({ pageId, ownerAccountId, initialPermiss
                     {loading && <p className="text-xs text-gray-400 px-1">{tCommon("searching")}</p>}
 
                     {results.length > 0 && (
-                        <div className="divide-y border rounded bg-white mb-2">
+                        <div className="mb-2 divide-y overflow-hidden rounded border bg-white">
                             {results.map(u => (
-                                <div key={u.user_id} className="flex items-center justify-between p-2">
-                                    <div className="flex items-center gap-2">
+                                <div key={u.user_id} className="flex min-w-0 flex-col gap-2 p-2 sm:flex-row sm:items-center sm:justify-between">
+                                    <div className="flex min-w-0 items-center gap-2">
                                         <UserAvatar accountId={u.accountId} imgLink={u.imgLink} alt={u.username || u.accountId} size={24} className="h-6 w-6" />
-                                        <div>
-                                            <p className="text-sm font-medium leading-tight">{u.username}</p>
-                                            <p className="text-xs text-gray-400 leading-tight">@{u.accountId}</p>
+                                        <div className="min-w-0">
+                                            <p className="break-words text-sm font-medium leading-tight">{u.username}</p>
+                                            <p className="break-words text-xs text-gray-400 leading-tight">@{u.accountId}</p>
                                         </div>
                                     </div>
                                     <button
@@ -263,7 +263,7 @@ export default function PagePermissions({ pageId, ownerAccountId, initialPermiss
             )}
 
             {mode === 'tagRole' && (
-                <div className="grid grid-cols-2 gap-2 mb-2">
+                <div className="mb-2 grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-2">
                     <div className="relative">
                         <input value={selectedTagId ? grantableTags.find(tag => tag.id === selectedTagId)?.name ?? '' : tagQuery} onChange={(e) => { setSelectedTagId(null); setSelectedTagRoleId(null); setTagQuery(e.target.value); }} placeholder={t("searchTag")} className="w-full min-w-0 border rounded px-2 py-1.5 text-sm bg-white" />
                         {!selectedTagId && tagQuery.trim() && <div className="absolute z-20 mt-1 max-h-48 w-full overflow-y-auto border rounded bg-white shadow">{filteredTags.map(tag => <button type="button" key={tag.id} onClick={() => { setSelectedTagId(tag.id); setTagQuery(''); setSelectedTagRoleId(null); }} className="block w-full px-2 py-1.5 text-left text-sm hover:bg-gray-100">#{tag.name}</button>)}</div>}
@@ -282,7 +282,7 @@ export default function PagePermissions({ pageId, ownerAccountId, initialPermiss
                     <button
                         onClick={handleAddTagRole}
                         disabled={isPending || !selectedTagId || !selectedTagRoleId}
-                        className="col-span-2 text-xs bg-[#800000] hover:bg-[#5f0000] disabled:opacity-40 disabled:cursor-not-allowed text-[#fffaf7] px-2.5 py-1.5 rounded"
+                        className="text-xs bg-[#800000] hover:bg-[#5f0000] disabled:opacity-40 disabled:cursor-not-allowed text-[#fffaf7] px-2.5 py-1.5 rounded sm:col-span-2"
                     >
                         {t("add")}
                     </button>
@@ -290,7 +290,7 @@ export default function PagePermissions({ pageId, ownerAccountId, initialPermiss
             )}
 
             {mode === 'orgRole' && (
-                <div className="grid grid-cols-2 gap-2 mb-2">
+                <div className="mb-2 grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-2">
                     <div className="relative">
                         <input value={selectedOrgId ? grantableOrgs.find(org => org.id === selectedOrgId)?.name ?? '' : orgQuery} onChange={(e) => { setSelectedOrgId(null); setSelectedOrgRoleId(null); setOrgQuery(e.target.value); }} placeholder={t("searchOrganization")} className="w-full min-w-0 border rounded px-2 py-1.5 text-sm bg-white" />
                         {!selectedOrgId && orgQuery.trim() && <div className="absolute z-20 mt-1 max-h-48 w-full overflow-y-auto border rounded bg-white shadow">{filteredOrgs.map(org => <button type="button" key={org.id} onClick={() => { setSelectedOrgId(org.id); setOrgQuery(''); setSelectedOrgRoleId(null); }} className="block w-full px-2 py-1.5 text-left text-sm hover:bg-gray-100">{org.name}</button>)}</div>}
@@ -309,7 +309,7 @@ export default function PagePermissions({ pageId, ownerAccountId, initialPermiss
                     <button
                         onClick={handleAddOrgRole}
                         disabled={isPending || !selectedOrgId || !selectedOrgRoleId}
-                        className="col-span-2 text-xs bg-[#800000] hover:bg-[#5f0000] disabled:opacity-40 disabled:cursor-not-allowed text-[#fffaf7] px-2.5 py-1.5 rounded"
+                        className="text-xs bg-[#800000] hover:bg-[#5f0000] disabled:opacity-40 disabled:cursor-not-allowed text-[#fffaf7] px-2.5 py-1.5 rounded sm:col-span-2"
                     >
                         {t("add")}
                     </button>
@@ -317,23 +317,23 @@ export default function PagePermissions({ pageId, ownerAccountId, initialPermiss
             )}
 
             <div className="divide-y border rounded bg-white mb-3">
-                <div className="flex items-center justify-between p-2 bg-gray-50">
-                    <span className="text-sm font-medium">@{ownerAccountId}</span>
+                <div className="flex min-w-0 flex-col gap-1 bg-gray-50 p-2 sm:flex-row sm:items-center sm:justify-between">
+                    <span className="break-words text-sm font-medium">@{ownerAccountId}</span>
                     <span className="text-xs text-gray-400">{t("owner")}</span>
                 </div>
                 {permissions.length === 0 ? (
                     <p className="text-xs text-gray-400 px-1 py-2">{t("noPermissionsYet")}</p>
                 ) : (
                     permissions.map((p) => (
-                        <div key={p.userToken} className="flex items-center justify-between p-2">
-                            <div className="flex items-center gap-2">
+                        <div key={p.userToken} className="flex min-w-0 flex-col gap-2 p-2 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="flex min-w-0 items-center gap-2">
                                 <UserAvatar accountId={p.user.accountId} imgLink={p.user.imgLink} alt={p.user.username || p.user.accountId} size={24} className="h-6 w-6" />
-                                <div>
-                                    <p className="text-sm font-medium leading-tight">{p.user.username}</p>
-                                    <p className="text-xs text-gray-400 leading-tight">@{p.user.accountId}</p>
+                                <div className="min-w-0">
+                                    <p className="break-words text-sm font-medium leading-tight">{p.user.username}</p>
+                                    <p className="break-words text-xs text-gray-400 leading-tight">@{p.user.accountId}</p>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex flex-wrap items-center gap-2 sm:shrink-0">
                                 <span className="text-xs text-gray-500">
                                     {p.permissions === 'READ' ? t("levelRead") : p.permissions === 'WRITE' ? t("levelWrite") : t("levelAdmin")}
                                 </span>
@@ -355,12 +355,12 @@ export default function PagePermissions({ pageId, ownerAccountId, initialPermiss
                     <div className="text-xs font-semibold text-gray-500 mb-1">{t("tagAccessList")}</div>
                     <div className="divide-y border rounded bg-white mb-3">
                         {tagAccess.map((a) => (
-                            <div key={a.tagId} className="flex items-center justify-between p-2">
-                                <p className="text-sm">
-                                    <span className="font-medium">{a.tag.name}</span>
+                            <div key={a.tagId} className="flex min-w-0 flex-col gap-2 p-2 sm:flex-row sm:items-center sm:justify-between">
+                                <p className="min-w-0 break-words text-sm">
+                                    <span className="font-medium break-words">{a.tag.name}</span>
                                     <span className="text-gray-400"> · {a.minRole.roleName}+</span>
                                 </p>
-                                <div className="flex items-center gap-2">
+                                <div className="flex flex-wrap items-center gap-2 sm:shrink-0">
                                     <span className="text-xs text-gray-500">
                                         {a.permissions === 'READ' ? t("levelRead") : a.permissions === 'WRITE' ? t("levelWrite") : t("levelAdmin")}
                                     </span>
@@ -383,12 +383,12 @@ export default function PagePermissions({ pageId, ownerAccountId, initialPermiss
                     <div className="text-xs font-semibold text-gray-500 mb-1">{t("orgAccessList")}</div>
                     <div className="divide-y border rounded bg-white">
                         {orgAccess.map((a) => (
-                            <div key={a.orgId} className="flex items-center justify-between p-2">
-                                <p className="text-sm">
-                                    <span className="font-medium">{a.organization.name}</span>
+                            <div key={a.orgId} className="flex min-w-0 flex-col gap-2 p-2 sm:flex-row sm:items-center sm:justify-between">
+                                <p className="min-w-0 break-words text-sm">
+                                    <span className="font-medium break-words">{a.organization.name}</span>
                                     <span className="text-gray-400"> · {a.minRole.roleName}+</span>
                                 </p>
-                                <div className="flex items-center gap-2">
+                                <div className="flex flex-wrap items-center gap-2 sm:shrink-0">
                                     <span className="text-xs text-gray-500">
                                         {a.permissions === 'READ' ? t("levelRead") : a.permissions === 'WRITE' ? t("levelWrite") : t("levelAdmin")}
                                     </span>

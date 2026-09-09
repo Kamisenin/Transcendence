@@ -98,7 +98,7 @@ export default function TagManagement({tag, capabilities, roles, members, pendin
 
             {tag.description && <p className="mb-6 max-w-2xl text-sm leading-6 text-[#8a6b63]">{tag.description}</p>}
 
-            <div className="mb-6 flex gap-1 overflow-x-auto border-b border-[#d9bfb7]">
+            <div className="mb-6 flex gap-1 overflow-x-auto overflow-y-hidden border-b border-[#d9bfb7]">
                 {visibleTabs.map(t => (
                     <button
                         key={t.key}

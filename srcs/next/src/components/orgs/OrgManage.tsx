@@ -64,6 +64,18 @@ type OrganizationManageData = {
     orgPageRequests?: Array<{ id: number; page: { pageId: number; title: string }; minRole: { roleName: string }; requester: { accountId: string; username: string | null } }>;
 };
 
+const ROLE_NAME_PATTERN = /^[A-Za-z0-9 _-]+$/;
+
+function getRoleError(code: string, t: ReturnType<typeof useTranslations>) {
+    switch (code) {
+        case "ROLE_NAME_REQUIRED": return t("roleNameRequired");
+        case "ROLE_NAME_TOO_LONG": return t("roleNameTooLong");
+        case "ROLE_NAME_INVALID": return t("roleNameInvalid");
+        case "HIERARCHY_LEVEL_INVALID": return t("hierarchyLevelInvalid");
+        default: return t("failedToCreateRole");
+    }
+}
+
 export default function OrgManageClient({ org, canManage }: { org: OrganizationManageData; canManage: boolean }) {
     const t = useTranslations("Orgs");
     const tMembers = useTranslations("Tags.members");
@@ -79,6 +91,7 @@ export default function OrgManageClient({ org, canManage }: { org: OrganizationM
     const [tagRequests, setTagRequests] = useState(org.orgTagRequests ?? []);
     const [pageRequests, setPageRequests] = useState(org.orgPageRequests ?? []);
     const [busyKey, setBusyKey] = useState<string | null>(null);
+    const [roleErrors, setRoleErrors] = useState<{ roleName?: string; hierarchyLevel?: string }>({});
 
     const [newRole, setNewRole] = useState({
         roleName: "",
@@ -232,7 +245,13 @@ export default function OrgManageClient({ org, canManage }: { org: OrganizationM
     };
 
     const handleCreateRole = async () => {
-        if (!newRole.roleName.trim()) return showToast(tRoles("roleNameRequired"));
+        const roleName = newRole.roleName.trim();
+        const errors = {
+            roleName: !roleName ? "ROLE_NAME_REQUIRED" : roleName.length > 20 ? "ROLE_NAME_TOO_LONG" : !ROLE_NAME_PATTERN.test(roleName) ? "ROLE_NAME_INVALID" : undefined,
+            hierarchyLevel: !Number.isInteger(newRole.hierarchyLevel) || newRole.hierarchyLevel < 0 || newRole.hierarchyLevel > 200 ? "HIERARCHY_LEVEL_INVALID" : undefined,
+        };
+        setRoleErrors(errors);
+        if (errors.roleName || errors.hierarchyLevel) return;
         setBusyKey("create-role");
         try {
             const created = await createOrganizationRole(org.id, {
@@ -252,7 +271,8 @@ export default function OrgManageClient({ org, canManage }: { org: OrganizationM
             });
             showToast(tRoles("roleCreated"), "success");
         } catch (e) {
-            showToast(e instanceof Error ? e.message : tRoles("failedToCreateRole"));
+            const message = e instanceof Error ? e.message : "";
+            setRoleErrors(message === "HIERARCHY_LEVEL_INVALID" ? { hierarchyLevel: message } : { roleName: message || "ROLE_CREATE_FAILED" });
         } finally {
             setBusyKey(null);
         }
@@ -461,13 +481,17 @@ export default function OrgManageClient({ org, canManage }: { org: OrganizationM
                             placeholder={t("roleNamePlaceholder")}
                             className="border border-[#d9bfb7] bg-[#fffaf7] px-3 py-2 text-sm"
                         />
+                        {roleErrors.roleName && <p className="text-xs text-[#a33a2b]">{getRoleError(roleErrors.roleName, tRoles)}</p>}
                         <input
                             type="number"
+                            min={0}
+                            max={200}
                             value={newRole.hierarchyLevel}
-                            onChange={(e) => setNewRole((p) => ({ ...p, hierarchyLevel: Number(e.target.value) || 100 }))}
+                            onChange={(e) => setNewRole((p) => ({ ...p, hierarchyLevel: Number(e.target.value) }))}
                             placeholder={t("hierarchyLevelPlaceholder")}
                             className="border border-[#d9bfb7] bg-[#fffaf7] px-3 py-2 text-sm"
                         />
+                        {roleErrors.hierarchyLevel && <p className="text-xs text-[#a33a2b]">{getRoleError(roleErrors.hierarchyLevel, tRoles)}</p>}
                         <button
                             onClick={handleCreateRole}
                             disabled={busyKey === "create-role"}

@@ -24,6 +24,19 @@ type FieldStatus = {
 };
 
 const IDLE_STATUS: FieldStatus = { checking: false, available: null };
+const TAG_NAME_PATTERN = /^[A-Za-z0-9 _-]+$/;
+
+function getTagError(code: string, t: ReturnType<typeof useTranslations>) {
+    switch (code) {
+        case "TAG_NAME_REQUIRED": return t('createModal.required');
+        case "TAG_NAME_INVALID": return t('createModal.nameInvalid');
+        case "TAG_NAME_TAKEN": return t('createModal.nameUnavailable');
+        case "TAG_NAMESPACE_REQUIRED": return t('createModal.namespaceRequired');
+        case "TAG_NAMESPACE_TAKEN": return t('createModal.namespaceUnavailable');
+        case "TAG_NAMESPACE_INVALID": return t('createModal.namespaceInvalid');
+        default: return t('genericError');
+    }
+}
 
 export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props) {
     const [name, setName] = useState("");
@@ -41,6 +54,11 @@ export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props)
     useEffect(() => {
         if (!name.trim()) {
             setNameStatus(IDLE_STATUS);
+            return;
+        }
+
+        if (name.trim().length > 50 || !TAG_NAME_PATTERN.test(name.trim())) {
+            setError('TAG_NAME_INVALID');
             return;
         }
         setNameStatus({ checking: true, available: null });
@@ -71,22 +89,22 @@ export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props)
         setError(null);
 
         if (!name.trim()) {
-            setError(t('createModal.required'));
+            setError('TAG_NAME_REQUIRED');
             return;
         }
 
         if (nameStatus.available !== true) {
-            setError(t('createModal.nameUnavailable'));
+            setError('TAG_NAME_TAKEN');
             return;
         }
 
         if (nsStatus.available !== true) {
-            setError(t('createModal.namespaceInvalid'));
+            setError('TAG_NAMESPACE_INVALID');
             return;
         }
 
         if (!namespace.trim()) {
-            setError(t('createModal.namespaceRequired'));
+            setError('TAG_NAMESPACE_REQUIRED');
             return;
         }
 
@@ -107,7 +125,7 @@ export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props)
             setNsStatus(IDLE_STATUS);
             onClose();
         } catch (err: any) {
-            setError(err.message || t('genericError'));
+            setError(err instanceof Error ? err.message : 'TAG_CREATE_FAILED');
         } finally {
             setIsSubmitting(false);
         }
@@ -138,7 +156,7 @@ export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props)
                     {error && (
                         <div className="flex items-center gap-2 rounded-lg border border-[#e6b8b0] bg-[#fff1ef] p-2.5 font-medium text-[#a33a2b]">
                             <AlertCircle size={14} className="shrink-0" />
-                            <span>{error}</span>
+                            <span>{getTagError(error, t)}</span>
                         </div>
                     )}
 
@@ -148,6 +166,7 @@ export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props)
                             type="text"
                             required
                             value={name}
+                            maxLength={50}
                             onChange={(e) => setName(e.target.value)}
                             placeholder={t('createModal.namePlaceholder')}
                             className="w-full rounded-lg border border-[#d9bfb7] bg-[#fffaf7] px-3 py-2 text-xs outline-none transition focus:border-[#800000]"
@@ -164,7 +183,7 @@ export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props)
                                     </span>
                                 ) : nameStatus.available === false ? (
                                         <span className="flex items-center gap-1 font-medium text-[#a33a2b]">
-                                        <AlertCircle size={12} /> {nameStatus.message ?? t('nameAlreadyTaken')}
+                                        <AlertCircle size={12} /> {getTagError(nameStatus.message ?? 'TAG_NAME_TAKEN', t)}
                                     </span>
                                 ) : null}
                             </div>
@@ -194,7 +213,7 @@ export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props)
                                     </span>
                                 ) : nsStatus.available === false ? (
                                     <span className="flex items-center gap-1 font-medium text-[#a33a2b]">
-                                        <AlertCircle size={12} /> {nsStatus.message ?? t('createModal.invalidNamespace')}
+                                        <AlertCircle size={12} /> {getTagError(nsStatus.message ?? 'TAG_NAMESPACE_INVALID', t)}
                                     </span>
                                 ) : null}
                             </div>
