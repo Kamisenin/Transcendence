@@ -101,6 +101,7 @@
 		}
 	},
 	"UserMenu": {
+		"profil": "Perfil",
 		"signIn": "Iniciar sesión",
 		"signUp": "Registrarse",
 		"hello": "Hola, {username}",

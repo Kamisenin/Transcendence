@@ -67,8 +67,16 @@ export default function UserMenu({ user }: UserMenuProps) {
             {open && (
                 <div className="absolute right-0 mt-2 w-48 bg-white text-back rounded shadow-lg border">
                     <div className="px-4 py-2 border-b text-sm font-semibold">
-                        {t("hello", {username: user.username})}
+                        <Link
+                            href={`/wiki/${encodeURIComponent(user.accountId)}`}
+                            className='hover:underline'>
+                            {t("hello", {username: user.username})}
+                        </Link>
                     </div>
+                    <Link
+                        href={`/wiki/${encodeURIComponent(user.accountId)}`} className="block px-4 py-2 hover:bg-gray-100">
+                        {t("profil")}
+                    </Link>
                     <Link href="/account" className="block px-4 py-2 hover:bg-gray-100">
                         {t("account")}
                     </Link>
