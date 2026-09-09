@@ -23,6 +23,7 @@ export default function RegisterPage() {
                 email: form.get('email'),
                 password: form.get('password'),
                 accountId: form.get('account_id'),
+                username: form.get('username'),
                 stayConnected: false
             })
         });

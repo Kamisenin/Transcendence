@@ -43,7 +43,8 @@
 		"offline" : "Fuera de línea",
 		"myImages": "Mis imágenes",
 		"fileCount": "{count} archivo(s)",
-		"back": "Volver"
+		"back": "Volver",
+		"addBlock": "Añadir un bloque"
 	},
 	"Auth": {
 		"login": {

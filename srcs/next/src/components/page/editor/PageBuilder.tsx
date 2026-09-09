@@ -172,70 +172,82 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
 
 
     async function handleSave() {
-    setSaving(true);
+        setSaving(true);
 
-    try {
-        const mainInfobox = blocks.find(b => b.type === 'infobox');
+        try {
+            const mainInfobox = blocks.find(b => b.type === 'infobox');
 
-        const infoboxData = mainInfobox?.infoboxData || DEFAULT_INFOBOX;
+            const infoboxData = mainInfobox?.infoboxData || DEFAULT_INFOBOX;
 
-        const pageTitle =
-        infoboxData.title || normalizedInitialTitle;
+            const pageTitle =
+            infoboxData.title || normalizedInitialTitle;
 
-        const visibility =
-        infoboxData.public || false;
+            const visibility =
+            infoboxData.public || false;
 
-        const namespace =
-        infoboxData.canonicalNamespace;
+            const namespace =
+            infoboxData.canonicalNamespace;
 
-        const content = {
-        blocks: blocks.map(block => {
-            const layoutItem = layout.find(l => l.i === block.id)!;
+            const content = {
+            blocks: blocks.map(block => {
+                const layoutItem = layout.find(l => l.i === block.id)!;
 
-            return {
-            id: block.id,
-            type: block.type || 'editor',
-            x: layoutItem.x,
-            y: layoutItem.y,
-            w: layoutItem.w,
-            h: layoutItem.h,
-            value: block.value,
-            infoboxData: block.infoboxData
+                return {
+                id: block.id,
+                type: block.type || 'editor',
+                x: layoutItem.x,
+                y: layoutItem.y,
+                w: layoutItem.w,
+                h: layoutItem.h,
+                value: block.value,
+                infoboxData: block.infoboxData
+                };
+            }),
             };
-        }),
-        };
 
-        await savePage(
-        pageId,
-        pageTitle,
-        content as any,
-        infoboxData,
-        visibility,
-        namespace
-        );
+            await savePage(
+            pageId,
+            pageTitle,
+            content as any,
+            infoboxData,
+            visibility,
+            namespace
+            );
 
-    } finally {
-        setSaving(false);
-    }
+        } finally {
+            setSaving(false);
+        }
     }
 
 
     return (
         <div className="min-h-screen bg-[#f0e0d6] p-8 pt-20">
-            <Toolbar ref={toolbarRef} editor={activeEditor} disabled={!activeEditor} onAddBlock={handleAddBlock} />
             <Link
                 href={`/wiki/${accountId}/${pageId}`}
                 className="shrink-0 px-3 py-1 rounded bg-[#800000] text-[#fffaf7] text-sm hover:bg-[#5f0000]"
             >
                 {`← ${tCommon("back")}`}
             </Link>
-            <button
-                onClick={handleSave}
-                disabled={saving}
-                className="fixed bottom-6 right-6 z-40 bg-[#800000] hover:bg-[#5f0000] text-[#fffaf7] px-4 py-2 rounded-lg shadow-lg text-sm font-semibold"
-            >
-                {saving ? tCommon('saving') : tCommon('save')}
-            </button>
+            <Toolbar ref={toolbarRef} editor={activeEditor} disabled={!activeEditor} onAddBlock={handleAddBlock} />
+            
+            {/* Conteneur des boutons fixes en bas à droite */}
+            <div className="fixed bottom-6 right-6 z-40 flex items-center gap-3">
+                <button
+                    onClick={handleAddBlock}
+                    type="button"
+                    className="bg-[#fffaf7] hover:bg-[#f0e0d6] text-[#800000] border border-[#800000] px-4 py-2 rounded-lg shadow-lg text-sm font-semibold transition-colors flex items-center gap-1.5"
+                >
+                    <span className="text-base font-bold">+</span>
+                    {tCommon("addBlock") || "Ajouter un bloc"}
+                </button>
+                <button
+                    onClick={handleSave}
+                    disabled={saving}
+                    className="bg-[#800000] hover:bg-[#5f0000] text-[#fffaf7] px-4 py-2 rounded-lg shadow-lg text-sm font-semibold transition-colors disabled:opacity-50"
+                >
+                    {saving ? tCommon('saving') : tCommon('save')}
+                </button>
+            </div>
 
             <div ref={containerRef} className="max-w-6xl mx-auto border border-[#d9bfb7] rounded-xl bg-[#fffaf7] p-4 min-h-[500px] shadow-sm relative mt-4">
                 <ReactGridLayout

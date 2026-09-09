@@ -43,7 +43,8 @@
 		"offline" : "Offline",
 		"myImages": "My images",
 		"fileCount": "{count} file(s)",
-		"back": "Back"
+		"back": "Back",
+		"addBlock": "Add block"
 	},
 	"Auth": {
 		"login": {
