@@ -30,6 +30,8 @@ services:
     restart: unless-stopped
     environment:
       - ADDRESS=${ADDRESS}
+    depends_on:
+      - next
     extra_hosts:
       - "host.parent:host-gateway"
     networks :
@@ -45,7 +47,6 @@ services:
       - gmail_user
     depends_on:
       - postgres
-    profiles: ["prod"]
     networks:
       - 42chan
 
