@@ -237,7 +237,7 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
                     layout={layout}
                     onLayoutChange={(newLayout) => setLayout(newLayout)}
                     width={width}
-                    draggableHandle=".drag-handle"
+                    dragConfig={{ handle: ".drag-handle" }}
                 >
                     {blocks.map(block => (
                         <div key={block.id} className="relative group/grid-item">
