@@ -26,26 +26,23 @@ export default function Footer({
   const [animationDirection, setAnimationDirection] = useState<
     "left" | "right"
   >("right");
+  const [reactionAnimation, setReactionAnimation] = useState(0);
 
   const handleReaction = async (event: "favorite" | "dislike") => {
     if (!userId) return;
 
     try {
       if (reaction === event) {
-        const cancelEvent =
-          event === "favorite" ? "cancel_favorite" : "cancel_dislike";
-
         const response = await fetch(
-          "http://localhost:8001/recommendation/event",
+          "http://localhost:8001/recommendation/reaction",
           {
-            method: "POST",
+            method: "DELETE",
             headers: {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
               user_id: userId,
               page_id: currentPageId,
-              event: cancelEvent,
             }),
           }
         );
@@ -55,6 +52,7 @@ export default function Footer({
         }
 
         setReaction(null);
+        setReactionAnimation((value) => value + 1);
         return;
       }
 
@@ -80,6 +78,7 @@ export default function Footer({
       }
 
       setReaction(event);
+      setReactionAnimation((value) => value + 1);
     } catch (error) {
       console.error("Error handling reaction:", error);
     }
@@ -210,7 +209,7 @@ export default function Footer({
   return (
     <footer className="relative w-full bg-muted border-t border-border py-6 px-4 text-foreground">
       <div className="max-w-7xl mx-auto flex flex-col gap-6">
-        {userId && hasTags && (
+        {userId && (
           <div className="absolute left-4 -top-14 flex gap-2">
             <button
               type="button"
@@ -226,9 +225,8 @@ export default function Footer({
               }
             >
               <span
-                className={`favorite-icon ${
-                  reaction === "favorite" ? "pop active" : ""
-                }`}
+                key={`favorite-${reactionAnimation}`}
+                className={`favorite-icon ${reaction === "favorite" ? "pop active" : ""}`}
               >
                 ♥
               </span>
@@ -244,9 +242,8 @@ export default function Footer({
               title={reaction === "dislike" ? t("removeDislike") : t("dislike")}
             >
               <span
-                className={`dislike-icon ${
-                  reaction === "dislike" ? "pop active" : ""
-                }`}
+                key={`dislike-${reactionAnimation}`}
+                className={`dislike-icon ${reaction === "dislike" ? "pop active" : ""}`}
               >
                 ×
               </span>
@@ -299,11 +296,11 @@ export default function Footer({
                 {pages.map((page, index) => (
                   <div
                     key={`${mode}-${page.pageId}`}
-                    className={`w-64 shrink-0 ${
+                    className={
                       animationDirection === "right"
                         ? "recommendation-card-from-right"
                         : "recommendation-card-from-left"
-                    }`}
+                    }
                     style={{
                       animationDelay: `${(pages.length - 1 - index) * 20}ms`,
                       animationDuration: "900ms",
@@ -314,7 +311,7 @@ export default function Footer({
                     <ForumCard
                       page={page}
                       userId={userId}
-                      className="w-full"
+                      className="flex-none w-64"
                     />
                   </div>
                 ))}

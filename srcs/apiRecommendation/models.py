@@ -9,4 +9,4 @@ class RecommendationEvent(BaseModel):
 class PageReaction(BaseModel):
     user_id: str
     page_id: int
-    type: str
+    type: str | None = None

@@ -39,10 +39,7 @@ def process_event(user_id, page_id, event):
             tags = cursor.fetchall()
 
             if not tags:
-                raise HTTPException(
-                    status_code=404,
-                    detail="Page has no tags"
-                )
+                return
 
             # ---------------------------------------
             # Modifier le profil utilisateur
