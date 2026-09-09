@@ -498,6 +498,91 @@ export async function deleteTag(tagId: number): Promise<void> {
     if (!isOwner && !hasDirectPermission && !hasRolePermission)
         throw new TagPermissionError("Forbidden");
 
-    await prisma.tag.delete({ where: { id: tagId } });
+    const taggedPages = await prisma.tagPage.findMany({
+        where: { tagId },
+        select: {
+            pageId: true,
+            page: {
+                select: {
+                    content: true,
+                    owner: { select: { accountId: true } },
+                },
+            },
+        },
+    });
+
+    await prisma.$transaction(async (tx) => {
+        for (const { pageId, page } of taggedPages) {
+            const content = page.content as {
+                blocks?: Array<{
+                    infoboxData?: {
+                        tags?: Array<{ id: number | string }>;
+                    };
+                }>;
+            } | null;
+            const blocks = content?.blocks;
+
+            if (blocks) {
+                await tx.page.update({
+                    where: { pageId },
+                    data: {
+                        content: {
+                            ...content,
+                            blocks: blocks.map((block) => block.infoboxData?.tags
+                                ? {
+                                    ...block,
+                                    infoboxData: {
+                                        ...block.infoboxData,
+                                        tags: block.infoboxData.tags.filter((tag) => Number(tag.id) !== tagId),
+                                    },
+                                }
+                                : block),
+                        },
+                    },
+                });
+            }
+
+            await tx.pageSlug.deleteMany({
+                where: { pageId, type: 'TAG' },
+            });
+
+            await tx.pageSlug.updateMany({
+                where: { pageId, type: 'USER' },
+                data: {
+                    isCanonical: false,
+                    namespace: page.owner.accountId,
+                },
+            });
+
+            await tx.pageSlug.upsert({
+                where: {
+                    namespace_slug: {
+                        namespace: page.owner.accountId,
+                        slug: `${pageId}`,
+                    },
+                },
+                update: { pageId, type: 'USER', isCanonical: true },
+                create: {
+                    pageId,
+                    namespace: page.owner.accountId,
+                    slug: `${pageId}`,
+                    type: 'USER',
+                    isCanonical: true,
+                },
+            });
+        }
+
+        await tx.orgTagCapability.deleteMany({ where: { tagId } });
+        await tx.orgTagAccess.deleteMany({ where: { tagId } });
+        await tx.orgTagRequest.deleteMany({ where: { tagId } });
+        await tx.tagPageCapability.deleteMany({ where: { tagId } });
+        await tx.tagPageAccess.deleteMany({ where: { tagId } });
+        await tx.tagPageRequest.deleteMany({ where: { tagId } });
+        await tx.tagPage.deleteMany({ where: { tagId } });
+        await tx.tag.delete({ where: { id: tagId } });
+    });
+
+    revalidatePath('/wiki/[namespace]/[slug]', 'page');
+    revalidatePath(`/tags/${tag.namespace}`);
     redirect("/");
 }
