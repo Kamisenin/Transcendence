@@ -5,7 +5,7 @@ export default async function TermsPage() {
     const t = await getTranslations("Terms");
 
     return (
-        <main className="max-w-3xl mx-auto px-6 pt-20 pb-12">
+        <main className="min-h-screen max-w-3xl mx-auto px-6 pt-20 pb-12">
             <h1 className="text-3xl font-bold mb-6">
                 {t("title")}
             </h1>

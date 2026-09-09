@@ -42,7 +42,8 @@
 		"online" : "Online",
 		"offline" : "Offline",
 		"myImages": "My images",
-		"fileCount": "{count} file(s)"
+		"fileCount": "{count} file(s)",
+		"back": "Back"
 	},
 	"Auth": {
 		"login": {

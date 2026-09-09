@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import type { BaseEditor, Descendant } from 'slate';
+import Link from "next/link";
 import type { ReactEditor } from 'slate-react';
 import type { ToolbarRef } from "@/components/page/editor/Toolbar";
 import ReactGridLayout, { type LayoutItem } from 'react-grid-layout';
@@ -222,7 +223,12 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
     return (
         <div className="min-h-screen bg-[#f0e0d6] p-8 pt-20">
             <Toolbar ref={toolbarRef} editor={activeEditor} disabled={!activeEditor} onAddBlock={handleAddBlock} />
-
+            <Link
+                href={`/wiki/${accountId}/${pageId}`}
+                className="shrink-0 px-3 py-1 rounded bg-[#800000] text-[#fffaf7] text-sm hover:bg-[#5f0000]"
+            >
+                {`← ${tCommon("back")}`}
+            </Link>
             <button
                 onClick={handleSave}
                 disabled={saving}

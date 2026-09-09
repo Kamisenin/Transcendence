@@ -1,6 +1,7 @@
 import ReadOnlyBlock from '@/components/page/ReadOnlyBlock';
 import Infobox, { type InfoboxData } from '@/components/page/Infobox';
 import Link from "next/link";
+import { getTranslations } from 'next-intl/server';
 
 type SavedBlock = {
     id: string;
@@ -14,6 +15,7 @@ type SavedBlock = {
 };
 
 export default async function PageViewer({ title, blocks, accountId, canEdit, editHref }: { title?: string; blocks: SavedBlock[]; accountId : string | undefined; canEdit?: boolean; editHref?: string; }) {
+    const mp = await getTranslations("MyPages");    
     const COLS = 12;
     const ROW_HEIGHT = 150;
     const maxRow = blocks.length === 0
@@ -33,7 +35,7 @@ export default async function PageViewer({ title, blocks, accountId, canEdit, ed
                             href={editHref}
                             className="shrink-0 px-3 py-1 rounded bg-[#800000] text-[#fffaf7] text-sm hover:bg-[#5f0000]"
                         >
-                            Edit
+                            {mp("edit")}
                         </Link>
                     )}
                 </div>
