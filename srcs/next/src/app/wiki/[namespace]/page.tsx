@@ -32,11 +32,13 @@ export default async function UserWikiPage({ params }: Params) {
 		notFound();
 
 	const currentUser = await getCurrentUser();
-	const relation = currentUser ? await getRelation(currentUser.user_id, target.user_id) : null;
+	const isSelf = currentUser?.user_id === target.user_id;
+	const relation = currentUser && !isSelf ? await getRelation(currentUser.user_id, target.user_id) : null;	
 	const isFriend = relation?.status === FriendshipStatus.ACCEPTED;
-	const displayName = isFriend && target.firstName && target.lastName
-		? `${target.firstName} ${target.lastName}`
-		: target.username || target.accountId;
+	const canSeeFullName = Boolean(currentUser && (isSelf || isFriend));
+	const displayName = canSeeFullName && target.firstName && target.lastName
+        ? `${target.firstName} ${target.lastName}`
+        : target.username || target.accountId;
 
 	const isOnline = isUserOnline(target.lastSeen, 60 * 1000);
 

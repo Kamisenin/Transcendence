@@ -1,8 +1,11 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import UserAvatar from "@/components/UserAvatar";
+import { getCurrentUser } from "%/lib/session";
+import { isFriends } from "@/actions/friendship";
 
 type FriendInfos = {
+    user_id : string;
     accountId : string;
     username : string;
     firstName?: string | null;
@@ -18,11 +21,16 @@ interface FriendCardProps {
 
 export default async function FriendCard({ friend } : FriendCardProps)
 {
+    const user = await getCurrentUser();
+    const isSelf = user?.user_id === friend.user_id;
+    const isFriend = user ? isSelf || await isFriends(user.user_id, friend.user_id) : false;    
     const t = await getTranslations("Common");
     const isOnline = new Date(friend.lastSeen).getTime() > new Date().getTime() - 2 * 60 * 1000;
-    const displayName = friend.firstName && friend.lastName
+    const canSeeFullName = Boolean(user && (isSelf || isFriend));
+    const displayName = canSeeFullName && friend.firstName && friend.lastName
         ? `${friend.firstName} ${friend.lastName}`
         : friend.username || friend.accountId;
+
 
     return (
         <Link

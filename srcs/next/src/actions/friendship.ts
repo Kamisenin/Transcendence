@@ -17,6 +17,15 @@ export async function getRelation(senderId : string, receiverId : string) : Prom
   return (relation);
 }
 
+export async function isFriends(senderId : string, receiver : string)
+{
+    const relation = await getRelation(senderId, receiver);
+
+    if (!relation)
+        return (false);
+    return (relation.status === FriendshipStatus.ACCEPTED);
+}
+
 export async function getFriends(userId : string) {
     const friends = await prisma.friendship.findMany({
     where: {
