@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { useTranslations } from 'next-intl';
+import { useRouter } from 'next/navigation';
 import { updateTagInfo, deleteTag } from '@/actions/tags';
 import type { TagCapabilities } from '%/lib/tag_permissions';
 import { type Tag } from './TagManagement';
@@ -21,6 +22,7 @@ function slugify(text: string): string {
 
 export default function TagSettingsPanel({ tag, capabilities }: Props) {
     const t = useTranslations('Tags');
+    const router = useRouter();
     const [isPending, startTransition] = useTransition();
     const [error, setError] = useState<string | null>(null);
 
@@ -45,6 +47,16 @@ export default function TagSettingsPanel({ tag, capabilities }: Props) {
                     color: parseInt(color.replace('#', ''), 16),
                     namespace
                 });
+                const previousNamespace = tag.namespace ?? '';
+                if (namespace !== previousNamespace) {
+                    if (namespace) {
+                        router.replace(`/tags/${namespace}/manage`);
+                    } else {
+                        router.replace(`/tags/${name}/manage`);
+                    }
+                } else {
+                    router.refresh();
+                }
             } catch (e: any) {
                 setError(e.message);
             }
