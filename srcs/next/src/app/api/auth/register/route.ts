@@ -5,6 +5,7 @@ import {createSession, setCookies} from "%/lib/session";
 import { sendVerifEmail, generateVerifCode, getVerifExpiry } from "@/app/lib/email";
 import { prisma } from "%/lib/prisma/prisma";
 import { isValidAccountId } from "@/app/lib/account-id";
+import { isDeletedUserAccount } from "@/app/lib/delete_user";
 
 export async function POST(req: NextRequest) {
     const body = await req.json();
@@ -16,6 +17,10 @@ export async function POST(req: NextRequest) {
 
     if (typeof body.accountId !== "string" || !isValidAccountId(body.accountId)) {
         return NextResponse.json({error: "INVALID_ACCOUNT_ID"}, {status: 400});
+    }
+
+    if (isDeletedUserAccount(body.accountId)) {
+        return NextResponse.json({error: "ACCOUNT_ID_RESERVED"}, {status: 400});
     }
 
     username = body.accountId;

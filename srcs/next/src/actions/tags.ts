@@ -550,7 +550,6 @@ export async function deleteTag(tagId: number): Promise<void> {
                 where: { pageId, type: 'USER' },
                 data: {
                     isCanonical: false,
-                    namespace: page.owner.accountId,
                 },
             });
 
@@ -579,6 +578,12 @@ export async function deleteTag(tagId: number): Promise<void> {
         await tx.tagPageAccess.deleteMany({ where: { tagId } });
         await tx.tagPageRequest.deleteMany({ where: { tagId } });
         await tx.tagPage.deleteMany({ where: { tagId } });
+        await tx.pageReaction.deleteMany({
+            where: {
+                type: 'FAVORITE',
+                page: { tagPages: { none: {} } },
+            },
+        });
         await tx.tag.delete({ where: { id: tagId } });
     });
 

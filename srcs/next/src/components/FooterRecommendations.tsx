@@ -299,11 +299,11 @@ export default function Footer({
                 {pages.map((page, index) => (
                   <div
                     key={`${mode}-${page.pageId}`}
-                    className={
+                    className={`w-64 shrink-0 ${
                       animationDirection === "right"
                         ? "recommendation-card-from-right"
                         : "recommendation-card-from-left"
-                    }
+                    }`}
                     style={{
                       animationDelay: `${(pages.length - 1 - index) * 20}ms`,
                       animationDuration: "900ms",
@@ -314,7 +314,7 @@ export default function Footer({
                     <ForumCard
                       page={page}
                       userId={userId}
-                      className="flex-none w-64"
+                      className="w-full"
                     />
                   </div>
                 ))}

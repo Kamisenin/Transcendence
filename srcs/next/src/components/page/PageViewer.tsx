@@ -1,6 +1,5 @@
 import ReadOnlyBlock from '@/components/page/ReadOnlyBlock';
 import Infobox, { type InfoboxData } from '@/components/page/Infobox';
-import { requireUser } from "@/actions/tags"
 import Link from "next/link";
 
 type SavedBlock = {
@@ -21,8 +20,6 @@ export default async function PageViewer({ title, blocks, accountId, canEdit, ed
         ? 0
         : Math.max(...blocks.map((block) => block.y + block.h));
     const totalHeight = Math.max(500, maxRow * ROW_HEIGHT + Math.max(0, maxRow - 1) * 5);
-
-    const user = await requireUser();
 
     return (
         <div className="min-h-screen bg-gray-50/50 p-8 pt-20">
@@ -67,7 +64,7 @@ export default async function PageViewer({ title, blocks, accountId, canEdit, ed
                         {block.type === 'infobox' ? (
                             <div className="h-full overflow-auto">
                                 <Infobox
-                                    accountId={user.accountId}
+                                    accountId={accountId}
                                     id={block.id}
                                     pageId={0}
                                     data={block.infoboxData || { title: '', imageUrl: '', description: '', tags: [], public: true }}

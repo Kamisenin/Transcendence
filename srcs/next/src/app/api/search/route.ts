@@ -8,10 +8,8 @@ export async function GET(req: NextRequest) {
 	return NextResponse.json({ error: "Missing query" }, { status: 400 })
 
   const user = await getCurrentUser()
-  if (!user)
-	return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+	const userId = user?.user_id ?? null
 
-  const userId = user.user_id
   const queryWords = query.split(" ").filter((w: string) => w.length > 0).join(" ")
 
   if (!queryWords)

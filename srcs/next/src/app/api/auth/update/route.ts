@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/app/lib/session";
 import { prisma } from "%/lib/prisma/prisma"
 import { isValidAccountId } from "@/app/lib/account-id";
+import { isDeletedUserAccount } from "@/app/lib/delete_user";
 
 export async function POST(req: NextRequest) {
     const user = await getCurrentUser();
@@ -21,6 +22,9 @@ export async function POST(req: NextRequest) {
 
     if (!isValidAccountId(accountId))
         return NextResponse.json({error: "INVALID_ACCOUNT_ID"}, {status: 400});
+
+    if (isDeletedUserAccount(accountId))
+        return NextResponse.json({error: "ACCOUNT_ID_RESERVED"}, {status: 400});
 
     const accountIdChanged = body.accountId !== user.accountId;
     const emailChanged = body.email !== user.email;

@@ -11,8 +11,8 @@ type Props = {
 export default function VisibilityToggler({ isPublic, onChange }: Props) {
     const t = useTranslations("Common");
     return (
-        <div className="flex shrink-0 items-center justify-between border-t border-gray-100 pt-2">
-            <label className="text-xs font-medium text-gray-600 flex items-center gap-1.5 cursor-pointer select-none">
+        <div className="flex shrink-0 flex-wrap items-center gap-x-2 gap-y-1 border-t border-gray-100 pt-2">
+            <label className="flex min-w-0 cursor-pointer select-none items-center gap-1.5 text-xs font-medium text-gray-600">
                 <span>{t('visibility')}</span>
                 <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
                     isPublic ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-100 text-gray-500'
@@ -21,7 +21,7 @@ export default function VisibilityToggler({ isPublic, onChange }: Props) {
                 </span>
             </label>
 
-            <label className="relative inline-flex items-center cursor-pointer">
+            <label className="relative ml-auto inline-flex shrink-0 cursor-pointer items-center">
                 <input
                     type="checkbox"
                     checked={isPublic}

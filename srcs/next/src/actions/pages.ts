@@ -335,6 +335,14 @@ export async function savePage(
         }
     });
 
+    await prisma.pageReaction.deleteMany({
+        where: {
+            pageId,
+            type: 'FAVORITE',
+            page: { tagPages: { none: {} } },
+        },
+    });
+
     for (const tagId of tagIds) {
 
         await prisma.tagPage.upsert({

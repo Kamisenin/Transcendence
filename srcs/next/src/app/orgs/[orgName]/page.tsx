@@ -12,7 +12,8 @@ export default async function OrgPage({ params }: Props) {
     const { orgName }  = await params;
     const t = await getTranslations('Orgs');
     const org = await getOrganization(orgName);
-    if (!org) return <div>{t('organizationNotFound')}</div>;
+    if (!org)
+        notFound();
 
     const sessionUser = await getSessionUser(await getSessionCookie());
     const canManage = await userHasOrgPermission(org.id, "canManageMembers", sessionUser);

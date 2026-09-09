@@ -1,5 +1,6 @@
 import { prisma } from '%/lib/prisma/prisma';
 import { getSessionUser, getSessionCookie } from '%/lib/session';
+import { DELETED_USER_ID } from '@/app/lib/delete_user';
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
@@ -17,6 +18,7 @@ export async function GET(request: Request) {
 
     const users = await prisma.user.findMany({
         where: {
+            user_id: { not: DELETED_USER_ID },
             OR: [
                 { username: { contains: query, mode: 'insensitive' } },
                 { accountId: { contains: query, mode: 'insensitive' } },
