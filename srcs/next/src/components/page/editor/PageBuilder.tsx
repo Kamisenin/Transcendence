@@ -237,6 +237,7 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
                     layout={layout}
                     onLayoutChange={(newLayout) => setLayout(newLayout)}
                     width={width}
+                    draggableHandle=".drag-handle"
                 >
                     {blocks.map(block => (
                         <div key={block.id} className="relative group/grid-item">
@@ -247,6 +248,7 @@ export default function PageBuilder({ accountId, pageId, initialTitle, initialBl
                                     pageId={pageId}
                                     data={block.infoboxData || DEFAULT_INFOBOX}
                                     onChange={(newData) => handleInfoboxChange(block.id, newData)}
+                                    onDelete={handleDeleteBlock}
                                     canonicalNamespace={canonicalNamespace}
                                     isOwner={isOwner}
                                     ownerAccountId={ownerAccountId}

@@ -139,8 +139,8 @@ export default function CreateTagModal({ isOpen, onClose, onTagCreated }: Props)
         nsStatus.available === true;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
-            <div className="w-full max-w-sm overflow-hidden rounded-2xl border border-[#d9bfb7] bg-[#fffaf7] shadow-xl animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 backdrop-blur-xs p-4 sm:items-center">
+            <div className="my-auto w-full max-w-sm max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-2xl border border-[#d9bfb7] bg-[#fffaf7] shadow-xl animate-in fade-in zoom-in-95 duration-150">
                 <div className="flex items-center justify-between border-b border-[#ead7d0] px-5 py-3.5">
                     <h3 className="text-sm font-bold text-[#800000]">{t('createModal.title')}</h3>
                     <button

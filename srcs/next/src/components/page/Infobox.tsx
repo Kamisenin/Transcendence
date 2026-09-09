@@ -58,6 +58,29 @@ export default function Infobox({ accountId, id, pageId, data, onChange, onDelet
 
     return (
         <div className="group relative h-full w-full min-w-0 bg-[#fffaf7] rounded-xl border border-[#d9bfb7] ring-1 ring-[#ead7d0] p-2 sm:p-4 shadow-sm flex flex-col overflow-hidden">
+            <div className="absolute left-2 top-2 z-10 flex flex-col items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-[#fffaf7]/90 backdrop-blur-sm rounded border border-[#ead7d0] shadow-xs p-0.5">
+                <button
+                    type="button"
+                    className="drag-handle cursor-grab active:cursor-grabbing p-1 rounded hover:bg-[#f7e9e2] text-[#a89088]"
+                    title={t("editor.moveBlock")}
+                >
+                    <GripVertical size={14} />
+                </button>
+                {onDelete && (
+                    <button
+                        type="button"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onDelete(id);
+                        }}
+                        className="p-1 rounded hover:bg-[#fff1ef] text-[#c26b5f] hover:text-[#a33a2b] transition"
+                        title={t("editor.deleteBlock")}
+                    >
+                        <Trash2 size={14} />
+                    </button>
+                )}
+            </div>
+
             {/* En-tête */}
             <div className="pl-0 sm:pl-7 flex flex-wrap items-center justify-between gap-2 border-b pb-2 mb-3 shrink-0">
                 <span className="text-xs font-bold uppercase tracking-wider text-gray-400">{t('options')}</span>
@@ -71,7 +94,7 @@ export default function Infobox({ accountId, id, pageId, data, onChange, onDelet
             </div>
 
             {/* Formulaire défilant si redimensionné petit en hauteur */}
-            <div className="pl-0 sm:pl-7 pr-0 sm:pr-1 space-y-3 flex-1 min-h-0 overflow-y-auto">
+            <div className="pl-0 sm:pl-7 pr-0 sm:pr-1 space-y-3 flex-1 min-h-0 overflow-y-auto" onMouseDown={(e) => e.stopPropagation()}>
                 <TitleInput pageId={pageId} title={data.title} onChange={(val) => updateField("title", val)} />
 
                 <div>

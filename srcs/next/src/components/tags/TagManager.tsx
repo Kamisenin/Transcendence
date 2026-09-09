@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { Plus, Globe, Loader2 } from "lucide-react";
 import { getTagsAction } from "@/actions/tags";
 import TagBadge from "./TagBadge";
@@ -24,6 +25,9 @@ export default function TagManager({ accountId, pageId, data, onChange, onOpenMo
     const [fetched, setFetched] = useState<Tag[]>([]);
     const [searching, setSearching] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
+    const menuRef = useRef<HTMLDivElement>(null);
+    const triggerRef = useRef<HTMLButtonElement>(null);
+    const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
 
     const tags = data.tags || [];
     const namespaces = Array.from(new Set(tags.map((t) => t.namespace).filter((ns): ns is string => Boolean(ns && ns.trim() !== ""))));
@@ -34,11 +38,39 @@ export default function TagManager({ accountId, pageId, data, onChange, onOpenMo
 
     useEffect(() => {
         const handler = (e: MouseEvent) => {
-            if (ref.current && !ref.current.contains(e.target as Node)) setIsOpen(false);
+            const target = e.target as Node;
+            if (ref.current && !ref.current.contains(target) && !menuRef.current?.contains(target)) setIsOpen(false);
         };
         document.addEventListener("mousedown", handler);
         return () => document.removeEventListener("mousedown", handler);
     }, []);
+
+    useEffect(() => {
+        if (!isOpen) return;
+
+        const updateMenuPosition = () => {
+            const trigger = triggerRef.current;
+            if (!trigger) return;
+
+            const rect = trigger.getBoundingClientRect();
+            const menuWidth = Math.min(240, window.innerWidth - 32);
+            const menuHeight = Math.min(320, window.innerHeight - 32);
+            const left = Math.min(rect.left, window.innerWidth - menuWidth - 16);
+            const top = rect.bottom + menuHeight <= window.innerHeight - 16
+                ? rect.bottom + 4
+                : Math.max(16, rect.top - menuHeight - 4);
+
+            setMenuPosition({ top, left: Math.max(16, left) });
+        };
+
+        updateMenuPosition();
+        window.addEventListener("resize", updateMenuPosition);
+        window.addEventListener("scroll", updateMenuPosition, true);
+        return () => {
+            window.removeEventListener("resize", updateMenuPosition);
+            window.removeEventListener("scroll", updateMenuPosition, true);
+        };
+    }, [isOpen]);
 
     useEffect(() => {
         if (!isOpen) return;
@@ -78,6 +110,7 @@ export default function TagManager({ accountId, pageId, data, onChange, onOpenMo
                 <div className="relative" ref={ref}>
                     <button
                         type="button"
+                        ref={triggerRef}
                         onClick={() => setIsOpen(!isOpen)}
                         className="inline-flex cursor-pointer items-center gap-1 rounded-full border border-dashed border-[#c9aaa1] bg-[#f7e9e2] px-2.5 py-0.5 text-xs font-medium text-[#800000] hover:bg-[#ead7d0]"
                     >
@@ -85,7 +118,12 @@ export default function TagManager({ accountId, pageId, data, onChange, onOpenMo
                     </button>
 
                     {isOpen && (
-                        <div className="absolute left-0 top-full z-50 mt-1 w-60 rounded-xl border border-[#d9bfb7] bg-[#fffaf7] p-2 text-xs shadow-xl">
+                        createPortal(
+                        <div
+                            ref={menuRef}
+                            style={{ top: menuPosition.top, left: menuPosition.left, width: "min(15rem, calc(100vw - 2rem))" }}
+                            className="fixed z-[60] rounded-xl border border-[#d9bfb7] bg-[#fffaf7] p-2 text-xs shadow-xl"
+                        >
                             <div className="relative mb-1.5">
                                 <input
                                     type="text"
@@ -128,7 +166,9 @@ export default function TagManager({ accountId, pageId, data, onChange, onOpenMo
                             >
                                 <Plus size={13} /> {t("createModal.title")}
                             </button>
-                        </div>
+                        </div>,
+                        document.body
+                        )
                     )}
                 </div>
             </div>
