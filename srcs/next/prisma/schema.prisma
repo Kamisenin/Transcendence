@@ -68,6 +68,7 @@ model Friendship {
   receiverId String
   receiver   User             @relation("ReceivedFriendships", fields: [receiverId], references: [user_id], onDelete: Cascade)
   sender     User             @relation("SentFriendships", fields: [senderId], references: [user_id], onDelete: Cascade)
+  notifications Notification[]
 
   @@unique([senderId, receiverId])
 }
@@ -232,11 +233,13 @@ model Notification {
   recipientId String           @map("recipient_id")
   actorId     String?          @map("actor_id")
   pageId      Int?             @map("page_id")
+  friendshipId String?         @map("friendship_id")
   type        NotificationType @default(PAGE_EDITED)
   read        Boolean          @default(false)
   createdAt   DateTime         @default(now()) @map("created_at")
   actor       User?            @relation("NotificationActor", fields: [actorId], references: [user_id])
   page        Page?            @relation(fields: [pageId], references: [pageId], onDelete: Cascade)
+  friendship  Friendship?      @relation(fields: [friendshipId], references: [id], onDelete: Cascade)
   recipient   User             @relation("NotificationRecipient", fields: [recipientId], references: [user_id], onDelete: Cascade)
 
   @@index([recipientId, read])
@@ -503,6 +506,7 @@ enum SlugType {
 
 enum NotificationType {
   PAGE_EDITED
+  FRIEND_REQUEST
 }
 
 enum PageReactionType {
