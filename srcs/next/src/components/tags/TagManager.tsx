@@ -96,12 +96,8 @@ export default function TagManager({ accountId, pageId, data, onChange, onOpenMo
     };
 
     const removeTag = async (id: string) => {
-        // const numId = parseInt(id, 10);
         if (onChange)
             onChange({ ...data, tags: tags.filter((t) => t.id !== id) });
-        // if (!isNaN(numId) && pageId)
-        //     await removeTagFromPageAction(numId, pageId);
-        
     };
 
     return (
