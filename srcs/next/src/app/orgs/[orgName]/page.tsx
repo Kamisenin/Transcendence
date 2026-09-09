@@ -2,6 +2,7 @@
 import React from 'react';
 import { getOrganization, userHasOrgPermission } from '@/actions/orgs';
 import { getTranslations } from 'next-intl/server';
+import { notFound } from 'next/navigation';
 import OrgDetails from '@/components/orgs/OrgDetails';
 import { getSessionCookie, getSessionUser } from "%/lib/session";
 import { getFriends } from "@/actions/friendship";
