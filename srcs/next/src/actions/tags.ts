@@ -88,8 +88,6 @@ export async function getTagPageState(tagId: string, pageId: number) : Promise<T
         }
     });
 
-    console.log("Tag :", tag.name, "Pending:", pendingRequest);
-
     return {
         id: tag.id,
         name: tag.name,

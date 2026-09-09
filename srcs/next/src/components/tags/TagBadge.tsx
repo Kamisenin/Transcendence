@@ -54,7 +54,6 @@ export default function TagBadge({ tagId, pageId, onRemove }: TagBadgeProps) {
     const backgroundColor = tag.pending ? "transparent" : `${tagColor}15`;
     const borderColor = tag.pending ? `${tagColor}30` : `${tagColor}50`;
 
-    console.log("Tag :", tag.name, "Pending:", tag.pending);
     return (
         <span
             style={{
