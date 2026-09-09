@@ -360,12 +360,13 @@ This table stores the user profile vector used by the recommendation engine. It 
 | Support for additional browsers / compatibility | Minor | 1 | humontas, jmassavi |
 | Standard user management and authentication | Major | 2 | nrolland |
 | Advanced permissions system | Major | 2 | csenelle |
+| Organization system | Major | 2 | csenelle |
 | 2FA | Minor | 1 | nrolland |
 | Recommendation system using machine learning | Major | 2 | thcaquet |
 | Multilingual real-time search engine | Major | 2 | humontas |
 | Custom collaborative wiki editor | Minor | 1 | csenelle, jmassavi |
 
-Total: 19 points
+Total: 20 points
 
 ---
 
