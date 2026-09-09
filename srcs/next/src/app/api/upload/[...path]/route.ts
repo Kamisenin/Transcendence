@@ -6,7 +6,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ path
 	const { path: pathSegments } = await params;
 	const userPath = pathSegments.join("/");
 
-	const baseDir = process.env.NEXT_UPLOADS_PATH + "/upload" || "/upload";
+	const baseDir = (process.env.NEXT_UPLOADS_PATH || "") + "/upload";
 
 	const fullPath = resolve(baseDir, userPath);
 
