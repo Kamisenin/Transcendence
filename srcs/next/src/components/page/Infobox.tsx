@@ -50,6 +50,7 @@ export default function Infobox({ accountId, id, pageId, data, onChange, isReadO
             <InfoboxPreview
                 data={data}
                 isReadOnly={isReadOnly}
+                pageId={pageId}
                 onEdit={() => setIsPreview(false)}
             />
         );

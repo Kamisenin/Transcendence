@@ -105,7 +105,7 @@ export default function TagManager({ accountId, pageId, data, onChange, onOpenMo
             <label className="mb-1.5 block text-xs font-medium text-[#3f2924]">{tCommon('tags')}</label>
             <div className="flex flex-wrap gap-1.5 items-center">
                 {tags.map((tag) => (
-                    <TagBadge key={tag.id} tag={tag} onRemove={() => removeTag(tag.id)} />
+                    <TagBadge key={tag.id} tagId={tag.id} pageId={pageId} onRemove={() => removeTag(tag.id)} />
                 ))}
 
                 <div className="relative" ref={ref}>

@@ -9,7 +9,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from "next/navigation";
 import { TagPermissionError } from '%/lib/errors';
 import { userHasOrgPermission } from '@/actions/orgs';
-import { User } from "@prisma/client";
+import { User, Tag } from "@prisma/client";
 
 const MAX_ROLE_NAME_LENGTH = 20;
 const MAX_HIERARCHY_LEVEL = 200;
@@ -61,6 +61,42 @@ export async function createTag(data: FormData) {
     const description = rawDescription || null;
 
     revalidatePath('/tags');
+}
+
+export type TagWithPending = {
+    id: number;
+    name: string;
+    namespace: string;
+    color: number | null;
+    pending: boolean;
+};
+
+export async function getTagPageState(tagId: string, pageId: number) : Promise<TagWithPending | null> {
+    const id = parseInt(tagId, 10);
+
+    if (isNaN(id))
+        return (null);
+
+    const tag = await prisma.tag.findUnique({ where: { id } });
+    if (!tag) return null;
+
+    const pendingRequest = await prisma.tagPageRequest.findFirst({
+        where: {
+            id,
+            pageId,
+            status: 'PENDING'
+        }
+    });
+
+    console.log("Tag :", tag.name, "Pending:", pendingRequest);
+
+    return {
+        id: tag.id,
+        name: tag.name,
+        namespace: tag.namespace,
+        color: tag.color,
+        pending: Boolean(pendingRequest)
+    };
 }
 
 // ───────────── ROLES ─────────────

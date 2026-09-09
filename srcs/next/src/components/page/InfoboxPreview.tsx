@@ -9,11 +9,12 @@ import { isDefaultTitle } from "@/app/lib/page/title";
 
 type InfoboxPreviewProps = {
     data: InfoboxData;
+    pageId: number;
     isReadOnly?: boolean;
     onEdit?: () => void;
 };
 
-export default function InfoboxPreview({ data, isReadOnly, onEdit }: InfoboxPreviewProps) {
+export default function InfoboxPreview({ data, pageId, isReadOnly, onEdit }: InfoboxPreviewProps) {
     const t = useTranslations("Page");
     const [showAllTags, setShowAllTags] = useState(false);
     const maxVisible = 4;
@@ -54,7 +55,7 @@ export default function InfoboxPreview({ data, isReadOnly, onEdit }: InfoboxPrev
             {tags.length > 0 && (
                 <div className="pt-2 border-t border-gray-100 flex flex-wrap gap-1.5 items-center shrink-0">
                     {visibleTags.map((tag) => (
-                        <TagBadge key={tag.id} tag={tag} />
+                        <TagBadge key={tag.id} tagId={tag.id} pageId={pageId} />
                     ))}
                     {tags.length > maxVisible && (
                         <button
