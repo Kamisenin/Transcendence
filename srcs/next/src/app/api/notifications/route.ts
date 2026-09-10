@@ -24,6 +24,42 @@ export async function GET(request: Request) {
                     slugs: { where: { isCanonical: true }, select: { namespace: true, slug: true } },
                 },
             },
+            tagPageRequest: {
+                select: {
+                    id: true,
+                    status: true,
+                    tag: { select: { name: true, namespace: true } },
+                    page: {
+                        select: {
+                            pageId: true,
+                            title: true,
+                            slugs: { where: { isCanonical: true }, select: { namespace: true, slug: true } },
+                        },
+                    },
+                },
+            },
+            orgTagRequest: {
+                select: {
+                    id: true,
+                    status: true,
+                    organization: { select: { name: true } },
+                    tag: { select: { name: true, namespace: true } },
+                },
+            },
+            orgPageRequest: {
+                select: {
+                    id: true,
+                    status: true,
+                    organization: { select: { name: true } },
+                    page: {
+                        select: {
+                            pageId: true,
+                            title: true,
+                            slugs: { where: { isCanonical: true }, select: { namespace: true, slug: true } },
+                        },
+                    },
+                },
+            },
         },
     });
 
@@ -32,16 +68,42 @@ export async function GET(request: Request) {
         type: n.type,
         read: n.read,
         createdAt: n.createdAt,
-        actor: n.actor ? {
-            username: n.actor.username,
-            imgLink: n.actor.imgLink,
-            accountId: n.actor.accountId,
-        } : null,
+        actor: n.actor
+            ? { username: n.actor.username, imgLink: n.actor.imgLink, accountId: n.actor.accountId }
+            : null,
         page: n.page
+            ? { pageId: n.page.pageId, title: n.page.title, canonicalSlug: n.page.slugs[0] || null }
+            : null,
+        tagPageRequest: n.tagPageRequest
             ? {
-                pageId: n.page.pageId,
-                title: n.page.title,
-                canonicalSlug: n.page.slugs[0] || null,
+                id: n.tagPageRequest.id,
+                status: n.tagPageRequest.status,
+                tagName: n.tagPageRequest.tag.name,
+                tagNamespace: n.tagPageRequest.tag.namespace,
+                pageTitle: n.tagPageRequest.page.title,
+                pageHref: n.tagPageRequest.page.slugs[0]
+                    ? `/wiki/${n.tagPageRequest.page.slugs[0].namespace}/${n.tagPageRequest.page.slugs[0].slug}`
+                    : `/pages/${n.tagPageRequest.page.pageId}`,
+            }
+            : null,
+        orgTagRequest: n.orgTagRequest
+            ? {
+                id: n.orgTagRequest.id,
+                status: n.orgTagRequest.status,
+                orgName: n.orgTagRequest.organization.name,
+                tagName: n.orgTagRequest.tag.name,
+                tagNamespace: n.orgTagRequest.tag.namespace,
+            }
+            : null,
+        orgPageRequest: n.orgPageRequest
+            ? {
+                id: n.orgPageRequest.id,
+                status: n.orgPageRequest.status,
+                orgName: n.orgPageRequest.organization.name,
+                pageTitle: n.orgPageRequest.page.title,
+                pageHref: n.orgPageRequest.page.slugs[0]
+                    ? `/wiki/${n.orgPageRequest.page.slugs[0].namespace}/${n.orgPageRequest.page.slugs[0].slug}`
+                    : `/pages/${n.orgPageRequest.page.pageId}`,
             }
             : null,
     }));

@@ -555,7 +555,12 @@
 		"justNow": "just now",
 		"minutesAgo": "{count, plural, one {# minute ago} other {# minutes ago}}",
 		"hoursAgo": "{count, plural, one {# hour ago} other {# hours ago}}",
-		"daysAgo": "{count, plural, one {# day ago} other {# days ago}}"
+		"daysAgo": "{count, plural, one {# day ago} other {# days ago}}",
+		"clearRead": "Clear read notifications",
+		"tagPageRequestText": "{actor} requests to add \"{title}\" to tag #{tag}",
+		"orgTagRequestText": "{actor} requests tag #{tag} for {org}",
+		"orgPageRequestText": "{actor} requests access to \"{title}\" for {org}",
+		"viewRequest": "View"
 	},
 	"RecentlyEdited": {
 		"title": "recently edited",

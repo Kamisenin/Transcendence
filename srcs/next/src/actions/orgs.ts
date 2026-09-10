@@ -8,6 +8,7 @@ import { PermissionLevel } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { OrgPermissionError } from "%/lib/errors";
 import { revalidatePath } from "next/cache";
+import { notifyOrgTagRequest, notifyOrgPageRequest } from "./notifications";
 
 type RolePermissionsInput = {
   roleName?: string;
@@ -489,12 +490,7 @@ export async function updateOrganizationMemberRole(orgId: number, userToken: str
   });
 }
 
-export async function requestOrganizationTagAccess(
-  orgId: number,
-  tagId: number,
-  orgRoleId: number,
-  tagRoleId: number,
-) {
+export async function requestOrganizationTagAccess( orgId: number, tagId: number, orgRoleId: number, tagRoleId: number) {
   const user = await requireUser();
   const [tag, organizationRole, tagRole, pending] = await Promise.all([
     prisma.tag.findUnique({ where: { id: tagId }, select: { id: true } }),
@@ -502,8 +498,8 @@ export async function requestOrganizationTagAccess(
     prisma.tagRole.findUnique({ where: { id: tagRoleId } }),
     prisma.orgTagRequest.findFirst({
       where: { orgId, tagId, status: "PENDING" },
-      select: { id: true },
-    }),
+      select: { id: true }
+    })
   ]);
   if (!tag) throw new Error("Tag not found");
   if (!organizationRole || organizationRole.organizationId !== orgId) throw new Error("Invalid organization role");
@@ -539,9 +535,12 @@ export async function requestOrganizationTagAccess(
 
   if (pending) throw new Error("A request for this tag is already pending");
 
-  await prisma.orgTagRequest.create({
+  const created = await prisma.orgTagRequest.create({
     data: { orgId, tagId, minRoleId: orgRoleId, tagRoleId, requestedBy: user.user_id },
   });
+
+  await notifyOrgTagRequest(created.id, orgId, user.user_id);
+
   return { requested: true as const, accepted: false as const };
 }
 
@@ -549,21 +548,21 @@ export async function getOrganizationsForTagRequest(tagId: number) {
   const user = await requireUser();
   const [organizations, tagRoles] = await Promise.all([
     prisma.organization.findMany({
-    orderBy: { name: "asc" },
-    select: {
-      id: true,
-      name: true,
-      roles: {
-        orderBy: { hierarchyLevel: "asc" },
-        select: { id: true, roleName: true, hierarchyLevel: true },
-      },
-    },
+      orderBy: { name: "asc" },
+      select: {
+        id: true,
+        name: true,
+        roles: {
+          orderBy: { hierarchyLevel: "asc" },
+          select: { id: true, roleName: true, hierarchyLevel: true }
+        }
+      }
     }),
     prisma.tagRole.findMany({
       where: { tagId },
       orderBy: { hierarchyLevel: "asc" },
       select: { id: true, roleName: true, hierarchyLevel: true },
-    }),
+    })
   ]);
 
   return {
@@ -577,19 +576,18 @@ export async function getOrganizationsForTagRequest(tagId: number) {
   };
 }
 
-export async function requestOrganizationPageAccess(
-  orgId: number,
-  pageId: number,
-  minRoleId: number,
-  permissions: PermissionLevel,
-) {
+export async function requestOrganizationPageAccess(orgId: number, pageId: number, minRoleId: number, permissions: PermissionLevel) {
   const user = await requireUser();
   const role = await prisma.organizationRole.findUnique({ where: { id: minRoleId } });
   if (!role || role.organizationId !== orgId) throw new Error("Invalid organization role");
 
-  return prisma.orgPageRequest.create({
+  const created = await prisma.orgPageRequest.create({
     data: { orgId, pageId, minRoleId, permissions, requestedBy: user.user_id },
   });
+
+  await notifyOrgPageRequest(created.id, orgId, user.user_id);
+
+  return created;
 }
 
 export async function reviewOrganizationTagRequest(requestId: number, accept: boolean) {
@@ -614,6 +612,9 @@ export async function reviewOrganizationTagRequest(requestId: number, accept: bo
     where: { id: requestId },
     data: { status: accept ? "APPROVED" : "REJECTED", reviewedBy: user.user_id },
   });
+
+  await prisma.notification.deleteMany({ where: { orgTagRequestId: requestId } });
+
   if (accept) {
     await prisma.orgTagAccess.upsert({
       where: { orgId_tagId: { orgId: request.orgId, tagId: request.tagId } },
@@ -639,6 +640,9 @@ export async function reviewOrganizationPageRequest(requestId: number, accept: b
     where: { id: requestId },
     data: { status: accept ? "APPROVED" : "REJECTED", reviewedBy: user.user_id },
   });
+
+  await prisma.notification.deleteMany({ where: { orgPageRequestId: requestId } });
+
   if (accept) {
     await prisma.orgPageAccess.upsert({
       where: { orgId_pageId: { orgId: request.orgId, pageId: request.pageId } },

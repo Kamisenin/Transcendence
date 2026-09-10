@@ -554,7 +554,12 @@
 		"justNow": "à l'instant",
 		"minutesAgo": "il y a {count, plural, one {# minute} other {# minutes}}",
 		"hoursAgo": "il y a {count, plural, one {# heure} other {# heures}}",
-		"daysAgo": "il y a {count, plural, one {# jour} other {# jours}}"
+		"daysAgo": "il y a {count, plural, one {# jour} other {# jours}}",
+		"clearRead": "Effacer les notifications lues",
+		"tagPageRequestText": "{actor} demande à ajouter \"{title}\" au tag #{tag}",
+		"orgTagRequestText": "{actor} demande le tag #{tag} pour {org}",
+		"orgPageRequestText": "{actor} demande l'accès à \"{title}\" pour {org}",
+		"viewRequest": "Voir"
 	},
 	"RecentlyEdited": {
 		"title": "modifiées récemment",

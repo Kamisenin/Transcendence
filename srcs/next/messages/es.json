@@ -435,8 +435,8 @@
 			"noTagsAvailable": "No hay etiquetas disponibles",
 			"noOrgsAvailable": "No hay organizaciones disponibles",
 			"tagAccessList": "Acceso por rol de etiqueta",
-			"orgAccessList": "Acceso por rol de organización"
-			,"requestSent": "Solicitud enviada a la organización"
+			"orgAccessList": "Acceso por rol de organización",
+			"requestSent": "Solicitud enviada a la organización"
 		},
 		"editor": {
 			"typeHere": "Escribe tu texto aquí...",
@@ -554,7 +554,12 @@
 		"justNow": "justo ahora",
 		"minutesAgo": "hace {count, plural, one {# minuto} other {# minutos}}",
 		"hoursAgo": "hace {count, plural, one {# hora} other {# horas}}",
-		"daysAgo": "hace {count, plural, one {# día} other {# días}}"
+		"daysAgo": "hace {count, plural, one {# día} other {# días}}",
+		"clearRead": "Borrar notificaciones leídas",
+		"tagPageRequestText": "{actor} solicita añadir \"{title}\" a la etiqueta #{tag}",
+		"orgTagRequestText": "{actor} solicita la etiqueta #{tag} para {org}",
+		"orgPageRequestText": "{actor} solicita acceso a \"{title}\" para {org}",
+		"viewRequest": "Ver"
 	},
 	"RecentlyEdited": {
 		"title": "editadas recientemente",

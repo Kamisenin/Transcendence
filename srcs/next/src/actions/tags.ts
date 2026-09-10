@@ -9,7 +9,8 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from "next/navigation";
 import { TagPermissionError } from '%/lib/errors';
 import { userHasOrgPermission } from '@/actions/orgs';
-import { User, Tag } from "@prisma/client";
+import { User } from "@prisma/client";
+import { notifyTagPageRequest } from '@/actions/notifications';
 
 const MAX_ROLE_NAME_LENGTH = 20;
 const MAX_HIERARCHY_LEVEL = 200;
@@ -334,6 +335,10 @@ export async function reviewTagPageRequest(requestId: number, accept: boolean) {
         },
     });
 
+    await prisma.notification.deleteMany({
+        where: { tagPageRequestId: requestId },
+    })
+
     if (accept) {
         await prisma.tagPage.upsert({
             where: { tagId_pageId: { tagId: request.tagId, pageId: request.pageId } },
@@ -365,9 +370,13 @@ export async function requestTagPageAccess(tagId: number, pageId: number) {
     if (!canEdit) throw new Error("Forbidden");
     if (existing || pending) return pending ?? existing;
 
-    return prisma.tagPageRequest.create({
+    const created = await prisma.tagPageRequest.create({
         data: { tagId, pageId, requestedBy: user.user_id },
     });
+
+    await notifyTagPageRequest(created.id, tagId, user.user_id);
+
+    return created;
 }
 
 // ───────────── TAG INFOS ─────────────
