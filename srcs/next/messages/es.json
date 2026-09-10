@@ -586,6 +586,13 @@
 		"removing": "Eliminando...",
 		"removeFriend": "Eliminar amigo",
 		"noPageFound": "No se encontró ninguna página",
-		"pages": "Páginas de {user} ({number})"
+		"pages": "Páginas de {user} ({number})",
+		"title": "Amigos",
+		"searchPlaceholder": "Buscar un amigo para añadir...",
+		"add": "Añadir",
+		"requestSent": "Solicitud enviada",
+		"alreadyFriends": "Ya son amigos",
+		"addFailed": "No se pudo enviar la solicitud",
+		"noFriends": "Aún no tienes amigos."
   	}
 }

@@ -4,6 +4,7 @@ import { Friendship, FriendshipStatus, NotificationType } from "@prisma/client";
 import { prisma } from "@/app/lib/prisma/prisma";
 import { notifyFriendRequest } from "./notifications";
 import { revalidatePath } from "next/dist/server/web/spec-extension/revalidate";
+import { getCurrentUser } from "%/lib/session";
 
 export async function getRelation(senderId : string, receiverId : string) : Promise<Friendship | null> {
     const relation = await prisma.friendship.findFirst({
@@ -99,4 +100,62 @@ export async function removeFriend(shipId : string) {
         throw new Error("Friendship not found");
 
     await prisma.friendship.delete({ where: { id: shipId } });
+}
+
+export type SearchFriendUser = {
+    user_id: string;
+    username: string | null;
+    accountId: string;
+    imgLink: string | null;
+    isFriend: boolean;
+    hasPendingRequest: boolean;
+};
+
+export async function searchUsersForFriends(query: string): Promise<SearchFriendUser[]> {
+    const currentUser = await getCurrentUser();
+    if (!currentUser) return [];
+
+    const q = query.trim();
+    if (!q) return [];
+
+    const users = await prisma.user.findMany({
+        where: {
+            OR: [
+                { accountId: { contains: q, mode: "insensitive" } },
+                { username: { contains: q, mode: "insensitive" } },
+            ],
+            NOT: {
+                user_id: currentUser.user_id,
+            },
+        },
+        select: {
+            user_id: true,
+            username: true,
+            accountId: true,
+            imgLink: true,
+            sentFriendships: {
+                where: { receiverId: currentUser.user_id },
+                select: { status: true },
+            },
+            receivedFriendships: {
+                where: { senderId: currentUser.user_id },
+                select: { status: true },
+            },
+        },
+        orderBy: { accountId: "asc" },
+        take: 20,
+    });
+
+    return users.map((u) => {
+        const friendship = u.sentFriendships[0] || u.receivedFriendships[0];
+
+        return {
+            user_id: u.user_id,
+            username: u.username,
+            accountId: u.accountId,
+            imgLink: u.imgLink,
+            isFriend: friendship?.status === "ACCEPTED",
+            hasPendingRequest: friendship?.status === "PENDING",
+        };
+    });
 }

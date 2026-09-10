@@ -586,6 +586,13 @@
 		"removing": "Suppression...",
 		"removeFriend": "Retirer l'ami",
 		"noPageFound": "Aucune page trouvée",
-		"pages": "Pages de {user} ({number})"
+		"pages": "Pages de {user} ({number})",
+		"title": "Amis",
+		"searchPlaceholder": "Rechercher un ami à ajouter...",
+		"add": "Ajouter",
+		"requestSent": "Demande envoyée",
+		"alreadyFriends": "Déjà ami",
+		"addFailed": "Impossible d'envoyer la demande",
+		"noFriends": "Tu n'as pas encore d'amis."
   	}
 }

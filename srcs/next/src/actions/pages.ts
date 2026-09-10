@@ -702,7 +702,7 @@ export async function getGrantableTagsAndOrgs(pageId: number) {
 
     if (!page || page.ownerId !== user.user_id) 
         throw new PagePermissionError("Forbidden");
-    
+
     const grantableTags = page.tagPages.map(({ tag }) => ({ id: tag.id, name: tag.name, roles: tag.roles }));
     const orgs = await prisma.organization.findMany({ include: { roles: true } });
     const grantableOrgs = orgs.map(({ id, name, roles }) => ({ id, name, roles }));

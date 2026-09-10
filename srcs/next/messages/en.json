@@ -587,8 +587,13 @@
 		"removing" : "Removing...",
 		"removeFriend" : "Remove friend",
 		"noPageFound" : "No page found",
-		"pages" : "Pages of {user} ({number})"
-
-
+		"pages" : "Pages of {user} ({number})",
+		"title": "Friends",
+		"searchPlaceholder": "Search for a friend to add...",
+		"add": "Add",
+		"requestSent": "Request sent",
+		"alreadyFriends": "Already friends",
+		"addFailed": "Failed to send request",
+		"noFriends": "You don't have any friends yet."
 	}
 }
