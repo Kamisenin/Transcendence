@@ -7,6 +7,43 @@ datasource db {
   provider = "postgresql"
 }
 
+enum PermissionLevel {
+  READ
+  WRITE
+  ADMIN
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+  BLOCKED
+}
+
+enum SlugType {
+  USER
+  TAG
+}
+
+enum NotificationType {
+  PAGE_EDITED
+  FRIEND_REQUEST
+  TAG_PAGE_REQUEST
+  ORG_TAG_REQUEST
+  ORG_PAGE_REQUEST
+}
+
+enum PageReactionType {
+  FAVORITE
+  DISLIKE
+}
+
+
 model User {
   user_id                 String               @id @default(uuid())
   accountId               String               @unique @map("account_id")
@@ -211,6 +248,7 @@ model PagePermission {
   canManagePermissions Boolean         @default(false) @map("can_manage_permissions")
   canManageTags        Boolean         @default(false) @map("can_manage_tags")
   canRequestTags       Boolean         @default(false) @map("can_request_tags")
+
   page                 Page            @relation(fields: [pageId], references: [pageId], onDelete: Cascade)
   user                 User            @relation(fields: [userToken], references: [user_id], onDelete: Cascade)
 
@@ -229,18 +267,25 @@ model TagPage {
 }
 
 model Notification {
-  id          Int              @id @default(autoincrement())
-  recipientId String           @map("recipient_id")
-  actorId     String?          @map("actor_id")
-  pageId      Int?             @map("page_id")
-  friendshipId String?         @map("friendship_id")
-  type        NotificationType @default(PAGE_EDITED)
-  read        Boolean          @default(false)
-  createdAt   DateTime         @default(now()) @map("created_at")
-  actor       User?            @relation("NotificationActor", fields: [actorId], references: [user_id])
-  page        Page?            @relation(fields: [pageId], references: [pageId], onDelete: Cascade)
-  friendship  Friendship?      @relation(fields: [friendshipId], references: [id], onDelete: Cascade)
-  recipient   User             @relation("NotificationRecipient", fields: [recipientId], references: [user_id], onDelete: Cascade)
+  id               Int              @id @default(autoincrement())
+  recipientId      String           @map("recipient_id")
+  actorId          String?          @map("actor_id")
+  pageId           Int?             @map("page_id")
+  friendshipId     String?          @map("friendship_id")
+  tagPageRequestId Int?             @map("tag_page_request_id")
+  orgTagRequestId  Int?             @map("org_tag_request_id")
+  orgPageRequestId Int?             @map("org_page_request_id")
+  type             NotificationType @default(PAGE_EDITED)
+  read             Boolean          @default(false)
+  createdAt        DateTime         @default(now()) @map("created_at")
+
+  actor            User?            @relation("NotificationActor", fields: [actorId], references: [user_id])
+  page             Page?            @relation(fields: [pageId], references: [pageId], onDelete: Cascade)
+  friendship       Friendship?      @relation(fields: [friendshipId], references: [id], onDelete: Cascade)
+  tagPageRequest   TagPageRequest?  @relation(fields: [tagPageRequestId], references: [id], onDelete: Cascade)
+  orgTagRequest    OrgTagRequest?   @relation(fields: [orgTagRequestId], references: [id], onDelete: Cascade)
+  orgPageRequest   OrgPageRequest?  @relation(fields: [orgPageRequestId], references: [id], onDelete: Cascade)
+  recipient        User             @relation("NotificationRecipient", fields: [recipientId], references: [user_id], onDelete: Cascade)
 
   @@index([recipientId, read])
   @@map("notifications")
@@ -254,10 +299,13 @@ model TagPageRequest {
   status      RequestStatus @default(PENDING)
   reviewedBy  String?       @map("reviewed_by")
   createdAt   DateTime      @default(now()) @map("created_at")
+
   page        Page          @relation(fields: [pageId], references: [pageId], onDelete: Cascade)
   requester   User          @relation("RequestedBy", fields: [requestedBy], references: [user_id])
   reviewer    User?         @relation("ReviewedBy", fields: [reviewedBy], references: [user_id])
   tag         Tag           @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  notifications Notification[]
 
   @@map("tag_page_requests")
 }
@@ -267,6 +315,7 @@ model TagPageAccess {
   tagId       Int             @map("tag_id")
   minRoleId   Int             @map("min_role_id")
   permissions PermissionLevel
+
   minRole     TagRole         @relation(fields: [minRoleId], references: [id])
   page        Page            @relation(fields: [pageId], references: [pageId], onDelete: Cascade)
   tag         Tag             @relation(fields: [tagId], references: [id], onDelete: Cascade)
@@ -280,6 +329,7 @@ model OrgPageAccess {
   pageId       Int              @map("page_id")
   minRoleId    Int              @map("min_role_id")
   permissions  PermissionLevel
+
   minRole      OrganizationRole @relation(fields: [minRoleId], references: [id])
   organization Organization     @relation(fields: [orgId], references: [id], onDelete: Cascade)
   page         Page             @relation(fields: [pageId], references: [pageId], onDelete: Cascade)
@@ -299,6 +349,7 @@ model OrgTagRequest {
   status      RequestStatus @default(PENDING)
   reviewedBy  String?       @map("reviewed_by")
   createdAt   DateTime      @default(now()) @map("created_at")
+
   organization Organization     @relation(fields: [orgId], references: [id], onDelete: Cascade)
   tag          Tag              @relation(fields: [tagId], references: [id], onDelete: Cascade)
   minRole      OrganizationRole @relation(fields: [minRoleId], references: [id])
@@ -306,25 +357,31 @@ model OrgTagRequest {
   requester    User             @relation("OrgTagRequestedBy", fields: [requestedBy], references: [user_id])
   reviewer     User?            @relation("OrgTagReviewedBy", fields: [reviewedBy], references: [user_id])
 
+  notifications Notification[]
+
   @@map("org_tag_requests")
 }
 
 model OrgPageRequest {
-  id          Int           @id @default(autoincrement())
-  orgId       Int           @map("org_id")
-  pageId      Int           @map("page_id")
-  minRoleId   Int           @map("min_role_id")
+  id          Int             @id @default(autoincrement())
+  orgId       Int             @map("org_id")
+  pageId      Int             @map("page_id")
+  minRoleId   Int             @map("min_role_id")
   permissions PermissionLevel
-  requestedBy String        @map("requested_by")
-  status      RequestStatus @default(PENDING)
-  reviewedBy  String?       @map("reviewed_by")
-  createdAt   DateTime      @default(now()) @map("created_at")
+  requestedBy String          @map("requested_by")
+  status      RequestStatus   @default(PENDING)
+  reviewedBy  String?         @map("reviewed_by")
+  createdAt   DateTime        @default(now()) @map("created_at")
+
+
   organization Organization     @relation(fields: [orgId], references: [id], onDelete: Cascade)
   page         Page             @relation(fields: [pageId], references: [pageId], onDelete: Cascade)
   minRole      OrganizationRole @relation(fields: [minRoleId], references: [id])
   requester    User             @relation("OrgPageRequestedBy", fields: [requestedBy], references: [user_id])
   reviewer     User?            @relation("OrgPageReviewedBy", fields: [reviewedBy], references: [user_id])
 
+  notifications Notification[]
+  
   @@map("org_page_requests")
 }
 
@@ -479,37 +536,4 @@ model PageReaction {
   @@id([userId, pageId])
   @@index([userId, type])
   @@map("page_reactions")
-}
-
-enum PermissionLevel {
-  READ
-  WRITE
-  ADMIN
-}
-
-enum RequestStatus {
-  PENDING
-  APPROVED
-  REJECTED
-}
-
-enum FriendshipStatus {
-  PENDING
-  ACCEPTED
-  BLOCKED
-}
-
-enum SlugType {
-  USER
-  TAG
-}
-
-enum NotificationType {
-  PAGE_EDITED
-  FRIEND_REQUEST
-}
-
-enum PageReactionType {
-  FAVORITE
-  DISLIKE
 }
