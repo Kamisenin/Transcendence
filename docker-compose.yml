@@ -31,7 +31,9 @@ services:
     environment:
       - ADDRESS=${ADDRESS}
     depends_on:
-      - next
+      next:
+        condition: service_started
+        required: false
     extra_hosts:
       - "host.parent:host-gateway"
     networks :
@@ -51,6 +53,8 @@ services:
       - postgres
     networks:
       - 42chan
+    profiles:
+      - prod
 
   search-engine:
     container_name: search
