@@ -198,6 +198,7 @@
 		"roles": "Roles",
 		"pages": "Páginas",
 		"tags": "Etiquetas",
+		"myTags": "Mis etiquetas",
 		"members": "Miembros",
 		"newOrganization": "Nueva organización",
 		"creatingOrganization": "Creando...",
@@ -521,7 +522,7 @@
 	},
 	"Home": {
 		"tagline": "Un wiki para wikis",
-		"title": "encuentra cualquier página del wiki"
+		"title": "Encuentra cualquier página del wiki"
 	},
 	"Footer": {
 		"privacyPolicy": "Política de privacidad",

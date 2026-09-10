@@ -198,6 +198,7 @@
 		"roles": "Roles",
 		"pages": "Pages",
 		"tags": "Tags",
+		"myTags": "My Tags",
 		"members": "Members",
 		"created": "Created {date}",
 		"newOrganization": "New organization",
@@ -522,7 +523,7 @@
 	},
 	"Home": {
 		"tagline": "A wiki for wikis",
-		"title": "find any page in the wiki"
+		"title": "Find any page in the wiki"
 	},
 	"Footer": {
 		"privacyPolicy": "Privacy Policy",
