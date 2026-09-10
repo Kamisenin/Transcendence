@@ -92,7 +92,7 @@ All of the following files must be placed inside the `/secrets/` directory at th
 db_root_pwd.txt        # password of the PostgreSQL root user
 db_website_pwd.txt    # password of the project database user
 gmail_app_pwd.txt     # Gmail application password for automated emails
-gmail_user           # Google account associated with the project
+gmail_user.txt           # Google account associated with the project
 ```
 
 ### Gmail configuration
