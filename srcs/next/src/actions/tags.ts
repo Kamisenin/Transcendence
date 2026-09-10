@@ -82,12 +82,13 @@ export async function getTagPageState(tagId: string, pageId: number) : Promise<T
 
     const pendingRequest = await prisma.tagPageRequest.findFirst({
         where: {
-            id,
+            tagId : id,
             pageId,
             status: 'PENDING'
         }
-    });
+    }); 
 
+    console.log('Pending request:', pendingRequest);
     return {
         id: tag.id,
         name: tag.name,
