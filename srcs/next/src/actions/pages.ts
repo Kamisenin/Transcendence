@@ -695,30 +695,16 @@ export async function removePagePermission(pageId: number, userToken: string) {
 
 export async function getGrantableTagsAndOrgs(pageId: number) {
     const user = await requireUser();
+    const page = await prisma.page.findUnique({
+        where: { pageId },
+        select: { ownerId: true, tagPages: { select: { tag: { select: { id: true, name: true, roles: { orderBy: { hierarchyLevel: 'desc' } } } } } } },
+    });
 
-    const [page, orgs] = await Promise.all([
-        prisma.page.findUnique({
-            where: { pageId },
-            select: { ownerId: true, tagPages: { select: { tag: true } } },
-        }),
-        prisma.organization.findMany({ include: { roles: true } }),
-    ]);
-    if (!page || page.ownerId !== user.user_id) throw new PagePermissionError("Forbidden");
-
-    const tags = page.tagPages.map(({ tag }) => tag);
-
-    const grantableTags = [];
-    for (const tag of tags) {
-        const caps = await getTagCapabilities(tag.id, user.user_id);
-        if (caps.canManagePageGrants) {
-            const roles = await prisma.tagRole.findMany({
-                where: { tagId: tag.id },
-                orderBy: { hierarchyLevel: 'desc' },
-            });
-            grantableTags.push({ id: tag.id, name: tag.name, roles });
-        }
-    }
-
+    if (!page || page.ownerId !== user.user_id) 
+        throw new PagePermissionError("Forbidden");
+    
+    const grantableTags = page.tagPages.map(({ tag }) => ({ id: tag.id, name: tag.name, roles: tag.roles }));
+    const orgs = await prisma.organization.findMany({ include: { roles: true } });
     const grantableOrgs = orgs.map(({ id, name, roles }) => ({ id, name, roles }));
 
     return { grantableTags, grantableOrgs };
